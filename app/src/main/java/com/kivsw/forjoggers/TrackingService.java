@@ -4,16 +4,53 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 
 public class TrackingService extends Service {
-    public final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
+    public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
                         ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP",
                         ACTION_SEND_TRACK ="com.kivsw.forjoggers.ACTION_SEND_TRACK";
 
     LocationListener mGPSLocationListener=null;
     Track track=null;
+    //------------------------------------------------------
 
+    /**
+     * Starts tracking
+     * @param context
+     */
+    public static void start(Context context)
+    {
+        Intent i=new Intent(ACTION_START, null,context, TrackingService.class);
+        //i.setClass(context,TrackingService.class);
+        context.startService(i);
+    }
+
+    /**
+     * Stops tracking and sends the track to Activity
+     * @param context
+     */
+    public static void stop(Context context)
+    {
+        Intent i=new Intent(ACTION_STOP, null,context, TrackingService.class);
+        context.startService(i);
+    }
+
+    public static void sendTrack(Context context)
+    {
+        Intent i=new Intent(ACTION_SEND_TRACK, null,context, TrackingService.class);
+        context.startService(i);
+    }
+    //-------------------------------------------------------
     public TrackingService() {
+        super();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
@@ -51,6 +88,8 @@ public class TrackingService extends Service {
         doStop();
     }
 
+
+
     //-----------------------------------------
     private void doStart()
     {
@@ -65,8 +104,7 @@ public class TrackingService extends Service {
         mGPSLocationListener=null;
 
         if(track!=null)
-
-        track=null;
+          track=null;
     };
 
     private void doSendTrack()
@@ -79,6 +117,7 @@ public class TrackingService extends Service {
         LocationListener(Context context)
         {
             super(context);
+
         };
 
         @Override

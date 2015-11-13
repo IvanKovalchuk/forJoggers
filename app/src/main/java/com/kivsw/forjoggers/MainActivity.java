@@ -1,7 +1,5 @@
 package com.kivsw.forjoggers;
 
-import android.content.Context;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -11,8 +9,6 @@ import android.view.MenuItem;
 public class MainActivity extends ActionBarActivity {
 
     MapFragment mapFragment;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
