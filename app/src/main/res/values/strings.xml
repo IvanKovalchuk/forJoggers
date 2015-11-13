@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ForJoggers</string>
+
+    <string name="gps_unreachable">GPS is unreachable</string>
+    <string name="gps_disable">GPS is disable</string>
+    <string name="action_settings">Settings</string>
+
+
+</resources>

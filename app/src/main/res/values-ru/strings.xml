@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ForJoggers</string>
+    <string name="gps_disable">GPS отключен</string>
+    <string name="gps_unreachable">GPS недоступен</string>
+    <string name="action_settings">Настройки</string>
+</resources>
