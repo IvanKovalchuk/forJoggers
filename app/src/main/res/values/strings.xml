@@ -4,6 +4,8 @@
     <string name="gps_unreachable">GPS is unreachable</string>
     <string name="gps_disable">GPS is disable</string>
     <string name="action_settings">Settings</string>
+    <string name="Start">Start</string>
+    <string name="Stop">Stop</string>
 
 
 </resources>

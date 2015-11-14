@@ -10,7 +10,9 @@ import android.support.annotation.Nullable;
 public class TrackingService extends Service {
     public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
                         ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP",
-                        ACTION_SEND_TRACK ="com.kivsw.forjoggers.ACTION_SEND_TRACK";
+                        ACTION_GET_TRACK ="com.kivsw.forjoggers.ACTION_GET_TRACK";
+
+    public static boolean isWorking=false;
 
     LocationListener mGPSLocationListener=null;
     Track track=null;
@@ -39,7 +41,7 @@ public class TrackingService extends Service {
 
     public static void sendTrack(Context context)
     {
-        Intent i=new Intent(ACTION_SEND_TRACK, null,context, TrackingService.class);
+        Intent i=new Intent(ACTION_GET_TRACK, null,context, TrackingService.class);
         context.startService(i);
     }
     //-------------------------------------------------------
@@ -71,7 +73,7 @@ public class TrackingService extends Service {
                 break;
             case ACTION_STOP:  doStop();
                 break;
-            case ACTION_SEND_TRACK: doSendTrack();
+            case ACTION_GET_TRACK: doGetTrack();
                 break;
 
 
@@ -95,10 +97,15 @@ public class TrackingService extends Service {
     {
         track=new Track();
         mGPSLocationListener = new LocationListener(this);
+        isWorking=true;
     };
 
     private void doStop()
     {
+        isWorking=false;
+
+        doGetTrack();
+
         if(mGPSLocationListener!=null)
             mGPSLocationListener.releaseInstance();
         mGPSLocationListener=null;
@@ -107,9 +114,11 @@ public class TrackingService extends Service {
           track=null;
     };
 
-    private void doSendTrack()
+    private void doGetTrack()
     {
-
+        if(track==null) return;
+        SettingsKeeper.getInstance(this).setCurrentTrack(track.toJSON());
+        MainActivity.receiveNewTrack(this);
     };
 
     class LocationListener extends GPSLocationListener
@@ -123,8 +132,10 @@ public class TrackingService extends Service {
         @Override
         public void onLocationChanged(Location loc)
         {
-            if(track!=null)
+            if(track!=null) {
                 track.mGeoPoints.add(loc);
+                doGetTrack();
+            }
         }
 
     }

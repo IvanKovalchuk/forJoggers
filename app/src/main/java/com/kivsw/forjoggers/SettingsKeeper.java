@@ -37,4 +37,15 @@ public class SettingsKeeper {
         e.commit();
     }
     //-----------------------------------------------------
+    public  String getCurrentTrack()
+    {
+        return sharedPreferences.getString("currentTrack","");
+    };
+    public void setCurrentTrack(String t)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putString("currentTrack",t);
+        e.commit();
+    }
+    //-----------------------------------------------------
 }

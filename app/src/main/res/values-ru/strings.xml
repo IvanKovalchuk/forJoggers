@@ -4,4 +4,6 @@
     <string name="gps_disable">GPS отключен</string>
     <string name="gps_unreachable">GPS недоступен</string>
     <string name="action_settings">Настройки</string>
+    <string name="Start">Старт</string>
+    <string name="Stop">Стоп</string>
 </resources>

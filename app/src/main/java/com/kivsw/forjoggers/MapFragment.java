@@ -2,6 +2,8 @@ package com.kivsw.forjoggers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,8 +13,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.graphics.Matrix;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.api.Marker;
 import org.osmdroid.api.Polyline;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
@@ -21,9 +25,15 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.DirectedLocationOverlay;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.util.ArrayList;
 
 
 public class MapFragment extends Fragment {
@@ -39,8 +49,11 @@ public class MapFragment extends Fragment {
     MyLocationNewOverlay myLocationoverlay;
     MyHandler mHandler;
 
+    ArrayList<Overlay> markers=null;
+
     public MapFragment() {
         super();
+
 
     }
 
@@ -48,7 +61,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        markers=new ArrayList<Overlay>();
         settings = SettingsKeeper.getInstance(getActivity());
 
         mGPSLocationListener = new MyGPSLocationListener(getActivity());
@@ -142,6 +155,37 @@ public class MapFragment extends Fragment {
 
     };
 
+    /**
+     *
+     */
+    void setTrack(String json)
+    {
+        OverlayManager om=mapView.getOverlayManager();
+        om.removeAll(markers);
+        markers.clear();
+
+        Track track=new Track();
+        track.fromJSON(json);
+
+
+        for(Location l:track.mGeoPoints) {
+            DirectedLocationOverlay m=new DirectedLocationOverlay(getActivity());
+            m.setLocation(new GeoPoint(l));
+            if(l.hasBearing())
+               m.setBearing(l.getBearing());
+            m.setAccuracy((int)l.getAccuracy());
+            markers.add(m);
+        }
+        om.addAll(markers);
+
+
+    }
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

@@ -44,14 +44,17 @@ public class Track {
         StringBuffer builder=new StringBuffer();
         final String separator=",\n";
         builder.append('[');
-        for (Location loc:mGeoPoints)
-        try{
-            builder.append(locationToJSON(loc)) ;
-            builder.append(separator);
-        }catch(org.json.JSONException e)
-        {e.toString();}
-
-        builder.setLength(builder.length() - separator.length());
+        if(mGeoPoints.size()>0) {
+            for (Location loc : mGeoPoints)
+                try {
+                    builder.append(locationToJSON(loc));
+                    builder.append(separator);
+                } catch (org.json.JSONException e) {
+                    e.toString();
+                }
+            if(builder.length()>separator.length())
+                  builder.setLength(builder.length() - separator.length());
+        }
         builder.append(']');
 
         return builder.toString();
