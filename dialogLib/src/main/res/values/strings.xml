@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="open_file">Open a file</string>
+    <string name="save_file">Save a file</string>
+    <string name="choose_directory">Choose a directory</string>
+    <string name="file_exists">The file already exsists. May it be rewrited?</string>
+    <string name="file">File:</string>
+    <string name="path">Path:</string>
+    <string name="file_doesnt_exist">File doesn\'t exist</string>
+    <string name="OK">OK</string>
+    <string name="Cancel">Cancel</string>
+    <string name="I_dont_know">I don\'t know</string>
+    <string name="enter_file_name">Enter a filename</string>
+    <string name="Confirmation">Confirmation</string>
+    <string name="Warning">"Warning"</string>
+    <string name="Error">"Error"</string>
+    <string name="Information">"Information"</string>
+    <string name="Wait">"Wait for a while..."</string>
+    <string name="Access_is_impossible">"Access is impossible"</string>
+    <string name="create_dir">"Create directory"</string>
+    <string name="create_file">"Create file"</string>
+    <string name="delete">"Delete"</string>
+    <string name="rename">"Rename"</string>
+    <string name="enter_dir_name">"Enter a directory name"</string>
+    <string name="cant_create_dir">"Can\'t create directory&#160;"</string>
+    <string name="cant_create_file">"Can\'t create file&#160;"</string>
+    <string name="cant_delete_file">"Can\'t delete file or directory&#160;"</string>
+    <string name="cant_rename_file">"Can\'t rename file or directory&#160;"</string>
+    <string name="doYouWantToDeleteFile">Do you want to delete file or directory %s?</string>
+
+</resources>

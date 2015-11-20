@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="open_file">Открыть файл</string>
+    <string name="save_file">Сохранить файл</string>
+    <string name="choose_directory">Выбор каталога</string>
+    <string name="file_exists">Файл уже сужествует. Переписать его?</string>
+    <string name="file">Файл:</string>
+    <string name="path">Путь:</string>
+    <string name="file_doesnt_exist">Файл не существует</string>
+    <string name="OK">OK</string>
+    <string name="Cancel">Отмена</string>
+    <string name="I_dont_know">Не знаю</string>
+    <string name="enter_file_name">Ввидите имя файла</string>
+    <string name="Confirmation">Подтверждение</string>
+    <string name="Warning">"Предупреждение"</string>
+    <string name="Error">"Ошибка"</string>
+    <string name="Information">"Сообщение"</string>
+    <string name="Wait">"Подождите немного..."</string>
+    <string name="Access_is_impossible">"Доступ невозможен"</string>
+    <string name="create_dir">"Создать каталог"</string>
+    <string name="create_file">"Создать файл"</string>
+    <string name="delete">"Удалить"</string>
+    <string name="rename">"Переименовать"</string>
+    <string name="enter_dir_name">"Введите имя каталога"</string>
+    <string name="cant_create_dir">"Не могу создать каталог&#160; "</string>
+    <string name="cant_create_file">"Не могу создать файл&#160; "</string>
+    <string name="cant_delete_file">"Не могу удалить файл или каталог&#160;"</string>
+    <string name="cant_rename_file">"Не могу переименовать файл или каталог&#160;"</string>
+    <string name="doYouWantToDeleteFile">Вы хотите удалить файл или каталог %s?</string>
+</resources>
