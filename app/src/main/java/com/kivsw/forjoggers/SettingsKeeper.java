@@ -28,7 +28,7 @@ public class SettingsKeeper {
     //-----------------------------------------------------
     public  int getZoomLevel()
     {
-        return sharedPreferences.getInt("zoom",1);
+        return sharedPreferences.getInt("zoom",2);
     };
     public void setZoomLevel(int zoom)
     {
@@ -39,13 +39,35 @@ public class SettingsKeeper {
     //-----------------------------------------------------
     public  String getCurrentTrack()
     {
-        return sharedPreferences.getString("currentTrack","");
+        return sharedPreferences.getString("currentTrack", "");
     };
     public void setCurrentTrack(String t)
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
-        e.putString("currentTrack",t);
+        e.putString("currentTrack", t);
         e.commit();
     }
     //-----------------------------------------------------
+    //-----------------------------------------------------
+    public  boolean getReturnToMyLocation()
+    {
+        return sharedPreferences.getBoolean("ReturnToMyLocation", true);
+    };
+    public void setReturnToMyLocation(boolean v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putBoolean("ReturnToMyLocation", v);
+        e.commit();
+    }
+    //-----------------------------------------------------
+    public  String getLastPath()
+    {
+        return sharedPreferences.getString("LastPath", null);
+    };
+    public void setLastPath(String t)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putString("LastPath", t);
+        e.commit();
+    }
 }

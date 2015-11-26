@@ -1,21 +1,24 @@
 package com.kivsw.forjoggers;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 
 public class TrackingService extends Service {
     public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
-                        ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP",
-                        ACTION_GET_TRACK ="com.kivsw.forjoggers.ACTION_GET_TRACK";
+                        ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP";
 
     public static boolean isWorking=false;
 
     LocationListener mGPSLocationListener=null;
-    Track track=null;
+    CurrentTrack currentTrack=null;
     //------------------------------------------------------
 
     /**
@@ -39,11 +42,7 @@ public class TrackingService extends Service {
         context.startService(i);
     }
 
-    public static void sendTrack(Context context)
-    {
-        Intent i=new Intent(ACTION_GET_TRACK, null,context, TrackingService.class);
-        context.startService(i);
-    }
+
     //-------------------------------------------------------
     public TrackingService() {
         super();
@@ -73,9 +72,6 @@ public class TrackingService extends Service {
                 break;
             case ACTION_STOP:  doStop();
                 break;
-            case ACTION_GET_TRACK: doGetTrack();
-                break;
-
 
         };
 
@@ -95,46 +91,71 @@ public class TrackingService extends Service {
     //-----------------------------------------
     private void doStart()
     {
-        track=new Track();
+        currentTrack=CurrentTrack.getInstance(this);
+
+        currentTrack.clear();
+        currentTrack.timeStart=SystemClock.elapsedRealtime();
         mGPSLocationListener = new LocationListener(this);
+        Location loc = mGPSLocationListener.getLastknownLocation();
+
         isWorking=true;
+        turnIntoForeground();
     };
 
     private void doStop()
     {
         isWorking=false;
-
-        doGetTrack();
-
+        if(currentTrack!=null)
+            currentTrack.timeStop= SystemClock.elapsedRealtime();
         if(mGPSLocationListener!=null)
             mGPSLocationListener.releaseInstance();
         mGPSLocationListener=null;
 
-        if(track!=null)
-          track=null;
+        if(currentTrack!=null)
+           CurrentTrack.saveTrack();
+        currentTrack=null;
     };
 
-    private void doGetTrack()
+
+    /**
+     * sets the foreground mode for this service
+     */
+    void turnIntoForeground()
     {
-        if(track==null) return;
-        SettingsKeeper.getInstance(this).setCurrentTrack(track.toJSON());
-        MainActivity.receiveNewTrack(this);
-    };
+        final int id=1;
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+        mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+        mBuilder.setContentTitle(this.getText(R.string.app_name));
+        //mBuilder.setContentText(this.getText(R.string.app_name));
 
+
+        Intent intent=new Intent(Intent.ACTION_MAIN);
+        intent.setClass(this, MainActivity.class);
+        //intent.setClassName(this, settings.getActivityName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        mBuilder.setContentIntent(PendingIntent.getActivity(this, -1, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+
+		/*NotificationManager mNotificationManager =
+			    (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+		// notificationId allows you to update the notification later on.
+		mNotificationManager.notify(id, mBuilder.build());*/
+        startForeground(id, mBuilder.build());
+    }
     class LocationListener extends GPSLocationListener
     {
         LocationListener(Context context)
         {
-            super(context);
+            super(context,false);
 
         };
 
         @Override
         public void onLocationChanged(Location loc)
         {
-            if(track!=null) {
-                track.mGeoPoints.add(loc);
-                doGetTrack();
+            if(currentTrack!=null) {
+                currentTrack.mGeoPoints.add(loc);
             }
         }
 

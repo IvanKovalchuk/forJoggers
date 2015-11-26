@@ -6,6 +6,11 @@
     <string name="action_settings">Settings</string>
     <string name="Start">Start</string>
     <string name="Stop">Stop</string>
-
-
+    <string name="action_load_track">Load a track</string>
+    <string name="action_save_track">Save current track</string>
+    <string name="cannot_save_file">Can not save file %s</string>
+    <string name="cannot_load_file">Can not load file %s</string>
+    <string name="return_to_mylocation">return to my location</string>
+    <string name="time">time:</string>
+    <string name="distance">distance:</string>
 </resources>

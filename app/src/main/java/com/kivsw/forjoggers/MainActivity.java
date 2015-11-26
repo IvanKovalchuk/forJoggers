@@ -3,15 +3,21 @@ package com.kivsw.forjoggers;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.kivSW.dialog.FileDialog;
+import com.kivSW.dialog.MessageDialog;
+
+import java.io.File;
+
 
 public class MainActivity extends ActionBarActivity
-implements  View.OnClickListener
+implements  View.OnClickListener, FileDialog.OnCloseListener
 {
 
     final static String ACTION_RECEIVE_TRACK="com.kivsw.forjoggers.ACTION_RECIEVE_TRACK";
@@ -70,17 +76,40 @@ implements  View.OnClickListener
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
+     @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+     {
+         MenuItem item=menu.findItem(R.id.return_to_mylocation);
+         item.setChecked(settings.getReturnToMyLocation());
+         return super.onPrepareOptionsMenu(menu);
+     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        FileDialog fd=null;
+        String dir=settings.getLastPath();
+        if(dir==null)
+            dir=Environment.getExternalStorageDirectory().getAbsolutePath();
+
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_save_track:
+                fd=FileDialog.newInstance(1,FileDialog.TypeDialog.SAVE , dir, "*", this);
+                fd.show(getSupportFragmentManager(), "");
+                return true;
+            case R.id.action_load_track:
+                fd=FileDialog.newInstance(2,FileDialog.TypeDialog.OPEN , dir, "*", this);
+                fd.show(getSupportFragmentManager(),"");
+                return true;
+            case R.id.return_to_mylocation:
+                settings.setReturnToMyLocation(!item.isChecked());
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -94,7 +123,7 @@ implements  View.OnClickListener
         switch(i.getAction())
         {
             case ACTION_RECEIVE_TRACK:
-                mapFragment.setTrack(settings.getCurrentTrack());
+                mapFragment.setTrack(CurrentTrack.getInstance(this));
                 break;
         }
     };
@@ -117,6 +146,7 @@ implements  View.OnClickListener
         {
             case R.id.buttonStart:
                 TrackingService.start(this);
+                mapFragment.onStartTrackingService();
                 buttonStart.setVisibility(View.GONE);
                 buttonStop.setVisibility(View.VISIBLE);
                 break;
@@ -127,4 +157,40 @@ implements  View.OnClickListener
                 break;
         }
     }
+
+    @Override
+    public void onClickOk(FileDialog dlg, String fileName) {
+
+        File f=new File(fileName);
+        if(f.exists())
+          settings.setLastPath(f.getParent());
+
+        switch(dlg.getDlgId())
+        {
+            case 1:
+                if(!mapFragment.saveTrackToFile(fileName))
+                {
+                    String msg=String.format(getText(R.string.cannot_save_file).toString(),fileName);
+                    MessageDialog.newInstance(getText(R.string.Error).toString(),msg)
+                            .show(getSupportFragmentManager(),"");
+                }
+                break;
+            case 2:
+                if(!mapFragment.loadTrackFromFile(fileName))
+                {
+                    String msg=String.format(getText(R.string.cannot_load_file).toString(),fileName);
+                    MessageDialog.newInstance(getText(R.string.Error).toString(),msg)
+                            .show(getSupportFragmentManager(),"");
+                };
+                break;
+        }
+    }
+
+    @Override
+    public void onClickCancel(FileDialog dlg) {
+
+    }
+
+    //--------------------------------------------------------------------------
+
 }

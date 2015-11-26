@@ -17,20 +17,21 @@ public class GPSLocationListener implements android.location.LocationListener{
     LocationManager locationManager=null;
     GpsStatus mGpsStatus=null;
 
-    private static boolean useNetWorkProvider=BuildConfig.DEBUG;
+    private boolean useNetWorkProvider=false;//BuildConfig.DEBUG;
     boolean isGPS;
 
     Location emulateLocation=null;
 
 
-    GPSLocationListener(Context context)
+    GPSLocationListener(Context context, boolean useNetWorkProvider )
     {
         super();
+        this.useNetWorkProvider=useNetWorkProvider;
         registerInstance(context, this );
     }
     //-------------------------------------------------
 
-    private static synchronized  GPSLocationListener registerInstance(Context context, GPSLocationListener listener )
+    private synchronized  GPSLocationListener registerInstance(Context context, GPSLocationListener listener )
     {
            LocationManager locationManager = (LocationManager)
                     context.getSystemService(Context.LOCATION_SERVICE);
@@ -41,7 +42,7 @@ public class GPSLocationListener implements android.location.LocationListener{
             try {
                 if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                     locationManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER, 1000, 10f, listener);
+                            LocationManager.GPS_PROVIDER, 1000, 2f, listener);
             }catch(Exception e)
             {
                 e.getMessage();
@@ -51,7 +52,7 @@ public class GPSLocationListener implements android.location.LocationListener{
             try {
                 if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
                     locationManager.requestLocationUpdates(
-                            LocationManager.NETWORK_PROVIDER, 1000, 10f, listener);
+                            LocationManager.NETWORK_PROVIDER, 1000, 2f, listener);
             }catch(Exception e)
             {
                 e.getMessage();
@@ -122,7 +123,10 @@ public class GPSLocationListener implements android.location.LocationListener{
     //----------------------------------------
     public Location getLastknownLocation()
     {
+        if(locationManager==null) return null;
         Location loc=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(loc==null && useNetWorkProvider)
+            loc=locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
         return loc;
     }

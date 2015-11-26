@@ -6,4 +6,18 @@
           android:title="@string/action_settings"
           android:orderInCategory="100"
           app:showAsAction="never"/>
+      <item android:id="@+id/action_save_track"
+            android:title="@string/action_save_track"
+            android:orderInCategory="100"
+            app:showAsAction="never"/>
+      <item android:id="@+id/action_load_track"
+            android:title="@string/action_load_track"
+            android:orderInCategory="100"
+            app:showAsAction="never"/>
+
+    <item android:id="@+id/return_to_mylocation"
+          android:title="@string/return_to_mylocation"
+          android:orderInCategory="100"
+          android:checkable="true"
+          app:showAsAction="never"/>
 </menu>

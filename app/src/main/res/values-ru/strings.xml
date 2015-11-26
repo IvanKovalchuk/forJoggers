@@ -6,4 +6,11 @@
     <string name="action_settings">Настройки</string>
     <string name="Start">Старт</string>
     <string name="Stop">Стоп</string>
+    <string name="action_load_track">Загрузить трек</string>
+    <string name="action_save_track">Сохранить трек</string>
+    <string name="cannot_save_file">Не удается сохранить файл %s</string>
+    <string name="cannot_load_file">Не удается загрузить файл %s</string>
+    <string name="return_to_mylocation">возвращать в мое положение</string>
+    <string name="time">время:</string>
+    <string name="distance">дистанция:</string>
 </resources>
