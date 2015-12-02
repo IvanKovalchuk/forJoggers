@@ -143,11 +143,12 @@ public class TrackingService extends Service {
 		mNotificationManager.notify(id, mBuilder.build());*/
         startForeground(id, mBuilder.build());
     }
+    //------------------------------------------------------
     class LocationListener extends GPSLocationListener
     {
         LocationListener(Context context)
         {
-            super(context,false);
+            super(context,!false);
 
         };
 

@@ -13,4 +13,12 @@
     <string name="return_to_mylocation">возвращать в мое положение</string>
     <string name="time">время:</string>
     <string name="distance">дистанция:</string>
+
+    <string-array name="graphs">
+        <item>широта</item>
+        <item>долгота</item>
+        <item>скорость</item>
+        <item>точность</item>
+    </string-array>
+
 </resources>

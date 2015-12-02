@@ -39,7 +39,8 @@ public class MapFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private MapView mapView;
+    private MapView mapView=null;
+
     private TextView textTrackInfo;
     Polyline polyline=null;
 
@@ -65,7 +66,7 @@ public class MapFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         settings = SettingsKeeper.getInstance(getActivity());
-        currentTrack = new Track();
+        currentTrack = CurrentTrack.getInstance(getActivity());
 
         mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler=new MyHandler();
@@ -255,6 +256,7 @@ public class MapFragment extends Fragment {
         for(Location l:currentTrack.mGeoPoints) {
             points.add(new GeoPoint(l));
         }
+
         polyline.setPoints(points);
         om.add(polyline);
 
@@ -265,7 +267,7 @@ public class MapFragment extends Fragment {
     {
         boolean r=currentTrack.loadGeoPoint(fileName);
         setTrack(currentTrack);
-        mHandler.startPointAnimation();
+        //mHandler.startPointAnimation();
         return r;
     }
 

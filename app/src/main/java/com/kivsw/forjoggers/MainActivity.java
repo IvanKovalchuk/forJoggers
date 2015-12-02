@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +25,10 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
 {
 
     final static String ACTION_RECEIVE_TRACK="com.kivsw.forjoggers.ACTION_RECIEVE_TRACK";
-    MapFragment mapFragment;
+
+    private ViewPager pager;
+    private MapFragment mapFragment=null;
+    private AnalysingFragment analysingFragment=null;
     SettingsKeeper settings;
 
     Button buttonStart, buttonStop;
@@ -32,7 +39,18 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mapFragment = (MapFragment)getSupportFragmentManager().findFragmentById(R.id.mapFragment);
+        pager =(ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+
+        /*pager.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });*/
+
+        //mapFragment = (MapFragment)getSupportFragmentManager().findFragmentById(R.id.mapFragment);
 
         buttonStart = (Button)findViewById(R.id.buttonStart);
         buttonStart.setOnClickListener(this);
@@ -52,7 +70,7 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
 
         settings=SettingsKeeper.getInstance(this);
 
-        mapFragment.setTrack(settings.getCurrentTrack());
+        //mapFragment.setTrack(settings.getCurrentTrack());
 
         processIntent(getIntent());
     }
@@ -192,5 +210,38 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
     }
 
     //--------------------------------------------------------------------------
+
+    public class MyPagerAdapter extends FragmentPagerAdapter {
+        public MyPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            //return ArrayListFragment.newInstance(position);
+            Fragment res=null;
+            switch(position)
+            {
+                case 0:
+                    if(mapFragment==null)
+                       mapFragment=new MapFragment();
+                    res = mapFragment;
+                    break;
+                case 1:
+                    if(analysingFragment==null)
+                        analysingFragment=new AnalysingFragment();
+
+                    res = analysingFragment;
+                    break;
+            }
+            return res;
+        }
+    }
+
 
 }
