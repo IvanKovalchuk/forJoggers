@@ -15,10 +15,12 @@ public class TrackingService extends Service {
     public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
                         ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP";
 
+    //------------------------------------------------
     public static boolean isWorking=false;
 
     LocationListener mGPSLocationListener=null;
     CurrentTrack currentTrack=null;
+
     //------------------------------------------------------
 
     /**
@@ -156,7 +158,7 @@ public class TrackingService extends Service {
         public void onLocationChanged(Location loc)
         {
             if(currentTrack!=null) {
-                currentTrack.mGeoPoints.add(loc);
+                currentTrack.addPoint(loc);
             }
         }
 

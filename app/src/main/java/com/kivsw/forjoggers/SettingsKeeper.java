@@ -48,6 +48,17 @@ public class SettingsKeeper {
         e.commit();
     }
     //-----------------------------------------------------
+  /*  public  String getCurrentFileName()
+    {
+        return sharedPreferences.getString("FileName", null);
+    };
+    public void setCurrentFileName(String fn)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putString("FileName", fn);
+        e.commit();
+    }*/
+    //-----------------------------------------------------
     //-----------------------------------------------------
     public  boolean getReturnToMyLocation()
     {

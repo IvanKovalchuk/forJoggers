@@ -8,6 +8,7 @@ import android.content.Context;
 public class CurrentTrack extends Track {
     static private CurrentTrack track=null;
     SettingsKeeper settings=null;
+    String fileName;
 
     static synchronized  public CurrentTrack getInstance(Context context)
     {
@@ -27,5 +28,47 @@ public class CurrentTrack extends Track {
     }
 
     private CurrentTrack()
-    {super();}
+    {
+        super();
+        fileName="";
+    }
+
+    @Override
+    public void clear()
+    {
+        super.clear();
+        fileName="";
+    }
+
+    //----------------------------------------------------
+    /**  save points in a file
+     * @param fileName file name
+     * @return true if the saving was successful
+     */
+    public boolean saveGeoPoint(String fileName)
+    {
+        if(super.saveGeoPoint(fileName)) {
+            this.fileName = fileName;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * load points from file
+     * @param fileName file name
+     * @return true if the loading was successful
+     */
+    public boolean loadGeoPoint(String fileName) {
+        if( super.loadGeoPoint(fileName)) {
+            this.fileName = fileName;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean needToBeSaved()
+    {
+        return (fileName==null || fileName.isEmpty()) && (mGeoPoints.size()>0);
+    }
 }

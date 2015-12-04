@@ -1,6 +1,7 @@
 package com.kivsw.forjoggers;
 
 
+import android.app.Activity;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,7 +30,7 @@ public class AnalysingFragment extends Fragment
 
 
     public AnalysingFragment() {
-        // Required empty public constructor
+        super();
     }
 
 
@@ -79,16 +80,28 @@ public class AnalysingFragment extends Fragment
 
     }
     //--------------------------------------------------------------------------
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            ((MainActivity)getActivity()).analysingFragment=this;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+    //--------------------------------------------------------------------------
 
     void showGraph(int num)
     {
         CurrentTrack curentTrack=CurrentTrack.getInstance(getActivity());
 
-        if(curentTrack.mGeoPoints.size()>0) {
-            DataPoint data[]=new DataPoint[curentTrack.mGeoPoints.size()];
-            long t0 = curentTrack.mGeoPoints.get(0).getTime();
+        if(curentTrack.getGeoPoints().size()>0) {
+            DataPoint data[]=new DataPoint[curentTrack.getGeoPoints().size()];
+            long t0 = curentTrack.getGeoPoints().get(0).getTime();
             int i=0;
-            for(Location loc:curentTrack.mGeoPoints)
+            for(Location loc:curentTrack.getGeoPoints())
             {
                 double y=0;
                 switch(num)

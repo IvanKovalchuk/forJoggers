@@ -21,14 +21,14 @@ import java.io.File;
 
 
 public class MainActivity extends ActionBarActivity
-implements  View.OnClickListener, FileDialog.OnCloseListener
+implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCloseListener
 {
 
     final static String ACTION_RECEIVE_TRACK="com.kivsw.forjoggers.ACTION_RECIEVE_TRACK";
 
     private ViewPager pager;
-    private MapFragment mapFragment=null;
-    private AnalysingFragment analysingFragment=null;
+    MapFragment mapFragment=null;
+    AnalysingFragment analysingFragment=null;
     SettingsKeeper settings;
 
     Button buttonStart, buttonStop;
@@ -41,6 +41,7 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
 
         pager =(ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+       // mapFragment = pager.insta
 
         /*pager.setOnTouchListener(new View.OnTouchListener() {
 
@@ -136,14 +137,6 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
     private void processIntent(Intent i)
     {
 
-        if(i==null) return;
-
-        switch(i.getAction())
-        {
-            case ACTION_RECEIVE_TRACK:
-                mapFragment.setTrack(CurrentTrack.getInstance(this));
-                break;
-        }
     };
     static public void receiveNewTrack(Context context)
     {
@@ -163,19 +156,44 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
         switch(v.getId())
         {
             case R.id.buttonStart:
-                TrackingService.start(this);
-                mapFragment.onStartTrackingService();
-                buttonStart.setVisibility(View.GONE);
-                buttonStop.setVisibility(View.VISIBLE);
+                if(CurrentTrack.getInstance(this).needToBeSaved())
+                    MessageDialog.newInstance(R.string.track_may_be_lost,
+                                  getText(R.string.Warning).toString(),
+                                  getText(R.string.track_may_be_lost).toString(),
+                                  this)
+                    .show(getSupportFragmentManager(),"");
+                else
+                    startTrackService();
                 break;
             case R.id.buttonStop:
-                TrackingService.stop(this);
-                buttonStop.setVisibility(View.GONE);
-                buttonStart.setVisibility(View.VISIBLE);
+                stopTrackService();
                 break;
         }
     }
 
+    /**
+     * start tracking
+     */
+    private void startTrackService()
+    {
+        TrackingService.start(this);
+        mapFragment.onStartTrackingService();
+        buttonStart.setVisibility(View.GONE);
+        buttonStop.setVisibility(View.VISIBLE);
+    };
+
+    /**
+     * stops tracking
+     */
+    private void stopTrackService()
+    {
+        TrackingService.stop(this);
+        buttonStop.setVisibility(View.GONE);
+        buttonStart.setVisibility(View.VISIBLE);
+    };
+
+    //-------------------------------
+    // FileDialog.OnCloseListener
     @Override
     public void onClickOk(FileDialog dlg, String fileName) {
 
@@ -208,12 +226,30 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
     public void onClickCancel(FileDialog dlg) {
 
     }
+    //-------------------------------
+    //  MessageDialog.OnCloseListener
+    @Override
+    public void onClickOk(MessageDialog msg) {
+        switch (msg.getDlgId())
+        {
+            case R.string.track_may_be_lost:
+                startTrackService();
+                break;
+        }
+    }
+
+    @Override
+    public void onClickCancel(MessageDialog msg) { }
+
+    @Override
+    public void onClickExtra(MessageDialog msg) { }
 
     //--------------------------------------------------------------------------
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
+
         }
 
         @Override
@@ -228,15 +264,10 @@ implements  View.OnClickListener, FileDialog.OnCloseListener
             switch(position)
             {
                 case 0:
-                    if(mapFragment==null)
-                       mapFragment=new MapFragment();
-                    res = mapFragment;
+                      res=new MapFragment();
                     break;
                 case 1:
-                    if(analysingFragment==null)
-                        analysingFragment=new AnalysingFragment();
-
-                    res = analysingFragment;
+                      res=new AnalysingFragment();
                     break;
             }
             return res;

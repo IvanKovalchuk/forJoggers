@@ -1,8 +1,34 @@
 package com.kivsw.forjoggers;
 
 /**
- * Created by ivan on 02.12.15.
+ * Created by ivan on 03.12.15.
  */
-public class TrackSmoother {
+public abstract class TrackSmoother extends Track
+        implements Track.IOnChange {
+    protected Track track;
+
+    TrackSmoother(Track track)
+    {
+        super();
+        mGeoPoints=null;
+        this.track=track;
+        track.setOnChange(this);
+    };
+
+    public void release()
+    {
+        track.setOnChange(null);
+        this.track=null;
+    }
+
+    public long getTrackTime()
+    {return track.getTrackTime();};
+
+
+    @Override
+    abstract public void onAddPoint();
+
+    @Override
+    abstract public void onClear();
 
 }

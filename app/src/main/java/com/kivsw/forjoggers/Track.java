@@ -17,17 +17,25 @@ import java.util.SimpleTimeZone;
  *   This class hold a track as a set of geo points
  */
 public class Track {
-    public ArrayList<Location> mGeoPoints=null;
+    //-----------------------------------------------------
+    interface IOnChange
+    {
+        void onAddPoint();
+        void onClear();
 
+    }
+    //-----------------------------------------------------
+    protected ArrayList<Location> mGeoPoints=null;
     public long timeStart=0, timeStop=0;
-    //----------------------------------------------------
+    IOnChange onChange=null;
+    //-----------------------------------------------------
     public Track()
     {
         mGeoPoints=new ArrayList<Location>();
     };
 
 
-    //----------------------------------------------------
+    //-----------------------------------------------------
     /**  save points in a file
      * @param fileName file name
      * @return true if the saving was successful
@@ -109,7 +117,8 @@ public class Track {
     {
         int start=0, end=0, i=0;
 
-        mGeoPoints.clear();
+        //mGeoPoints.clear();
+        clear();
         while(-1!=(start = str.indexOf('{',end)))
         {
             end= str.indexOf('}',start+1);
@@ -123,7 +132,8 @@ public class Track {
 
                 if(isLocation) {
                     Location loc = JSONtoLocation(str.substring(start, end));
-                    mGeoPoints.add(loc);
+                    addPoint(loc);
+
                 }
             }catch(org.json.JSONException e)
             {
@@ -242,6 +252,8 @@ public class Track {
     {
         Location prevLoc=null;
         double dist=0;
+        if(mGeoPoints==null) return 0;
+
          for(Location loc:mGeoPoints)
          {
              if(prevLoc!=null) {
@@ -256,6 +268,8 @@ public class Track {
     }
 
     final static double earthRadius = 6371000; // the average earth radius
+    public static double distance (Location a,Location b)
+    {return distance(a.getLatitude(),a.getLongitude(),b.getLatitude(),b.getLongitude());}
     public static double distance (double Lat1,double Lng1,double Lat2,double Lng2)
     {
         double latRadius = earthRadius*Math.cos(Math.toRadians(Lat1));
@@ -278,5 +292,28 @@ public class Track {
     {
         mGeoPoints.clear();
         timeStart=0; timeStop=0;
+        if(onChange!=null)
+            onChange.onClear();
     }
+    public void addPoint(Location loc)
+    {
+        mGeoPoints.add(loc);
+        if(onChange!=null) onChange.onAddPoint();
+    }
+
+    public void setOnChange(IOnChange onChange)
+    {
+        this.onChange = onChange;
+    }
+    public IOnChange getOnChange()
+    {
+        return this.onChange;
+    }
+
+    ArrayList<Location> getGeoPoints()
+    {
+        return mGeoPoints;
+    }
+
+
 }

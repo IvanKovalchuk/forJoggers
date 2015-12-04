@@ -25,7 +25,6 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -42,11 +41,12 @@ public class MapFragment extends Fragment {
     private MapView mapView=null;
 
     private TextView textTrackInfo;
-    Polyline polyline=null;
+    Polyline originalPath =null, smoothyPath=null;
 
     private View rootView;
 
     private Track currentTrack;
+    TrackSmoother trackSmoother;
     private SettingsKeeper settings=null;
     private MyGPSLocationListener mGPSLocationListener;
     private MyLocationNewOverlay myLocationoverlay;
@@ -57,7 +57,6 @@ public class MapFragment extends Fragment {
     public MapFragment() {
         super();
 
-
     }
 
 
@@ -67,6 +66,7 @@ public class MapFragment extends Fragment {
 
         settings = SettingsKeeper.getInstance(getActivity());
         currentTrack = CurrentTrack.getInstance(getActivity());
+        trackSmoother = new TrackSmootherByLine(currentTrack);
 
         mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler=new MyHandler();
@@ -96,8 +96,15 @@ public class MapFragment extends Fragment {
         mapView.getOverlays().add(myLocationoverlay);
 
         // path overlay
-        polyline = new Polyline(getActivity());
-        mapView.getOverlays().add(polyline);
+        originalPath = new Polyline(getActivity());
+        originalPath.setColor(0xFFFF0000);
+        originalPath.setWidth(3f);
+        mapView.getOverlays().add(originalPath);
+
+        smoothyPath =  new Polyline(getActivity());
+        smoothyPath.setColor(0xFF7F3030);
+        smoothyPath.setWidth(2f);
+        mapView.getOverlays().add(smoothyPath);
 
         IMapController mapController = mapView.getController();
         mapController.setZoom(settings.getZoomLevel());
@@ -108,6 +115,8 @@ public class MapFragment extends Fragment {
         textTrackInfo = (TextView)rootView.findViewById(R.id.textTrackInfo);
         textTrackInfo.setText("");
 
+        updateTrack(true);
+
         return rootView;
     }
      @Override
@@ -115,6 +124,7 @@ public class MapFragment extends Fragment {
      {
          super.onDestroy();
          mGPSLocationListener.releaseInstance();
+         trackSmoother.release();
      }
 
     @Override
@@ -145,7 +155,9 @@ public class MapFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
         try {
+            ((MainActivity)getActivity()).mapFragment=this;
             if(activity instanceof OnFragmentInteractionListener)
                mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -167,7 +179,7 @@ public class MapFragment extends Fragment {
      */
     public void onStartTrackingService()
     {
-        updateTrack(CurrentTrack.getInstance(getActivity()));
+        updateTrack(true);
         mHandler.startTrackUpdate(true);
     }
 
@@ -200,32 +212,19 @@ public class MapFragment extends Fragment {
     void setTrack(String json)
     {
         currentTrack.fromJSON(json);
-        setTrack(currentTrack);
+        updateTrack(true);
     }
-    /** Sets a new track for the fragment
-     *  @param track
-     */
-    void setTrack(Track track)
-    {
-        currentTrack=track;
 
-        putCurrentTrackOnMap();
-
-        updateTrackInfo();
-
-    }
 
     /**
      * update the CurrentTrack if it's necessary
-     * @param track
      */
-    void updateTrack(Track track)
+    void updateTrack(boolean always)
     {
-        if((track != currentTrack ) ||
-           (track.mGeoPoints.size() != polyline.getNumberOfPoints()))
-            setTrack(track);
-        else
-            updateTrackInfo();
+        if(always || currentTrack.getGeoPoints().size() != originalPath.getNumberOfPoints()) {
+            putCurrentTrackOnMap();
+        }
+        updateTrackInfo();
     }
 
     private void updateTrackInfo()
@@ -234,7 +233,9 @@ public class MapFragment extends Fragment {
 
         str.append(getText(R.string.distance));
         str.append((long)currentTrack.getTrackDistance());
-        str.append("\n");
+        str.append(" (");
+        str.append((long)trackSmoother.getTrackDistance());
+        str.append(")\n");
         str.append(getText(R.string.time));
 
         str.append(currentTrack.getTrackTimeStr());
@@ -246,19 +247,20 @@ public class MapFragment extends Fragment {
     private void putCurrentTrackOnMap()
     {
 
-        OverlayManager om=mapView.getOverlayManager();
-        polyline.setColor(0xFFFF0000);
-        polyline.setWidth(4f);
-        polyline.setGeodesic(true);
+        //OverlayManager om=mapView.getOverlayManager();
+        ArrayList<GeoPoint> points=new ArrayList<GeoPoint>(currentTrack.getGeoPoints().size());;
 
-        ArrayList<GeoPoint> points=new ArrayList<GeoPoint>(currentTrack.mGeoPoints.size());
-
-        for(Location l:currentTrack.mGeoPoints) {
+        for(Location l:currentTrack.getGeoPoints()) {
             points.add(new GeoPoint(l));
         }
+        originalPath.setPoints(points);
 
-        polyline.setPoints(points);
-        om.add(polyline);
+        points.clear();
+        for(Location l:trackSmoother.getGeoPoints()) {
+            points.add(new GeoPoint(l));
+        }
+        smoothyPath.setPoints(points);
+        //om.add(originalPath);
 
         mapView.invalidate();
     }
@@ -266,7 +268,7 @@ public class MapFragment extends Fragment {
     boolean loadTrackFromFile(String fileName)
     {
         boolean r=currentTrack.loadGeoPoint(fileName);
-        setTrack(currentTrack);
+        updateTrack(true);
         //mHandler.startPointAnimation();
         return r;
     }
@@ -410,8 +412,8 @@ public class MapFragment extends Fragment {
         }
         private void nextPointAnimation()
         {
-            if(pointIndex<currentTrack.mGeoPoints.size()) {
-                Location loc=currentTrack.mGeoPoints.get(pointIndex);
+            if(pointIndex<currentTrack.getGeoPoints().size()) {
+                Location loc=currentTrack.getGeoPoints().get(pointIndex);
                 pointIndex++;
 
                 marker.onLocationChanged(loc,null);
@@ -461,8 +463,7 @@ public class MapFragment extends Fragment {
                      nextPointAnimation();
                      break;
                 case UPDATE_TRACK:
-                    updateTrack(CurrentTrack.getInstance(getActivity()));
-                    //updateTrackInfo();
+                    updateTrack(false);
                     startTrackUpdate(TrackingService.isWorking);
                     break;
             }
