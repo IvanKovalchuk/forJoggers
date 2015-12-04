@@ -66,7 +66,8 @@ public class MapFragment extends Fragment {
 
         settings = SettingsKeeper.getInstance(getActivity());
         currentTrack = CurrentTrack.getInstance(getActivity());
-        trackSmoother = new TrackSmootherByLine(currentTrack);
+        trackSmoother = //new TrackSmootherByLine(currentTrack);
+                        new TrackSmootherBy2Lines(currentTrack);
 
         mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler=new MyHandler();
