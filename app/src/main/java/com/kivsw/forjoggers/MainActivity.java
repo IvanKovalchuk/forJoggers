@@ -14,8 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.kivSW.dialog.FileDialog;
-import com.kivSW.dialog.MessageDialog;
+import com.kivsw.dialog.FileDialog;
+import com.kivsw.dialog.MessageDialog;
 
 import java.io.File;
 

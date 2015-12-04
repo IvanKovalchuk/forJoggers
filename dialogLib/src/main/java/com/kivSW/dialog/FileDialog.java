@@ -2,7 +2,7 @@
  *  this class is a dialog that allows to choose file or directory
  *  
  */
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 //-----------------------------------------------------------------
 
 import android.content.DialogInterface;
@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.kivSW.dialoglib.R;
+import com.kivsw.dialoglib.R;
 
 import java.io.File;
 

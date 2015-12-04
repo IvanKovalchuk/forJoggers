@@ -1,4 +1,4 @@
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 
 import android.os.SystemClock;
 

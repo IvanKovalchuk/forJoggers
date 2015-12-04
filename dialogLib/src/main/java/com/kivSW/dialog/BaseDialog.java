@@ -4,7 +4,7 @@
  *   this work properly only when the listener is FragmentActivity or Fragment
  */
  
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;

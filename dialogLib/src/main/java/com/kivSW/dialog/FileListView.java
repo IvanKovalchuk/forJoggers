@@ -2,7 +2,7 @@
 * This Fragment is intended to show the file list of a directory
 */
 
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 
 //import android.app.Activity;
 //import android.os.Bundle;
@@ -10,7 +10,7 @@ package com.kivSW.dialog;
 //import android.support.v4.app.ListFragment;
 import java.util.ArrayList;
 
-import com.kivSW.dialog.FileAdapter.FileInfo;
+import com.kivsw.dialog.FileAdapter.FileInfo;
 
 import android.util.AttributeSet;
 import android.view.View;

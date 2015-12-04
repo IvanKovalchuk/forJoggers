@@ -1,6 +1,6 @@
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 
-import com.kivSW.dialoglib.R;
+import com.kivsw.dialoglib.R;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

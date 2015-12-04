@@ -4,7 +4,7 @@
 * in order to receive gesture information 
 */
 
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 
 import android.content.Context;
 import android.os.SystemClock;

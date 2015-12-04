@@ -2,9 +2,9 @@
 * Class that shows a message without any button.
 * if informs the user that an operation is executing.
 */
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 
-import com.kivSW.dialoglib.R;
+import com.kivsw.dialoglib.R;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;

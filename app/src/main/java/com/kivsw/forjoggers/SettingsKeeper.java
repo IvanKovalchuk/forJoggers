@@ -2,6 +2,7 @@ package com.kivsw.forjoggers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 
 /**
  * Created by ivan on 11.11.15.
@@ -26,16 +27,29 @@ public class SettingsKeeper {
     }
 
     //-----------------------------------------------------
+    public double getLastLatitude()
+    {
+        String s=sharedPreferences.getString("latitude","0");
+        return Double.parseDouble(s);
+    }
+    public double getLastLongitude()
+    {
+        String s=sharedPreferences.getString("longitude","0");
+        return Double.parseDouble(s);
+    }
     public  int getZoomLevel()
     {
         return sharedPreferences.getInt("zoom",2);
     };
-    public void setZoomLevel(int zoom)
+    public void setZoomLevel(int zoom, double lat, double lng)
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putInt("zoom",zoom);
+        e.putString("latitude", Double.toString(lat));
+        e.putString("longitude", Double.toString(lng));
         e.commit();
     }
+
     //-----------------------------------------------------
     public  String getCurrentTrack()
     {

@@ -77,7 +77,7 @@ public class TrackSmootherByLine extends TrackSmoother{
     };
 
 
-    protected int deltaT=60000, deltaDistance=30;
+    protected int deltaT=60000, deltaDistance=60;
     protected Location getAvarageFor(int ind, int b, int e)
     {
         ArrayList<Location> original=track.getGeoPoints();

@@ -52,7 +52,7 @@
              />
 --> 
     
-    <com.kivSW.dialog.FileListView
+    <com.kivsw.dialog.FileListView
         android:id="@+id/FileList"
         android:layout_width="match_parent"
         android:layout_height="0dp"

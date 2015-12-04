@@ -2,7 +2,7 @@
  *  FileAdapter class is intended to supply FileListFragment with 
  *  a file list. Adapter gets the file list of a directory
  */
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kivSW.dialoglib.R;
+import com.kivsw.dialoglib.R;
 
 //---------------------------------------------------------
 //---------------------------------------------------------

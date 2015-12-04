@@ -4,9 +4,9 @@
 *  WARNING!!! it's not desirable to invoke DialogFragment.show(...) from  OnCloseListener's methods
 *             because Z-order of these DialogFragments could be violated when the phone is rotated.
 */
-package com.kivSW.dialog;
+package com.kivsw.dialog;
 
-import com.kivSW.dialoglib.R;
+import com.kivsw.dialoglib.R;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

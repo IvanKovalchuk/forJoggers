@@ -66,8 +66,8 @@ public class MapFragment extends Fragment {
 
         settings = SettingsKeeper.getInstance(getActivity());
         currentTrack = CurrentTrack.getInstance(getActivity());
-        trackSmoother = //new TrackSmootherByLine(currentTrack);
-                        new TrackSmootherBy2Lines(currentTrack);
+        trackSmoother = new TrackSmootherByLine(currentTrack);
+                        //new TrackSmootherBy2Lines(currentTrack);
 
         mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler=new MyHandler();
@@ -109,8 +109,11 @@ public class MapFragment extends Fragment {
 
         IMapController mapController = mapView.getController();
         mapController.setZoom(settings.getZoomLevel());
-        if(mGPSLocationListener.getLastKnownLocation()!=null)
-           mapController.animateTo(new GeoPoint(mGPSLocationListener.getLastKnownLocation()));
+        GeoPoint c=new GeoPoint(settings.getLastLatitude(), settings.getLastLongitude());
+        mapController.setCenter(c);
+        mHandler.scheduleRestoringPosition();
+        /*if(mGPSLocationListener.getLastKnownLocation()!=null)
+           mapController.animateTo(new GeoPoint(mGPSLocationListener.getLastKnownLocation()));*/
         mapView.setMapListener(new MapListener());
 
         textTrackInfo = (TextView)rootView.findViewById(R.id.textTrackInfo);
@@ -203,6 +206,7 @@ public class MapFragment extends Fragment {
        {
            IMapController mapController = mapView.getController();
            mapController.animateTo(cl);
+           settings.setZoomLevel(settings.getZoomLevel(), cl.getLatitude(), cl.getLongitude());
        }
 
     };
@@ -305,17 +309,19 @@ public class MapFragment extends Fragment {
     class MapListener implements org.osmdroid.events.MapListener
     {
 
-
         @Override
         public boolean onScroll(ScrollEvent event) {
             mHandler.scheduleRestoringPosition();
+            GeoPoint c=mapView.getBoundingBox().getCenter();
+            settings.setZoomLevel(settings.getZoomLevel(), c.getLatitude(), c.getLongitude());
             return false;
         }
 
         @Override
         public boolean onZoom(ZoomEvent event) {
             int zl=event.getZoomLevel();
-            settings.setZoomLevel(zl);
+            GeoPoint c=mapView.getBoundingBox().getCenter();
+            settings.setZoomLevel(zl, c.getLatitude(), c.getLongitude());
             return false;
         }
     }
