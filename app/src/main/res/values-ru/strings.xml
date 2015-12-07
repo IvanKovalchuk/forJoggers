@@ -18,6 +18,8 @@
         <item>широта</item>
         <item>долгота</item>
         <item>скорость</item>
+        <item>направление</item>
+        <item>поворот</item>
         <item>точность</item>
     </string-array>
 

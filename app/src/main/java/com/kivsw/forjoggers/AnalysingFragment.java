@@ -43,8 +43,8 @@ public class AnalysingFragment extends Fragment
         graph =(GraphView)rootView.findViewById(R.id.graph);
         series = new LineGraphSeries<DataPoint>();
         graph.addSeries(series);
-        /*graph.getViewport().setScalable(true);
-        graph.getViewport().setScrollable(true);*/
+        graph.getViewport().setScalable(true);
+        //graph.getViewport().setScrollable(true);
 
 
         graphSpiner=(Spinner)rootView.findViewById(R.id.spinner);
@@ -95,14 +95,20 @@ public class AnalysingFragment extends Fragment
 
     void showGraph(int num)
     {
-        CurrentTrack curentTrack=CurrentTrack.getInstance(getActivity());
+        Track curentTrack=CurrentTrack.getInstance(getActivity());
+        if(curentTrack.getOnChange() instanceof Track)
+        {
+            curentTrack = (Track)curentTrack.getOnChange();
+        };
 
         if(curentTrack.getGeoPoints().size()>0) {
             DataPoint data[]=new DataPoint[curentTrack.getGeoPoints().size()];
             long t0 = curentTrack.getGeoPoints().get(0).getTime();
             int i=0;
+            Location prevLoc=null;
             for(Location loc:curentTrack.getGeoPoints())
             {
+
                 double y=0;
                 switch(num)
                 {
@@ -110,12 +116,19 @@ public class AnalysingFragment extends Fragment
                         break;
                     case 1: y=loc.getLongitude();
                         break;
-                    case 3: y=loc.getSpeed();
+                    case 2: y = loc.getSpeed();
                         break;
-                    case 4: y=loc.getAccuracy();
+                    case 3: y=loc.getBearing();
+                        break;
+                    case 4:
+                            if(prevLoc!=null && prevLoc.hasBearing() && loc.hasBearing())
+                                y=Track.turn(prevLoc.getBearing(),loc.getBearing());
+                        break;
+                    case 5: y=loc.getAccuracy();
                         break;
                 }
                 data[i++]=new DataPoint((loc.getTime()-t0)/1000, y);
+                prevLoc = loc;
             }
             //graph.getViewport().setXAxisBoundsManual(false);
             //graph.getViewport().setYAxisBoundsManual(false);

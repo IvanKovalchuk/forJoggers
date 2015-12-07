@@ -18,6 +18,8 @@
         <item>latitude</item>
         <item>logitude</item>
         <item>speed</item>
+        <item>bearing</item>
+        <item>turn</item>
         <item>accuracy</item>
     </string-array>
 

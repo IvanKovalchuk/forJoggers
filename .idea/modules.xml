@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GraphView/GraphView.iml" filepath="$PROJECT_DIR$/GraphView/GraphView.iml" />
-      <module fileurl="file://$PROJECT_DIR$/GraphView/GraphView.iml" filepath="$PROJECT_DIR$/GraphView/GraphView.iml" />
       <module fileurl="file://$PROJECT_DIR$/OSMBonusPack/OSMBonusPack.iml" filepath="$PROJECT_DIR$/OSMBonusPack/OSMBonusPack.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/dialogLib/dialogLib.iml" filepath="$PROJECT_DIR$/dialogLib/dialogLib.iml" />

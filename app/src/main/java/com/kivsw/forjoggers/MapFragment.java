@@ -274,7 +274,7 @@ public class MapFragment extends Fragment {
     {
         boolean r=currentTrack.loadGeoPoint(fileName);
         updateTrack(true);
-        //mHandler.startPointAnimation();
+        mHandler.startPointAnimation();
         return r;
     }
 
@@ -419,8 +419,9 @@ public class MapFragment extends Fragment {
         }
         private void nextPointAnimation()
         {
-            if(pointIndex<currentTrack.getGeoPoints().size()) {
-                Location loc=currentTrack.getGeoPoints().get(pointIndex);
+            Track track = trackSmoother; // currenttrack
+            if(pointIndex<track.getGeoPoints().size()) {
+                Location loc=track.getGeoPoints().get(pointIndex);
                 pointIndex++;
 
                 marker.onLocationChanged(loc,null);

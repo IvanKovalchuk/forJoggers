@@ -257,7 +257,8 @@ public class Track {
          for(Location loc:mGeoPoints)
          {
              if(prevLoc!=null) {
-                 double d = distance(loc.getLatitude(), loc.getLongitude(), prevLoc.getLatitude(), prevLoc.getLongitude());
+                 //double d = distance(loc.getLatitude(), loc.getLongitude(), prevLoc.getLatitude(), prevLoc.getLongitude());
+                 double d = loc.distanceTo(prevLoc);
                  dist += d;
              }
              prevLoc=loc;
@@ -265,27 +266,6 @@ public class Track {
 
         return dist;
 
-    }
-
-    final static double earthRadius = 6371000; // the average earth radius
-    public static double distance (Location a,Location b)
-    {return distance(a.getLatitude(),a.getLongitude(),b.getLatitude(),b.getLongitude());}
-    public static double distance (double Lat1,double Lng1,double Lat2,double Lng2)
-    {
-        double latRadius = earthRadius*Math.cos(Math.toRadians(Lat1));
-
-        double dLat = Math.abs(Lat1-Lat2),
-                dLon=Math.abs(Lng1-Lng2);
-
-        if(dLat>180) dLat-=360;
-        if(dLon>180) dLon-=360;
-
-        double dy = earthRadius *Math.toRadians(dLat),
-                dx = latRadius *Math.toRadians(dLon);
-
-        double d= Math.sqrt(dy*dy+dx*dx);
-
-        return d;
     }
 
     public void clear()
@@ -315,5 +295,75 @@ public class Track {
         return mGeoPoints;
     }
 
+//----------------------------------------------------------------------------------------------
+    final static double earthRadius = 6371000; // the average earth radius
+    /** Calculates the distance between two points
+    *
+     */
+    public static double _distance (Location a,Location b)
+    {return _distance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude());}
+    public static double _distance (double Lat1,double Lng1,double Lat2,double Lng2)
+    {
+        double latRadius = earthRadius*Math.cos(Math.toRadians(Lat1));
 
+        double dLat = Math.abs(Lat1-Lat2),
+                dLon=Math.abs(Lng1-Lng2);
+
+        if(dLat>180) dLat-=360;
+        if(dLon>180) dLon-=360;
+
+        double dy = earthRadius *Math.toRadians(dLat),
+                dx = latRadius *Math.toRadians(dLon);
+
+        double d= Math.sqrt(dy*dy+dx*dx);
+
+        return d;
+    }
+
+    /** Calculates the bearing from the first points to the second one
+     *
+     */
+    public static double _bearing (Location a,Location b)
+    {
+        return _bearing(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude());
+    };
+    public static double _bearing(double Lat1,double Lng1,double Lat2,double Lng2)
+    {
+      /*  double lat1 = Math.toRadians(Lat1),//φ1
+            lat2 = Math.toRadians(Lat2),//φ2
+            dLat = Math.toRadians((Lat2-Lat1)),//Δφ
+            dLon = Math.toRadians((Lng2-Lng1)); // Δλ
+        //θ = atan2( sin Δλ ⋅ cos φ2 , cos φ1 ⋅ sin φ2 − sin φ1 ⋅ cos φ2 ⋅ cos Δλ );
+        double bearing=
+        Math.atan2(
+           Math.sin(dLon) + Math.cos(lat2),
+           Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon));
+
+        bearing = Math.toDegrees(bearing);
+        return bearing;*/
+        double latRadius = earthRadius*Math.cos(Math.toRadians(Lat1));
+
+        double dLat = Lat2-Lat1,
+               dLon=Lng2-Lng1;
+
+        if(dLat>180) dLat-=360;
+        if(dLon>180) dLon-=360;
+
+        double dy = earthRadius *Math.toRadians(dLat),
+                dx = latRadius *Math.toRadians(dLon);
+        double bearing= Math.atan2(dx,dy);
+        bearing = Math.toDegrees(bearing);
+
+        return bearing;
+    }
+
+    public static double turn(double angle1, double angle2)
+    {
+        double r=angle2-angle1;
+
+        if(r>180) r-=360;
+        if(r<-180) r+=360;
+
+        return r;
+    }
 }

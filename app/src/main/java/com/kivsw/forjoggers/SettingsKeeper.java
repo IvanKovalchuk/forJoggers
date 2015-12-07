@@ -2,7 +2,6 @@ package com.kivsw.forjoggers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Location;
 
 /**
  * Created by ivan on 11.11.15.
