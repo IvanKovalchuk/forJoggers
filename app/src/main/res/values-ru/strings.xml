@@ -13,6 +13,8 @@
     <string name="return_to_mylocation">возвращать в мое положение</string>
     <string name="time">время:</string>
     <string name="distance">дистанция:</string>
+    <string name="current_speed">тек. скорость:</string>
+    <string name="average_speed">ср. скорость:</string>
 
     <string-array name="graphs">
         <item>широта</item>

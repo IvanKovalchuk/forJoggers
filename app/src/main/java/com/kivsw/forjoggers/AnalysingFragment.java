@@ -43,7 +43,7 @@ public class AnalysingFragment extends Fragment
         graph =(GraphView)rootView.findViewById(R.id.graph);
         series = new LineGraphSeries<DataPoint>();
         graph.addSeries(series);
-        graph.getViewport().setScalable(true);
+        //graph.getViewport().setScalable(true);
         //graph.getViewport().setScrollable(true);
 
 
@@ -106,6 +106,7 @@ public class AnalysingFragment extends Fragment
             long t0 = curentTrack.getGeoPoints().get(0).getTime();
             int i=0;
             Location prevLoc=null;
+            double prev=0, add=0;
             for(Location loc:curentTrack.getGeoPoints())
             {
 
@@ -118,7 +119,16 @@ public class AnalysingFragment extends Fragment
                         break;
                     case 2: y = loc.getSpeed();
                         break;
-                    case 3: y=loc.getBearing();
+                    case 3: y=loc.getBearing()+add;
+                            if(prevLoc!=null)
+                            {
+                                double d=y-prev;
+                                if(d<-180) add+=360;
+                                if(d>180) add-=360;
+                                y=loc.getBearing()+add;
+                            }
+                            prev=y;
+
                         break;
                     case 4:
                             if(prevLoc!=null && prevLoc.hasBearing() && loc.hasBearing())

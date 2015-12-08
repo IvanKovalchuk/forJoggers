@@ -13,6 +13,8 @@
     <string name="return_to_mylocation">return to my location</string>
     <string name="time">time:</string>
     <string name="distance">distance:</string>
+    <string name="current_speed">curr. speed:</string>
+    <string name="average_speed">av. speed:</string>
     
     <string-array name="graphs">
         <item>latitude</item>

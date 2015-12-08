@@ -13,7 +13,10 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text=""
+        android:textColor="#FF000000"
         android:id="@+id/textTrackInfo"
-        android:layout_gravity="right|top"/>
+        android:layout_gravity="left|top"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
 
 </FrameLayout>

@@ -25,11 +25,13 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 //import org.osmdroid.bonuspack.overlays.Polyline;
 
@@ -66,8 +68,8 @@ public class MapFragment extends Fragment {
 
         settings = SettingsKeeper.getInstance(getActivity());
         currentTrack = CurrentTrack.getInstance(getActivity());
-        trackSmoother = new TrackSmootherByLine(currentTrack);
-                        //new TrackSmootherBy2Lines(currentTrack);
+        trackSmoother = //new TrackSmootherByLine(currentTrack);
+                        new TrackSmootherByPolynom(currentTrack);
 
         mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler=new MyHandler();
@@ -89,6 +91,7 @@ public class MapFragment extends Fragment {
         //mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
 
+
         // My Location Overlay
         myLocationoverlay = new MyLocationNewOverlay(getActivity(), mapView);
         myLocationoverlay.enableMyLocation(mGPSLocationListener); // not on by default
@@ -106,6 +109,9 @@ public class MapFragment extends Fragment {
         smoothyPath.setColor(0xFF7F3030);
         smoothyPath.setWidth(2f);
         mapView.getOverlays().add(smoothyPath);
+
+        CompassOverlay compass=new CompassOverlay(getActivity(), mapView);
+        mapView.getOverlays().add(compass);
 
         IMapController mapController = mapView.getController();
         mapController.setZoom(settings.getZoomLevel());
@@ -235,16 +241,37 @@ public class MapFragment extends Fragment {
     private void updateTrackInfo()
     {
         StringBuilder str=new StringBuilder();
+        ArrayList<Location> points = trackSmoother.getGeoPoints();
+
+        double distance = trackSmoother.getTrackDistance();
+        double time = trackSmoother.getTrackTime()/1000.0;
 
         str.append(getText(R.string.distance));
-        str.append((long)currentTrack.getTrackDistance());
-        str.append(" (");
-        str.append((long)trackSmoother.getTrackDistance());
-        str.append(")\n");
-        str.append(getText(R.string.time));
+            /*str.append((long)currentTrack.getTrackDistance());
+            str.append(" (");*/
+        str.append((long) distance);
+        str.append("\n");
 
-        str.append(currentTrack.getTrackTimeStr());
-        //str.append(Double.toString(currentTrack.getTrackTime()/1000));
+        str.append(getText(R.string.time));
+        str.append(trackSmoother.getTrackTimeStr());
+        str.append("\n");
+
+        if(points.size()>1) {
+            str.append(getText(R.string.average_speed));
+            str.append(String.format(Locale.US,"%.1f",distance / time));
+            str.append("\n");
+
+            if(TrackingService.isWorking) {
+                str.append(getText(R.string.current_speed));
+                double sp = points.get(points.size() - 1).getSpeed();
+                str.append(String.format(Locale.US, "%.1f", sp));
+                str.append("\n");
+            }
+        }
+
+
+
+
 
         textTrackInfo.setText(str);
     };

@@ -3,7 +3,7 @@ package com.kivsw.forjoggers;
 /**
  * Created by ivan on 03.12.15.
  */
-public class LineApproximator {
+public class LineApproximator implements  iApproximator{
 
     private int N=0;
     private double SumX=0,  //  Xi

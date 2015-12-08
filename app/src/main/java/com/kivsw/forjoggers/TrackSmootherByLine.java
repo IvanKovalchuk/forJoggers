@@ -10,14 +10,22 @@ import java.util.ArrayList;
 public class TrackSmootherByLine extends TrackSmoother{
 
     //protected ArrayList<Location> mGeoPoints=null;
-    LineApproximator latApproximator, lngApproximator;
+    iApproximator latApproximator=null, lngApproximator=null;
+    protected int deltaT=1200000, deltaDistance=100;
 
     TrackSmootherByLine(Track track)
     {
         super(track);
-        latApproximator=new LineApproximator();
-        lngApproximator=new LineApproximator();
+        deltaT=1200000; deltaDistance=100;
     };
+
+    protected void createApproximators()
+    {
+        if(latApproximator==null)
+           latApproximator=new LineApproximator();
+        if(lngApproximator==null)
+           lngApproximator=new LineApproximator();
+    }
 
     ArrayList<Location> getGeoPoints()
     {
@@ -43,7 +51,7 @@ public class TrackSmootherByLine extends TrackSmoother{
     }
 
     //-----------------------------------------------------
-    protected int deltaT=1200000, deltaDistance=100;
+
     void doSmooth()
     {
 
@@ -62,6 +70,7 @@ public class TrackSmootherByLine extends TrackSmoother{
      */
     ArrayList<Location> doSmooth(ArrayList<Location> original, int begin, int end, int start, int stop, int deltaT, int deltaDistance)
     {
+        createApproximators();
         if(begin<0) begin=0;
         if(end>original.size()) end=original.size();
         if(start<begin) start=begin;
@@ -69,6 +78,7 @@ public class TrackSmootherByLine extends TrackSmoother{
 
         ArrayList<Location> mResGeoPoints=new ArrayList<Location>(stop-start);
         int avE=begin, avB=begin;
+        Location prevLoc=null;
 
         for(int i=start;i<stop;i++) {
             Location loc = original.get(i);
@@ -91,8 +101,17 @@ public class TrackSmootherByLine extends TrackSmoother{
 
 
             Location avLoc = getAvarageFor(i, avB, avE); // interpolates interval [avB, avE) with a line
+           /* if(prevLoc!=null)
+            {
+                float distanceAndBearing[]=new float[3];
+                Location.distanceBetween(prevLoc.getLatitude(), prevLoc.getLongitude(),
+                                    avLoc.getLatitude(), avLoc.getLongitude(),distanceAndBearing);
+                avLoc.setBearing(distanceAndBearing[1]);
+                avLoc.setSpeed((float) distanceAndBearing[0]*1000f/(avLoc.getTime()-prevLoc.getTime()));
+            }*/
 
             mResGeoPoints.add(avLoc);
+            prevLoc = avLoc;
         }
         return mResGeoPoints;
        /* ArrayList<Location> original=track.getGeoPoints();
@@ -153,11 +172,11 @@ public class TrackSmootherByLine extends TrackSmoother{
         if(latApproximator.approximate(t,lat) && lngApproximator.approximate(t,lng))
         {
             Location loc=new Location(original.get(ind));
-            long deltaT=1000;
             double time=(original.get(ind).getTime()-t0)/1000.0;
             double latitude=latApproximator.function(time),
                     longitude=lngApproximator.function(time);
 
+            long deltaT=10;
             double latitude2=latApproximator.function(time+deltaT),
                    longitude2=lngApproximator.function(time+deltaT);
 
