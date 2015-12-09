@@ -16,6 +16,7 @@ public class CurrentTrack extends Track {
         {
             track = new CurrentTrack();
             track.settings = SettingsKeeper.getInstance(context);
+
             track.fromJSON(track.settings.getCurrentTrack());
         }
         return track;

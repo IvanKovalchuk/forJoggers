@@ -27,5 +27,16 @@
         android:layout_gravity="center_horizontal|bottom"
         />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="fileNameTextView"
+        android:id="@+id/fileNameTextView"
+
+        android:layout_gravity="left|top"
+        android:textStyle="bold"
+        android:textColor="#FF000000"
+        android:textSize="15sp"/>
+
 
 </FrameLayout>

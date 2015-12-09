@@ -247,9 +247,13 @@ public class MapFragment extends Fragment {
         double time = trackSmoother.getTrackTime()/1000.0;
 
         str.append(getText(R.string.distance));
-            /*str.append((long)currentTrack.getTrackDistance());
-            str.append(" (");*/
         str.append((long) distance);
+        if(BuildConfig.DEBUG)
+        {
+           str.append(" (");
+           str.append((long)currentTrack.getTrackDistance());
+            str.append(")");
+        }
         str.append("\n");
 
         str.append(getText(R.string.time));

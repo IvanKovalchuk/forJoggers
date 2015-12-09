@@ -33,7 +33,7 @@ public class CustomPagerView extends android.support.v4.view.ViewPager {
                 if(event.getPointerCount()==1)
                 {
                     int w=getWidth();
-                    int min=10,max=w-10;
+                    int min=20,max=w-20;
                     int x=(int)event.getX();
                     enabled= x<min || x>max;
                 }

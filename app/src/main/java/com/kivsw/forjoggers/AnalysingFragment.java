@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.kivsw.dialog.MessageDialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -142,7 +143,13 @@ public class AnalysingFragment extends Fragment
             }
             //graph.getViewport().setXAxisBoundsManual(false);
             //graph.getViewport().setYAxisBoundsManual(false);
-            series.resetData(data);
+            try {
+                series.resetData(data);
+            }catch(Exception e)
+            {
+                MessageDialog.newInstance(getText(R.string.Error).toString(), e.toString())
+                        .show(getFragmentManager(),"");
+            }
             //graph.getViewport().setScalable(true);
         }
 

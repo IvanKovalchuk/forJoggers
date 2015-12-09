@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 22
     buildToolsVersion '22.0.1'
-
     defaultConfig {
         applicationId "com.kivsw.forjoggers"
         minSdkVersion 10
@@ -25,8 +24,6 @@ dependencies {
     compile project(':OSMBonusPack')
     compile project(':GraphView')
     //compile 'org.slf4j:slf4j-simple:1.6.1'
-
-
     compile 'org.osmdroid:osmdroid-android:4.3'
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:support-v4:22.2.1'

@@ -150,7 +150,7 @@ public class TrackingService extends Service {
     {
         LocationListener(Context context)
         {
-            super(context,!false);
+            super(context,!false && BuildConfig.DEBUG);
 
         };
 

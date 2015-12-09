@@ -4,14 +4,14 @@
 */
 package com.kivsw.dialog;
 
-import com.kivsw.dialoglib.R;
-
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.kivsw.dialoglib.R;
 
 public class StatusDialog extends DialogFragment {
 	

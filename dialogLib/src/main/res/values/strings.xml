@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <string name="open_file">Open a file</string>
     <string name="save_file">Save a file</string>
     <string name="choose_directory">Choose a directory</string>
@@ -11,6 +11,7 @@
     <string name="OK">OK</string>
     <string name="Cancel">Cancel</string>
     <string name="I_dont_know">I don\'t know</string>
+    <string name="dont_show_again">don\'t show this message again</string>
     <string name="enter_file_name">Enter a filename</string>
     <string name="Confirmation">Confirmation</string>
     <string name="Warning">"Warning"</string>

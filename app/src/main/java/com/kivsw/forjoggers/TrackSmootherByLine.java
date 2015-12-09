@@ -11,7 +11,7 @@ public class TrackSmootherByLine extends TrackSmoother{
 
     //protected ArrayList<Location> mGeoPoints=null;
     iApproximator latApproximator=null, lngApproximator=null;
-    protected int deltaT=1200000, deltaDistance=100;
+    protected int deltaT, deltaDistance;
 
     TrackSmootherByLine(Track track)
     {
@@ -176,15 +176,15 @@ public class TrackSmootherByLine extends TrackSmoother{
             double latitude=latApproximator.function(time),
                     longitude=lngApproximator.function(time);
 
-            long deltaT=10;
-            double latitude2=latApproximator.function(time+deltaT),
-                   longitude2=lngApproximator.function(time+deltaT);
+            long deltaT=2;
+            double latitude0=latApproximator.function(time-deltaT),
+                   longitude0=lngApproximator.function(time-deltaT);
 
             loc.setLatitude(latitude);
             loc.setLongitude(longitude);
 
             float distanceAndBearing[]=new float[3];
-            Location.distanceBetween(latitude, longitude, latitude2, longitude2,distanceAndBearing);
+            Location.distanceBetween(latitude0, longitude0, latitude, longitude,distanceAndBearing);
 
             loc.setBearing(distanceAndBearing[1]);
             loc.setSpeed((float) distanceAndBearing[0]/deltaT);
