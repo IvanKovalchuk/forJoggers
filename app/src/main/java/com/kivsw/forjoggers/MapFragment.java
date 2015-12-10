@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
@@ -43,6 +46,8 @@ public class MapFragment extends Fragment {
     private MapView mapView=null;
 
     private TextView textTrackInfo;
+    ImageView satelliteImageView;
+
     Polyline originalPath =null, smoothyPath=null;
 
     private View rootView;
@@ -53,6 +58,7 @@ public class MapFragment extends Fragment {
     private MyGPSLocationListener mGPSLocationListener;
     private MyLocationNewOverlay myLocationoverlay;
     private MyHandler mHandler;
+    boolean isGPS_available=false;
 
 
 
@@ -74,6 +80,7 @@ public class MapFragment extends Fragment {
         mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler=new MyHandler();
 
+
     }
 
     @Override
@@ -90,7 +97,6 @@ public class MapFragment extends Fragment {
         mapView.setTileSource(tileSource);
         //mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
-
 
         // My Location Overlay
         myLocationoverlay = new MyLocationNewOverlay(getActivity(), mapView);
@@ -125,11 +131,22 @@ public class MapFragment extends Fragment {
         textTrackInfo = (TextView)rootView.findViewById(R.id.textTrackInfo);
         textTrackInfo.setText("");
 
+        satelliteImageView = (ImageView)rootView.findViewById(R.id.satelliteImageView);
+
         updateTrack(true);
+        if(savedInstanceState!=null)
+            isGPS_available = savedInstanceState.getBoolean("isGPS_available",false);
+        setGSPstatus(isGPS_available);
 
         return rootView;
     }
-     @Override
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isGPS_available", isGPS_available);
+    }
+
+    @Override
      public void onDestroy()
      {
          super.onDestroy();
@@ -153,13 +170,6 @@ public class MapFragment extends Fragment {
 
         mHandler.deleteAllMessages();
 
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -280,11 +290,29 @@ public class MapFragment extends Fragment {
         textTrackInfo.setText(str);
     };
 
+    /**
+     *
+     * @param available
+     */
+    private void setGSPstatus(boolean available)
+    {
+        isGPS_available=available;
+        if(available) {
+            satelliteImageView.setImageResource(R.drawable.satellite_en);
+            mHandler.scheduleLastPositionFix(mGPSLocationListener.UPDATE_INTERVAL * 4);
+        }
+        else satelliteImageView.setImageResource(R.drawable.satellite_dis);
+    }
+    public boolean getGPSstatus()
+    {
+        return isGPS_available;
+    }
+
     private void putCurrentTrackOnMap()
     {
 
         //OverlayManager om=mapView.getOverlayManager();
-        ArrayList<GeoPoint> points=new ArrayList<GeoPoint>(currentTrack.getGeoPoints().size());;
+        ArrayList<GeoPoint> points=new ArrayList<GeoPoint>(currentTrack.getGeoPoints().size());
 
         for(Location l:currentTrack.getGeoPoints()) {
             points.add(new GeoPoint(l));
@@ -362,7 +390,7 @@ public class MapFragment extends Fragment {
     {
 
         MyGPSLocationListener(Context context)
-        {super(context,BuildConfig.DEBUG);}
+        {super(context,false&&BuildConfig.DEBUG);}
 
         //----------------------------------------
         @Override
@@ -373,7 +401,28 @@ public class MapFragment extends Fragment {
                 consumer.onLocationChanged(loc, this);
 
                 mHandler.scheduleIfNecessaryRestoringPosition();
+                if(loc.getProvider().equals(LocationManager.GPS_PROVIDER)) {
+                    setGSPstatus(true);
+
+                }
             }
+        }
+        @Override
+        public void onStatusChanged(String provider,int status, Bundle extras) {
+            super.onStatusChanged(provider, status, extras);
+
+            if(!provider.equals(LocationManager.GPS_PROVIDER)) return;
+
+            switch(status) {
+                case     LocationProvider.TEMPORARILY_UNAVAILABLE:
+                case     LocationProvider.OUT_OF_SERVICE:
+                    setGSPstatus(false);
+                    break;
+                case   LocationProvider.AVAILABLE:
+                    //setGSPstatus(1);
+                    break;
+            }
+
         }
 
         //------------------------------
@@ -398,7 +447,7 @@ public class MapFragment extends Fragment {
 
     class MyHandler extends Handler
     {
-        final private int RESTORE_POSITION=1, POINT_ANIMATION=2, UPDATE_TRACK=3;
+        final private int RESTORE_POSITION=1, POINT_ANIMATION=2, UPDATE_TRACK=3, LAST_LOCATION_FIX_TIMEOUT =4;
         MyHandler()
         {
             super();
@@ -409,6 +458,7 @@ public class MapFragment extends Fragment {
             removeMessages(RESTORE_POSITION);
             removeMessages(POINT_ANIMATION);
             removeMessages(UPDATE_TRACK);
+            removeMessages(LAST_LOCATION_FIX_TIMEOUT);
 
             if(marker!=null)
                mapView.getOverlays().remove(marker);
@@ -425,6 +475,11 @@ public class MapFragment extends Fragment {
         {
             removeMessages(RESTORE_POSITION);
             sendEmptyMessageDelayed(RESTORE_POSITION, 7000);
+        }
+        public void scheduleLastPositionFix(int timeout)
+        {
+            removeMessages(LAST_LOCATION_FIX_TIMEOUT);
+            sendEmptyMessageDelayed(LAST_LOCATION_FIX_TIMEOUT, timeout);
         }
 
         private int pointIndex=0;
@@ -504,6 +559,9 @@ public class MapFragment extends Fragment {
                 case UPDATE_TRACK:
                     updateTrack(false);
                     startTrackUpdate(TrackingService.isWorking);
+                    break;
+                case LAST_LOCATION_FIX_TIMEOUT:
+                    setGSPstatus(false);
                     break;
             }
 

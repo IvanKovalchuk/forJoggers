@@ -15,7 +15,7 @@
     <string name="distance">distance:</string>
     <string name="current_speed">curr. speed:</string>
     <string name="average_speed">av. speed:</string>
-    
+
     <string-array name="graphs">
         <item>latitude</item>
         <item>logitude</item>
@@ -25,5 +25,10 @@
         <item>accuracy</item>
     </string-array>
 
-    <string name="track_may_be_lost">The current track has not been saved. Its data will be lost. Continue?</string>
+    <string name="track_may_be_lost">The current track has not been saved. Its data will be lost.&lt;br/> &lt;br/> </string>
+    <string name="GPRS_has_not_found_location">GPRS hasn\'t found your location yet.&lt;br/> &lt;br/> </string>
+    <string name="Continue">Continue?</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

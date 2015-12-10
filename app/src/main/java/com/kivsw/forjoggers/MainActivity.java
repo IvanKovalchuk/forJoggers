@@ -72,6 +72,7 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
             buttonStart.setVisibility(View.VISIBLE);
         }
 
+
         settings=SettingsKeeper.getInstance(this);
 
         //mapFragment.setTrack(settings.getCurrentTrack());
@@ -161,15 +162,25 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
     public void onClick(View v) {
         switch(v.getId())
         {
-            case R.id.buttonStart:
-                if(CurrentTrack.getInstance(this).needToBeSaved())
-                    MessageDialog.newInstance(TRACK_MAY_BE_LOST_START_SERVICE,
-                                  getText(R.string.Warning).toString(),
-                                  getText(R.string.track_may_be_lost).toString(),
-                                  this)
-                    .show(getSupportFragmentManager(),"");
-                else
-                    startTrackService();
+            case R.id.buttonStart: {
+                StringBuilder problems=new StringBuilder();
+
+                if (mapFragment != null && !mapFragment.getGPSstatus())
+                     problems.append(getText(R.string.GPRS_has_not_found_location));
+
+                if (CurrentTrack.getInstance(this).needToBeSaved())
+                    problems.append(getText(R.string.track_may_be_lost));
+
+                if(problems.length()>0) {
+                    problems.append(getText(R.string.Continue));
+                    MessageDialog.newInstance(WARNINGS_AND_START_SERVICE,
+                            getText(R.string.Warning).toString(), problems.toString(),
+                            this)
+                            .show(getSupportFragmentManager(), "");
+                }
+                    else
+                        startTrackService();
+                }
                 break;
             case R.id.buttonStop:
                 stopTrackService();
@@ -274,13 +285,13 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
     }
     //-------------------------------
 
-    final int TRACK_MAY_BE_LOST_START_SERVICE=0, TRACK_MAY_BE_LOST_LOAD_FILE=1;
+    final int WARNINGS_AND_START_SERVICE =0, TRACK_MAY_BE_LOST_LOAD_FILE=1;
     //  MessageDialog.OnCloseListener
     @Override
     public void onClickOk(MessageDialog msg) {
         switch (msg.getDlgId())
         {
-            case TRACK_MAY_BE_LOST_START_SERVICE://R.string.track_may_be_lost:
+            case WARNINGS_AND_START_SERVICE://R.string.track_may_be_lost:
                      startTrackService();
                 break;
             case TRACK_MAY_BE_LOST_LOAD_FILE://R.string.track_may_be_lost:

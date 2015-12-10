@@ -25,6 +25,7 @@
         <item>точность</item>
     </string-array>
 
-    <string name="track_may_be_lost">Текущий трек не сохранен, данные будут потеряны. Продолжить?</string>
-
+    <string name="track_may_be_lost">Текущий трек не сохранен, данные будут потеряны.&lt;br/> &lt;br/>  </string>
+    <string name="GPRS_has_not_found_location">GPRS еще не определило ваше местоположние.&lt;br/> &lt;br/>  </string>
+    <string name="Continue">Продолжить?</string>
 </resources>

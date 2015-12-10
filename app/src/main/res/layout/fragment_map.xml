@@ -18,5 +18,10 @@
         android:layout_gravity="left|top"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="15sp"/>
-
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/satelliteImageView"
+        android:layout_gravity="right|top"
+        android:src="@drawable/satellite_dis"/>
 </FrameLayout>

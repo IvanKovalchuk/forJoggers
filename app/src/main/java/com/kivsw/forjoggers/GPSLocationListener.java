@@ -1,7 +1,6 @@
 package com.kivsw.forjoggers;
 
 import android.content.Context;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
@@ -15,12 +14,9 @@ import java.util.List;
 public class GPSLocationListener implements android.location.LocationListener{
     Context context=null;
     LocationManager locationManager=null;
-    GpsStatus mGpsStatus=null;
-
     private boolean useNetWorkProvider=false;//BuildConfig.DEBUG;
-    boolean isGPS;
-
     Location emulateLocation=null;
+    final public int UPDATE_INTERVAL=1000;
 
 
     GPSLocationListener(Context context, boolean useNetWorkProvider )
@@ -42,7 +38,7 @@ public class GPSLocationListener implements android.location.LocationListener{
             try {
                 if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                     locationManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER, 1000, 2f, listener);
+                            LocationManager.GPS_PROVIDER, UPDATE_INTERVAL, 2f, listener);
             }catch(Exception e)
             {
                 e.getMessage();
@@ -52,7 +48,7 @@ public class GPSLocationListener implements android.location.LocationListener{
             try {
                 if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
                     locationManager.requestLocationUpdates(
-                            LocationManager.NETWORK_PROVIDER, 1000, 2f, listener);
+                            LocationManager.NETWORK_PROVIDER, UPDATE_INTERVAL, 2f, listener);
             }catch(Exception e)
             {
                 e.getMessage();
@@ -86,14 +82,14 @@ public class GPSLocationListener implements android.location.LocationListener{
                 context.getSystemService(Context.LOCATION_SERVICE);
 
         List<String> providers =locationManager.getAllProviders();
-        boolean isGPS=false, isNetwork=false;
+        boolean isGPS=false;
         if(providers!=null)
         {
             isGPS= providers.indexOf(LocationManager.GPS_PROVIDER)>=0;
-            isNetwork =  providers.indexOf(LocationManager.NETWORK_PROVIDER)>=0;
+            //isNetwork =  providers.indexOf(LocationManager.NETWORK_PROVIDER)>=0;
         };
 
-        if(isGPS==false &&  isNetwork==false)
+        if(isGPS==false/* &&  isNetwork==false*/)
         {
             msg.append(context.getText(R.string.gps_unreachable));
             return 2;
@@ -136,48 +132,7 @@ public class GPSLocationListener implements android.location.LocationListener{
     public void onLocationChanged(Location loc)
     {
 
-       /* if(loc!=null) {
-            String provider = loc.getProvider();
-            synchronized (mutex) {
-                switch (provider) {
-                    case LocationManager.GPS_PROVIDER:
-                        locGPS = loc;
-                        break;
-                    case LocationManager.NETWORK_PROVIDER:
-                        locNETWORK_PROVIDER = loc;
-                        break;
-                } ;
-            }
-        }
 
-        Location bestLocation=getBestLocation();
-        float speed=-1;
-        if(bestLocation.hasSpeed())
-            speed=bestLocation.getSpeed()*(3.6f);
-
-        GPSDataReceiver.sendMyPosition(context, bestLocation.getLatitude(),
-                bestLocation.getLongitude(), speed);*/
-
-
-
-    /*//----------to get City-Name from coordinates -------------
-      String cityName=null;
-      Geocoder gcd = new Geocoder(getBaseContext(),
-   Locale.getDefault());
-      List<Address>  addresses;
-      try {
-      addresses = gcd.getFromLocation(loc.getLatitude(), loc
-   .getLongitude(), 1);
-      if (addresses.size() > 0)
-         System.out.println(addresses.get(0).getLocality());
-         cityName=addresses.get(0).getLocality();
-        } catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      String s = longitude+"\n"+latitude +
-   "\n\nMy Currrent City is: "+cityName;
-           editLocation.setText(s);*/
     }
 
     @Override
@@ -192,9 +147,11 @@ public class GPSLocationListener implements android.location.LocationListener{
         provider.toString();
     }
 
+
     @Override
     public void onStatusChanged(String provider,int status, Bundle extras) {
-        // TODO Auto-generated method stub
+
+
         provider.toString();
         switch(status) {
             case     LocationProvider.OUT_OF_SERVICE:
@@ -205,7 +162,7 @@ public class GPSLocationListener implements android.location.LocationListener{
                 break;
         }
 
-        mGpsStatus = locationManager.getGpsStatus(mGpsStatus);
+        //mGpsStatus = locationManager.getGpsStatus(mGpsStatus);
     }
 
 }
