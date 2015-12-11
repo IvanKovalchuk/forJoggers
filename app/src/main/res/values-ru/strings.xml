@@ -3,18 +3,18 @@
     <string name="app_name">ForJoggers</string>
     <string name="gps_disable">GPS отключен</string>
     <string name="gps_unreachable">GPS недоступен</string>
-    <string name="action_settings">Настройки</string>
     <string name="Start">Старт</string>
     <string name="Stop">Стоп</string>
-    <string name="action_load_track">Загрузить трек</string>
-    <string name="action_save_track">Сохранить трек</string>
+
     <string name="cannot_save_file">Не удается сохранить файл %s</string>
     <string name="cannot_load_file">Не удается загрузить файл %s</string>
-    <string name="return_to_mylocation">возвращать в мое положение</string>
+    <string name="show_my_location">Мое положение</string>
     <string name="time">время:</string>
     <string name="distance">дистанция:</string>
     <string name="current_speed">тек. скорость:</string>
     <string name="average_speed">ср. скорость:</string>
+    <string name="energy">энергия:</string>
+    <string name="KCal">Ккал</string>
 
     <string-array name="graphs">
         <item>широта</item>
@@ -28,4 +28,57 @@
     <string name="track_may_be_lost">Текущий трек не сохранен, данные будут потеряны.&lt;br/> &lt;br/>  </string>
     <string name="GPRS_has_not_found_location">GPRS еще не определило ваше местоположние.&lt;br/> &lt;br/>  </string>
     <string name="Continue">Продолжить?</string>
+
+    <!-- settings fragment -->
+    <string name="Settings">Настройки</string>
+    <string name="return_to_my_location">возвращать в мое положение</string>
+    <string name="my_weight">Мой вес</string>
+
+    <string name="my_activity">Вид деятельности</string>
+    <string-array name="activities">
+        <item>Ходьба</item>
+        <item>Бег</item>
+        <item>Велосипед</item>
+    </string-array>
+
+    <string name="distance_unit">Измерение дистанции:</string>
+    <string-array name="distance_unit">
+        <item>метры</item>
+        <item>километры</item>
+        <item>мили</item>
+    </string-array>
+
+    <string-array name="distance_short_unit">
+        <item>м</item>
+        <item>км</item>
+        <item>мл.</item>
+    </string-array>
+
+    <string name="speed_unit">Измерение скорости:</string>
+    <string-array name="time_unit">
+        <item>секунду</item>
+        <item>минуту</item>
+        <item>час</item>
+    </string-array>
+    <string-array name="time_short_unit">
+        <item>сек</item>
+        <item>мин</item>
+        <item>ч</item>
+    </string-array>
+
+    <string-array name="weight_unit">
+        <item>кг</item>
+        <item>фунты</item>
+    </string-array>
+
+    <string name="Incorrect_value">Некорректное значение!</string>
+
+    <!-- MENU -->
+    <string name="action_settings">Настройки</string>
+    <string name="action_load_track">Загрузить трек</string>
+    <string name="action_save_track">Сохранить трек</string>
+    <string name="action_show_my_location">Моё положение</string>
+    <string name="action_show_track">Мой трек</string>
+    <string name="action_animate_track">Анимировать трек</string>
+
 </resources>

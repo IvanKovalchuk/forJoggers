@@ -3,18 +3,18 @@
 
     <string name="gps_unreachable">GPS is unreachable</string>
     <string name="gps_disable">GPS is disable</string>
-    <string name="action_settings">Settings</string>
     <string name="Start">Start</string>
     <string name="Stop">Stop</string>
-    <string name="action_load_track">Load a track</string>
-    <string name="action_save_track">Save current track</string>
+
     <string name="cannot_save_file">Can not save file %s</string>
     <string name="cannot_load_file">Can not load file %s</string>
-    <string name="return_to_mylocation">return to my location</string>
+
     <string name="time">time:</string>
     <string name="distance">distance:</string>
     <string name="current_speed">curr. speed:</string>
     <string name="average_speed">av. speed:</string>
+    <string name="energy">energy:</string>
+    <string name="KCal">Kcal</string>
 
     <string-array name="graphs">
         <item>latitude</item>
@@ -29,6 +29,56 @@
     <string name="GPRS_has_not_found_location">GPRS hasn\'t found your location yet.&lt;br/> &lt;br/> </string>
     <string name="Continue">Continue?</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- settings fragment -->
+    <string name="Settings">Settings</string>
+    <string name="return_to_my_location">return to my location</string>
+    <string name="my_weight">My weight</string>
+
+    <string name="my_activity">My activity</string>
+    <string-array name="activities">
+        <item>Hiking</item>
+        <item>Jogging</item>
+        <item>Bicycling</item>
+    </string-array>
+
+    <string name="distance_unit">Distance unit:</string>
+    <string-array name="distance_unit">
+        <item>meters</item>
+        <item>kilometers</item>
+        <item>miles</item>
+    </string-array>
+
+    <string-array name="distance_short_unit">
+        <item>m</item>
+        <item>km</item>
+        <item>ml.</item>
+    </string-array>
+
+    <string name="speed_unit">Speed unit:</string>
+    <string-array name="time_unit">
+        <item>secund</item>
+        <item>minune</item>
+        <item>hour</item>
+    </string-array>
+    <string-array name="time_short_unit">
+        <item>s</item>
+        <item>m</item>
+        <item>h</item>
+    </string-array>
+
+    <string-array name="weight_unit">
+        <item>kg</item>
+        <item>lb</item>
+    </string-array>
+
+    <string name="Incorrect_value">Incorrect value!</string>
+
+    <!-- MENU -->
+    <string name="action_settings">Settings</string>
+    <string name="action_load_track">Load track</string>
+    <string name="action_save_track">Save current track</string>
+    <string name="action_show_my_location">Show my location</string>
+    <string name="action_show_track">Show track</string>
+    <string name="action_animate_track">Animate track</string>
+
 </resources>

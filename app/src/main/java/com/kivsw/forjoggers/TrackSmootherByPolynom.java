@@ -12,7 +12,7 @@ public class TrackSmootherByPolynom extends TrackSmootherByLine{
     TrackSmootherByPolynom(Track track)
     {
         super(track);
-        deltaT=30000; deltaDistance=300;
+        deltaT=20000; deltaDistance=600;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class TrackSmootherByPolynom extends TrackSmootherByLine{
         }
 
         //deltaT=1200000; deltaDistance=100;
-        deltaT=30000; deltaDistance=600;
+
     };//*/
 
     @Override

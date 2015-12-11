@@ -22,7 +22,9 @@ public abstract class TrackSmoother extends Track
     }
 
     public long getTrackTime()
-    {return track.getTrackTime();};
+    {
+        if(track==null) return 0;
+        return track.getTrackTime();};
 
 
     @Override

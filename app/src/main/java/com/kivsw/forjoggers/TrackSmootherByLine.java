@@ -54,7 +54,7 @@ public class TrackSmootherByLine extends TrackSmoother{
 
     void doSmooth()
     {
-
+        if(track==null) return;
         int s=track.getGeoPoints().size();
         mGeoPoints = doSmooth(track.getGeoPoints(), 0,s,  0,s, deltaT,deltaDistance);
     }

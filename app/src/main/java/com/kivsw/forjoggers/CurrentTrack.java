@@ -17,7 +17,11 @@ public class CurrentTrack extends Track {
             track = new CurrentTrack();
             track.settings = SettingsKeeper.getInstance(context);
 
-            track.fromJSON(track.settings.getCurrentTrack());
+            String fn=track.settings.getCurrentFileName();
+            if(fn!=null && !fn.isEmpty())
+               track.loadGeoPoint(fn);
+            else
+                track.fromJSON(track.settings.getCurrentTrack());
         }
         return track;
     }
@@ -39,6 +43,7 @@ public class CurrentTrack extends Track {
     {
         super.clear();
         fileName="";
+        settings.setCurrentFileName("");
     }
 
     //----------------------------------------------------
@@ -50,6 +55,7 @@ public class CurrentTrack extends Track {
     {
         if(super.saveGeoPoint(fileName)) {
             this.fileName = fileName;
+            settings.setCurrentFileName(fileName);
             return true;
         }
         return false;
@@ -63,6 +69,7 @@ public class CurrentTrack extends Track {
     public boolean loadGeoPoint(String fileName) {
         if( super.loadGeoPoint(fileName)) {
             this.fileName = fileName;
+            settings.setCurrentFileName(fileName);
             return true;
         }
         return false;
@@ -70,6 +77,6 @@ public class CurrentTrack extends Track {
 
     public boolean needToBeSaved()
     {
-        return (fileName==null || fileName.isEmpty()) && (mGeoPoints.size()>0);
+        return (fileName==null || fileName.isEmpty()) && (mGeoPoints.size()>1);
     }
 }

@@ -1,108 +1,203 @@
 package com.kivsw.forjoggers;
 
-import android.content.Context;
-import android.net.Uri;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
+
+import com.kivsw.dialog.BaseDialog;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SettingsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class SettingsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class SettingsFragment extends BaseDialog
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+{
 
-    private OnFragmentInteractionListener mListener;
+    SettingsKeeper settings;
+
+    interface onSettingsCloseListener
+    {
+        void onSettingsChanged();
+    }
+    CheckBox returnToMyLocationCheckBox;
+    EditText weightEditText;
+    Spinner weightUnitsSpinner,
+            activitySpinner,
+            distanceUnitsSpinner,
+            speedDUnitsSpinner,
+            speedTUnitsSpinner;
+
 
     public SettingsFragment() {
-        // Required empty public constructor
+        super();
     }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param listener a listener for this Fragment
      * @return A new instance of fragment SettingsFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static SettingsFragment newInstance(String param1, String param2) {
+    public static SettingsFragment newInstance(onSettingsCloseListener listener) {
         SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+        fragment.setOnCloseLister(listener);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settings=SettingsKeeper.getInstance(getActivity());
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ArrayAdapter<CharSequence> adapter;
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        View rootView= inflater.inflate(R.layout.fragment_settings, container, false);
+
+        returnToMyLocationCheckBox = (CheckBox)rootView.findViewById(R.id.returnToMyLocationCheckBox);
+        weightEditText = (EditText)rootView.findViewById(R.id.weightEditText);
+        weightEditText.addTextChangedListener(new WeightWatcher());
+
+        weightUnitsSpinner = (Spinner)rootView.findViewById(R.id.weightUnitsSpinner);
+        adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.weight_unit, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        weightUnitsSpinner.setAdapter(adapter);
+
+        activitySpinner = (Spinner)rootView.findViewById(R.id.activitySpinner);
+        adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.activities, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        activitySpinner.setAdapter(adapter);
+
+        distanceUnitsSpinner = (Spinner)rootView.findViewById(R.id.distanceUnitsSpinner);
+        adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.distance_unit, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        distanceUnitsSpinner.setAdapter(adapter);
+
+        speedDUnitsSpinner = (Spinner)rootView.findViewById(R.id.speedDUnitsSpinner);
+        adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.distance_unit, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        speedDUnitsSpinner.setAdapter(adapter);
+
+        speedTUnitsSpinner = (Spinner)rootView.findViewById(R.id.speedTUnitsSpinner);
+        adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.time_unit, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        speedTUnitsSpinner.setAdapter(adapter);
+
+        getDialog().setTitle(getText(R.string.Settings));
+
+        loadData();
+        return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(Activity context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    @Override
+    public void onPause()
+    {
+        saveData();
+        super.onPause();
+
     }
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+
+    }
+     @Override
+    public void onCancel(DialogInterface dialog) {
+
+         super.onCancel(dialog);
+    }
+ @Override
+    public void onDismiss(DialogInterface dialog) {
+
+        super.onDismiss(dialog);
+    }
+
+    private void loadData()
+    {
+        returnToMyLocationCheckBox.setChecked(settings.getReturnToMyLocation());
+        weightEditText.setText(String.valueOf(settings.getMyWeight()));
+        weightUnitsSpinner.setSelection(settings.getMyWeightUnit());
+
+        activitySpinner.setSelection(settings.getActivityType());
+        distanceUnitsSpinner.setSelection(settings.getDistanceUnit());
+        speedDUnitsSpinner.setSelection(settings.getSpeedUnitDistance());
+        speedTUnitsSpinner.setSelection(settings.getSpeedUnitTime());
+    }
+    private void saveData()
+    {
+        int i;
+        settings.setReturnToMyLocation(returnToMyLocationCheckBox.isChecked());
+
+        try{i=Integer.parseInt(weightEditText.getText().toString());}
+        catch(Exception e){i=0;};
+        settings.setMyWeight(i, weightUnitsSpinner.getSelectedItemPosition());
+
+        settings.setActivityType(activitySpinner.getSelectedItemPosition());
+
+        settings.setDistanceUnit(distanceUnitsSpinner.getSelectedItemPosition());
+
+        settings.setSpeedUnit(speedDUnitsSpinner.getSelectedItemPosition(), speedTUnitsSpinner.getSelectedItemPosition());
+
+        onSettingsCloseListener l=(onSettingsCloseListener)getOnCloseLister();
+        if(l!=null)
+            l.onSettingsChanged();
+
+    }
+    ////--------------------------------------------
+    class WeightWatcher implements TextWatcher {
+        //TextWatcher
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            long v = -1;
+            try {
+                v = Long.parseLong(s.toString());
+            } catch (Exception e) {
+            }
+            ;
+            if (v < 0 || v > 999) {
+                weightEditText.setError(getText(R.string.Incorrect_value));
+            } else
+                weightEditText.setError(null);
+
+        }
+    }
+    //----------------------------------------------
 }

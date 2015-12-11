@@ -1,6 +1,7 @@
 package com.kivsw.forjoggers;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
 
 import java.io.File;
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity
@@ -104,14 +106,20 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
      @Override
     public boolean onPrepareOptionsMenu(Menu menu)
      {
-         MenuItem item=menu.findItem(R.id.return_to_mylocation);
-         item.setChecked(settings.getReturnToMyLocation());
+         MenuItem item=menu.findItem(R.id.action_show_my_location);
 
          item=menu.findItem(R.id.action_load_track);
          item.setEnabled(!TrackingService.isWorking);
 
          item=menu.findItem(R.id.action_save_track);
          item.setEnabled(!TrackingService.isWorking);
+
+         boolean isTrack = CurrentTrack.getInstance(this).getGeoPoints().size()>1;
+         item=menu.findItem(R.id.action_show_my_track);
+         item.setEnabled(isTrack);
+
+         item=menu.findItem(R.id.action_animate_my_track);
+         item.setEnabled(isTrack && !TrackingService.isWorking);
 
          return super.onPrepareOptionsMenu(menu);
      }
@@ -126,10 +134,19 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
         //noinspection SimplifiableIfStatement
         switch(id) {
             case R.id.action_settings:
+                SettingsFragment.newInstance(new SettingsFragment.onSettingsCloseListener(){
+                    @Override
+                    public void onSettingsChanged() {
+                        analysingFragment.onSettingsChanged();
+                        mapFragment.onSettingsChanged();
+                    }
+                }).show(getSupportFragmentManager(),"");
                 return true;
+
             case R.id.action_save_track:
                 saveCurrentTrack();
                 return true;
+
             case R.id.action_load_track:
                 if(CurrentTrack.getInstance(this).needToBeSaved())
                 {
@@ -144,9 +161,20 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
                     loadCurrentTrack();
                 }
                 return true;
-            case R.id.return_to_mylocation:
-                settings.setReturnToMyLocation(!item.isChecked());
+
+            case R.id.action_show_my_location:
+                mapFragment.showMyLocation();
                 return true;
+
+            case R.id.action_show_my_track:
+                ArrayList<Location> points=CurrentTrack.getInstance(this).getGeoPoints();
+                if(points!=null && points.size()>0)
+                   mapFragment.showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
+                return true;
+
+            case R.id.action_animate_my_track:
+                mapFragment.animateTrack();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

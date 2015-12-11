@@ -21,7 +21,7 @@ import com.kivsw.dialog.MessageDialog;
  * A simple {@link Fragment} subclass.
  */
 public class AnalysingFragment extends Fragment
-        implements AdapterView.OnItemSelectedListener
+        implements AdapterView.OnItemSelectedListener, SettingsFragment.onSettingsCloseListener
 {
 
     GraphView graph;
@@ -154,5 +154,10 @@ public class AnalysingFragment extends Fragment
         }
 
 
+    }
+
+    @Override
+    public void onSettingsChanged() {
+        showGraph(graphSpiner.getSelectedItemPosition());
     }
 }

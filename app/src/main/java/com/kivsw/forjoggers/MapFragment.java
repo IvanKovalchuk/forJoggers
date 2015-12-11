@@ -39,7 +39,9 @@ import java.util.Locale;
 //import org.osmdroid.bonuspack.overlays.Polyline;
 
 
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment
+implements SettingsFragment.onSettingsCloseListener
+{
 
     private OnFragmentInteractionListener mListener;
 
@@ -209,6 +211,10 @@ public class MapFragment extends Fragment {
     void checkMyLocationVisibility()
     {
         if(!settings.getReturnToMyLocation()) return;
+        showMyLocation();
+    };
+    public void showMyLocation()
+    {
         if(mGPSLocationListener.getLastKnownLocation()==null) return;
         GeoPoint topLeftGpt     = (GeoPoint) mapView.getProjection().fromPixels(0, 0);
         GeoPoint bottomRightGpt = (GeoPoint) mapView.getProjection().fromPixels(
@@ -217,15 +223,23 @@ public class MapFragment extends Fragment {
         BoundingBoxE6 bounding=mapView.getBoundingBox();
 
         GeoPoint cl=new GeoPoint(mGPSLocationListener.getLastKnownLocation());
-       boolean r= bounding.contains(cl);
-       if(!r)
-       {
-           IMapController mapController = mapView.getController();
-           mapController.animateTo(cl);
-           settings.setZoomLevel(settings.getZoomLevel(), cl.getLatitude(), cl.getLongitude());
-       }
-
-    };
+        boolean r= bounding.contains(cl);
+        if(!r)
+        {
+            showLocation(cl.getLatitude(), cl.getLongitude());
+        }
+    }
+    public void showLocation(double lat, double lon)
+    {
+        IMapController mapController = mapView.getController();
+        GeoPoint cl=new GeoPoint(lat,lon);
+        mapController.animateTo(cl);
+        settings.setZoomLevel(settings.getZoomLevel(), cl.getLatitude(), cl.getLongitude());
+    }
+    public void animateTrack()
+    {
+        mHandler.startPointAnimation();
+    }
 
     /**
      *
@@ -257,11 +271,11 @@ public class MapFragment extends Fragment {
         double time = trackSmoother.getTrackTime()/1000.0;
 
         str.append(getText(R.string.distance));
-        str.append((long) distance);
+        str.append(distanceToStr(distance));
         if(BuildConfig.DEBUG)
         {
            str.append(" (");
-           str.append((long)currentTrack.getTrackDistance());
+           str.append(distanceToStr(currentTrack.getTrackDistance()));
             str.append(")");
         }
         str.append("\n");
@@ -270,25 +284,128 @@ public class MapFragment extends Fragment {
         str.append(trackSmoother.getTrackTimeStr());
         str.append("\n");
 
+        String energy=getCalloriesStr();
+        if(energy!=null)
+        {
+            str.append(getText(R.string.energy));
+            str.append(energy);
+            str.append("\n");
+        }
+
         if(points.size()>1) {
             str.append(getText(R.string.average_speed));
-            str.append(String.format(Locale.US,"%.1f",distance / time));
+            str.append(speedToStr(distance / time));
             str.append("\n");
 
             if(TrackingService.isWorking) {
                 str.append(getText(R.string.current_speed));
-                double sp = points.get(points.size() - 1).getSpeed();
-                str.append(String.format(Locale.US, "%.1f", sp));
+
+                Location lastLoc=null;
+                if(!currentTrack.getGeoPoints().isEmpty())
+                {
+                    lastLoc=currentTrack.getGeoPoints().get(currentTrack.getGeoPoints().size()-1);
+                    if(!lastLoc.hasSpeed()) lastLoc=null;
+                };
+                if(lastLoc==null)
+                {
+                    lastLoc = points.get(points.size() - 1);
+                }
+
+                str.append(speedToStr(lastLoc.getSpeed()));
                 str.append("\n");
+
             }
         }
 
-
-
-
-
         textTrackInfo.setText(str);
     };
+    private String distanceToStr(double distanceMeters)
+    {
+        double k=1;
+        String unit="";
+        String units[]=getResources().getStringArray(R.array.distance_short_unit);
+        String format="%f";
+        try {
+            int v=settings.getDistanceUnit();
+            unit=units[v];
+            switch(v)
+            {
+                case SettingsKeeper.METERS:
+                    k=1;
+                    format="%.0f ";
+                    break;
+                case SettingsKeeper.KILOMETERS:
+                    k=0.001;
+                    format="%.3f ";
+                    break;
+                case SettingsKeeper.MILES:
+                    k=1/1609.0;
+                    format="%.3f" ;
+                    break;
+            }
+        }catch(Exception e)
+        {
+            return e.toString();
+        }
+
+        return String.format(Locale.US,format, distanceMeters*k) + unit;
+    }
+    private String speedToStr(double speedMetersPerSec)
+    {
+        double k=1;
+        String unit="";
+        String distanceUnits[]=getResources().getStringArray(R.array.distance_short_unit);
+        String timeUnits[]=getResources().getStringArray(R.array.time_short_unit);
+        String format="%.1f";
+
+        try {
+            int speedUnit = settings.getSpeedUnitDistance();
+            unit = distanceUnits[speedUnit];
+            switch (speedUnit) {
+                case SettingsKeeper.METERS:
+                    k = 1;
+                    break;
+                case SettingsKeeper.KILOMETERS:
+                    k = 0.001;
+                    break;
+                case SettingsKeeper.MILES:
+                    k = 1 / 1609.0;
+                    break;
+            }
+
+            speedUnit = settings.getSpeedUnitTime();
+            unit = unit + "/" + timeUnits[speedUnit];
+            switch (speedUnit) {
+                case SettingsKeeper.SECOND:
+                    k = k * 1;
+                    break;
+                case SettingsKeeper.MINUTE:
+                    k = k * 60;
+                    break;
+                case SettingsKeeper.HOUR:
+                    k = k * 3600;
+                    break;
+            }
+        }catch(Exception e)
+        {
+            return e.toString();
+        }
+
+        return String.format(Locale.US,format, speedMetersPerSec*k) + unit;
+
+    }
+
+    String getCalloriesStr()
+    {
+         double e= trackSmoother.getСalories(settings.getMyWeightKg());
+        String res=null;
+
+        if(e>1)
+        {
+            res = String.format(Locale.US,"%.0f", e/1000) + getText(R.string.KCal);
+        }
+        return res;
+    }
 
     /**
      *
@@ -333,7 +450,7 @@ public class MapFragment extends Fragment {
     {
         boolean r=currentTrack.loadGeoPoint(fileName);
         updateTrack(true);
-        mHandler.startPointAnimation();
+
         return r;
     }
 
@@ -348,6 +465,12 @@ public class MapFragment extends Fragment {
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
+
+    @Override
+    public void onSettingsChanged() {
+        updateTrackInfo();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

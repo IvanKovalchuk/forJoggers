@@ -27,6 +27,7 @@ public class Track {
     //-----------------------------------------------------
     protected ArrayList<Location> mGeoPoints=null;
     public long timeStart=0, timeStop=0;
+    int activityType;
     IOnChange onChange=null;
     //-----------------------------------------------------
     public Track()
@@ -193,6 +194,7 @@ public class Track {
             JSONObject json = new JSONObject();
             json.put("timeStart", timeStart);
             json.put("timeStop", timeStop);
+            json.put("activityType", activityType);
 
             return json.toString();
         }catch(Exception e)
@@ -204,12 +206,14 @@ public class Track {
     private boolean loadParamFromJSON(String jsonStr)
     {
         timeStart =  timeStop =0;
+        activityType=SettingsKeeper.JOGGING;
         try{
             JSONObject json=new JSONObject(jsonStr);
 
             if(json.has("timeStart") && json.has("timeStop") ) {
                 timeStart = json.getLong("timeStart");
                 timeStop = json.getLong("timeStop");
+                activityType = json.getInt("activityType");
                 return true;
             }
         }
@@ -270,6 +274,7 @@ public class Track {
 
     public void clear()
     {
+        activityType=SettingsKeeper.JOGGING;
         mGeoPoints.clear();
         timeStart=0; timeStop=0;
         if(onChange!=null)
@@ -279,6 +284,51 @@ public class Track {
     {
         mGeoPoints.add(loc);
         if(onChange!=null) onChange.onAddPoint();
+    }
+
+    public void setActivityType(int v)
+    {
+        activityType=v;
+    }
+
+    public double getСalories(double weight)
+    {
+        /**
+         *  Определяем сколько калорий сжигается при ходьбе:
+         Е=0,007 x V^2 + 21,   где V -скорость ходьбы  в м/мин , Е—расход энергии (кал/кг/мин).
+         E=0,0001167 * v^2 + 21, где V -скорость ходьбы  в м/сек
+
+         Определяем сколько сжигается калорий при беге:
+         Е =18,0 x V - 20,   где V—скорость бега (км/час), Е—расход энергии (кал/кг/мин).
+         E=5.0 * v - 20, где V -скорость ходьбы  в м/сек
+         */
+
+        Location prevLoc=null;
+        double res=0;
+        if(mGeoPoints==null) return 0;
+
+        for(Location loc:mGeoPoints)
+        {
+            double e=0;
+            if(prevLoc!=null && loc.hasSpeed()) {
+                switch(activityType)
+                {
+                    case SettingsKeeper.HIKING:
+                        e=(0.0001167 * loc.getSpeed()*loc.getSpeed()+21);
+                        break;
+                    case SettingsKeeper.JOGGING:
+                        e=(5.0 * loc.getSpeed()-20);
+                        break;
+                    case SettingsKeeper.BICYCLING: e=0;
+                        break;
+                }
+                e*=(loc.getTime()-prevLoc.getTime())/60;
+            }
+            res = res + e;
+            prevLoc=loc;
+        }
+
+        return res;
     }
 
     public void setOnChange(IOnChange onChange)
