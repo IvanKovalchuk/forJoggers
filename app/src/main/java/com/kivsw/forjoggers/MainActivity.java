@@ -23,18 +23,19 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity
-implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCloseListener
+implements  FileDialog.OnCloseListener,
+            MessageDialog.OnCloseListener,SettingsFragment.onSettingsCloseListener
 {
 
     final static String ACTION_RECEIVE_TRACK="com.kivsw.forjoggers.ACTION_RECIEVE_TRACK";
 
     private ViewPager pager;
+    SettingsFragment settingsFragment=null;
     MapFragment mapFragment=null;
     AnalysingFragment analysingFragment=null;
-    TextView fileNameTextView;
+
     SettingsKeeper settings;
 
-    Button buttonStart, buttonStop;
 
 
     @Override
@@ -44,6 +45,7 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
 
         pager =(ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+        pager.addOnPageChangeListener(new MyOnPageChange());
        // mapFragment = pager.insta
 
         /*pager.setOnTouchListener(new View.OnTouchListener() {
@@ -55,29 +57,18 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
         });*/
 
         //mapFragment = (MapFragment)getSupportFragmentManager().findFragmentById(R.id.mapFragment);
-        fileNameTextView = (TextView)findViewById(R.id.fileNameTextView);
-        updateFileName();
-
-        buttonStart = (Button)findViewById(R.id.buttonStart);
-        buttonStart.setOnClickListener(this);
-
-        buttonStop = (Button)findViewById(R.id.buttonStop);
-        buttonStop.setOnClickListener(this);
-        if(TrackingService.isWorking)
-        {
-            buttonStop.setVisibility(View.VISIBLE);
-            buttonStart.setVisibility(View.GONE);
-        }
-        else
-        {
-            buttonStop.setVisibility(View.GONE);
-            buttonStart.setVisibility(View.VISIBLE);
-        }
 
 
         settings=SettingsKeeper.getInstance(this);
 
-        //mapFragment.setTrack(settings.getCurrentTrack());
+       if(savedInstanceState!=null)
+       {
+           pager.setCurrentItem(savedInstanceState.getInt("pageIndex"));
+       }
+        else
+       {
+           pager.setCurrentItem(1);
+       }
 
         processIntent(getIntent());
     }
@@ -93,6 +84,14 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
     protected void onDestroy()
     {
         super.onDestroy();
+
+    }
+    //----------------------------------------------------------
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("pageIndex", pager.getCurrentItem());
 
     }
     //----------------------------------------------------------
@@ -133,7 +132,7 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
 
         //noinspection SimplifiableIfStatement
         switch(id) {
-            case R.id.action_settings:
+           /* case R.id.action_settings:
                 SettingsFragment.newInstance(new SettingsFragment.onSettingsCloseListener(){
                     @Override
                     public void onSettingsChanged() {
@@ -141,24 +140,24 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
                         mapFragment.onSettingsChanged();
                     }
                 }).show(getSupportFragmentManager(),"");
-                return true;
+                return true;*/
 
             case R.id.action_save_track:
-                saveCurrentTrack();
+                if(!TrackingService.isWorking)
+                   saveCurrentTrack();
                 return true;
 
             case R.id.action_load_track:
-                if(CurrentTrack.getInstance(this).needToBeSaved())
-                {
-                    MessageDialog.newInstance(TRACK_MAY_BE_LOST_LOAD_FILE,
-                            getText(R.string.Warning).toString(),
-                            getText(R.string.track_may_be_lost).toString(),
-                            this)
-                            .show(getSupportFragmentManager(),"");
-                }
-                else
-                {
-                    loadCurrentTrack();
+                if(!TrackingService.isWorking) {
+                    if (CurrentTrack.getInstance(this).needToBeSaved()) {
+                        MessageDialog.newInstance(TRACK_MAY_BE_LOST_LOAD_FILE,
+                                getText(R.string.Warning).toString(),
+                                getText(R.string.track_may_be_lost).toString(),
+                                this)
+                                .show(getSupportFragmentManager(), "");
+                    } else {
+                        loadCurrentTrack();
+                    }
                 }
                 return true;
 
@@ -185,69 +184,11 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
 
     };
 
-    //----------------------------------------------------------
-    @Override
-    public void onClick(View v) {
-        switch(v.getId())
-        {
-            case R.id.buttonStart: {
-                StringBuilder problems=new StringBuilder();
 
-                if (mapFragment != null && !mapFragment.getGPSstatus())
-                     problems.append(getText(R.string.GPRS_has_not_found_location));
 
-                if (CurrentTrack.getInstance(this).needToBeSaved())
-                    problems.append(getText(R.string.track_may_be_lost));
 
-                if(problems.length()>0) {
-                    problems.append(getText(R.string.Continue));
-                    MessageDialog.newInstance(WARNINGS_AND_START_SERVICE,
-                            getText(R.string.Warning).toString(), problems.toString(),
-                            this)
-                            .show(getSupportFragmentManager(), "");
-                }
-                    else
-                        startTrackService();
-                }
-                break;
-            case R.id.buttonStop:
-                stopTrackService();
-                break;
-        }
-    }
-//----------------------------------------------------------
-    /**
-     * start tracking
-     */
-    private void startTrackService()
-    {
-        TrackingService.start(this);
-        mapFragment.onStartTrackingService();
-        buttonStart.setVisibility(View.GONE);
-        buttonStop.setVisibility(View.VISIBLE);
-    };
-//----------------------------------------------------------
-    /**
-     * stops tracking
-     */
-    private void stopTrackService()
-    {
-        TrackingService.stop(this);
-        buttonStop.setVisibility(View.GONE);
-        buttonStart.setVisibility(View.VISIBLE);
-    };
 
-    private void updateFileName()
-    {
-        String fn= CurrentTrack.getInstance(this).fileName;
-        if(fn!=null && !fn.isEmpty()) {
-            File file = new File(fn);
-            fn=file.getName();
-        }
-        if(fn==null || fn.isEmpty())
-            fn="*";
-        fileNameTextView.setText(fn);
-    };
+
 
     private void saveCurrentTrack()
     {
@@ -285,11 +226,7 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
                 {
                     String msg=String.format(getText(R.string.cannot_save_file).toString(),fileName);
                     MessageDialog.newInstance(getText(R.string.Error).toString(),msg)
-                            .show(getSupportFragmentManager(),"");
-                }
-                else
-                {
-                    updateFileName();
+                            .show(getSupportFragmentManager(), "");
                 }
                 break;
             case 2:
@@ -297,12 +234,9 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
                 {
                     String msg=String.format(getText(R.string.cannot_load_file).toString(),fileName);
                     MessageDialog.newInstance(getText(R.string.Error).toString(),msg)
-                            .show(getSupportFragmentManager(),"");
+                            .show(getSupportFragmentManager(), "");
                 }
-                else
-                {
-                    updateFileName();
-                };
+
                 break;
         }
     }
@@ -312,16 +246,14 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
 
     }
     //-------------------------------
-
-    final int WARNINGS_AND_START_SERVICE =0, TRACK_MAY_BE_LOST_LOAD_FILE=1;
     //  MessageDialog.OnCloseListener
+    final static int TRACK_MAY_BE_LOST_LOAD_FILE=1;
+
     @Override
     public void onClickOk(MessageDialog msg) {
         switch (msg.getDlgId())
         {
-            case WARNINGS_AND_START_SERVICE://R.string.track_may_be_lost:
-                     startTrackService();
-                break;
+
             case TRACK_MAY_BE_LOST_LOAD_FILE://R.string.track_may_be_lost:
                     loadCurrentTrack();
                 break;
@@ -335,6 +267,12 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
     public void onClickExtra(MessageDialog msg) { }
 
     //--------------------------------------------------------------------------
+    // SettingsFragment.onSettingsCloseListener
+    @Override
+    public void onSettingsChanged() {
+        analysingFragment.onSettingsChanged();
+        mapFragment.onSettingsChanged();
+    }
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
         public MyPagerAdapter(FragmentManager fm) {
@@ -344,7 +282,7 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -354,14 +292,45 @@ implements  View.OnClickListener, FileDialog.OnCloseListener, MessageDialog.OnCl
             switch(position)
             {
                 case 0:
-                      res=new MapFragment();
+                    res = new SettingsFragment();
                     break;
                 case 1:
-                      res=new AnalysingFragment();
+                    res=new MapFragment();
+                    break;
+                case 2:
+                    res=new AnalysingFragment();
                     break;
             }
             return res;
         }
+    }
+    //--------------------------------------------------------------------------
+
+    class MyOnPageChange extends ViewPager.SimpleOnPageChangeListener
+    {
+        Fragment currentPage =null;
+
+        @Override
+        public void onPageSelected(int position)
+        {
+            if(currentPage !=null && (currentPage instanceof CustomPagerView.IonPageAppear))
+                ((CustomPagerView.IonPageAppear) currentPage).onPageDisappear();
+
+            switch(position)
+            {
+                case 0:currentPage=settingsFragment;
+                    break;
+                case 1:currentPage=mapFragment;
+                    break;
+                case 2:currentPage=analysingFragment;
+                    break;
+                default: currentPage=null;
+            };
+
+            if(currentPage !=null && (currentPage instanceof CustomPagerView.IonPageAppear))
+                ((CustomPagerView.IonPageAppear) currentPage).onPageAppear();
+        }
+
     }
 
 

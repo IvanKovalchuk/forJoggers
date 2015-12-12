@@ -3,11 +3,17 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity">
 
-      <item android:id="@+id/action_settings"
+    <!--  <item android:id="@+id/action_settings"
           android:title="@string/action_settings"
             android:icon="@drawable/ic_action_settings"
           android:orderInCategory="100"
-          app:showAsAction="ifRoom"/>
+          app:showAsAction="ifRoom"/> -->
+
+       <item android:id="@+id/action_load_track"
+            android:title="@string/action_load_track"
+            android:icon="@drawable/ic_action_collection"
+            android:orderInCategory="100"
+            app:showAsAction="ifRoom"/>
 
       <item android:id="@+id/action_save_track"
             android:title="@string/action_save_track"
@@ -15,11 +21,6 @@
             android:orderInCategory="100"
             app:showAsAction="ifRoom"/>
 
-      <item android:id="@+id/action_load_track"
-            android:title="@string/action_load_track"
-            android:icon="@drawable/ic_action_collection"
-            android:orderInCategory="100"
-            app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/action_show_my_location"
           android:title="@string/action_show_my_location"

@@ -3,6 +3,7 @@ package com.kivsw.forjoggers;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -16,11 +17,12 @@ import android.widget.Spinner;
 import com.kivsw.dialog.BaseDialog;
 
 
-public class SettingsFragment extends BaseDialog
-
+public class SettingsFragment extends Fragment
+implements CustomPagerView.IonPageAppear
 {
 
     SettingsKeeper settings;
+
 
     interface onSettingsCloseListener
     {
@@ -29,7 +31,9 @@ public class SettingsFragment extends BaseDialog
     CheckBox returnToMyLocationCheckBox;
     EditText weightEditText;
     Spinner weightUnitsSpinner,
-            activitySpinner,
+            currentActivitySpinner,
+            defaultActivitySpinner,
+
             distanceUnitsSpinner,
             speedDUnitsSpinner,
             speedTUnitsSpinner;
@@ -39,18 +43,12 @@ public class SettingsFragment extends BaseDialog
         super();
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param listener a listener for this Fragment
-     * @return A new instance of fragment SettingsFragment.
-     */
-    public static SettingsFragment newInstance(onSettingsCloseListener listener) {
+
+    /*public static SettingsFragment newInstance(onSettingsCloseListener listener) {
         SettingsFragment fragment = new SettingsFragment();
         fragment.setOnCloseLister(listener);
         return fragment;
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,11 +76,14 @@ public class SettingsFragment extends BaseDialog
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         weightUnitsSpinner.setAdapter(adapter);
 
-        activitySpinner = (Spinner)rootView.findViewById(R.id.activitySpinner);
+        currentActivitySpinner = (Spinner)rootView.findViewById(R.id.currentActivitySpinner);
         adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.activities, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        activitySpinner.setAdapter(adapter);
+        currentActivitySpinner.setAdapter(adapter);
+
+        defaultActivitySpinner= (Spinner)rootView.findViewById(R.id.defaultActivitySpinner);
+        defaultActivitySpinner.setAdapter(adapter);
 
         distanceUnitsSpinner = (Spinner)rootView.findViewById(R.id.distanceUnitsSpinner);
         adapter = ArrayAdapter.createFromResource(getActivity(),
@@ -102,23 +103,13 @@ public class SettingsFragment extends BaseDialog
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         speedTUnitsSpinner.setAdapter(adapter);
 
-        getDialog().setTitle(getText(R.string.Settings));
+       // getDialog().setTitle(getText(R.string.Settings));
 
         loadData();
         return rootView;
     }
 
-
-    @Override
-    public void onAttach(Activity context) {
-        super.onAttach(context);
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
+    //-------------------------------------------------------
 
     @Override
     public void onPause()
@@ -133,15 +124,21 @@ public class SettingsFragment extends BaseDialog
         super.onStop();
 
     }
-     @Override
-    public void onCancel(DialogInterface dialog) {
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
 
-         super.onCancel(dialog);
+        try {
+            ((MainActivity)getActivity()).settingsFragment=this;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
- @Override
-    public void onDismiss(DialogInterface dialog) {
 
-        super.onDismiss(dialog);
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 
     private void loadData()
@@ -150,7 +147,9 @@ public class SettingsFragment extends BaseDialog
         weightEditText.setText(String.valueOf(settings.getMyWeight()));
         weightUnitsSpinner.setSelection(settings.getMyWeightUnit());
 
-        activitySpinner.setSelection(settings.getActivityType());
+        currentActivitySpinner.setSelection(CurrentTrack.getInstance(getActivity()).activityType);
+        defaultActivitySpinner.setSelection(settings.getActivityType());
+
         distanceUnitsSpinner.setSelection(settings.getDistanceUnit());
         speedDUnitsSpinner.setSelection(settings.getSpeedUnitDistance());
         speedTUnitsSpinner.setSelection(settings.getSpeedUnitTime());
@@ -164,16 +163,31 @@ public class SettingsFragment extends BaseDialog
         catch(Exception e){i=0;};
         settings.setMyWeight(i, weightUnitsSpinner.getSelectedItemPosition());
 
-        settings.setActivityType(activitySpinner.getSelectedItemPosition());
+        CurrentTrack.getInstance(getActivity()).setActivityType(
+                currentActivitySpinner.getSelectedItemPosition());
+
+        settings.setActivityType(defaultActivitySpinner.getSelectedItemPosition());
 
         settings.setDistanceUnit(distanceUnitsSpinner.getSelectedItemPosition());
 
         settings.setSpeedUnit(speedDUnitsSpinner.getSelectedItemPosition(), speedTUnitsSpinner.getSelectedItemPosition());
 
-        onSettingsCloseListener l=(onSettingsCloseListener)getOnCloseLister();
-        if(l!=null)
+        if(getActivity()!=null && (getActivity() instanceof onSettingsCloseListener) ) {
+            onSettingsCloseListener l = (onSettingsCloseListener) getActivity();
             l.onSettingsChanged();
+        }
 
+    }
+    //----------------------------------------------
+    // CustomPagerView.IonPageAppear
+    @Override
+    public void onPageAppear() {
+        loadData();
+    }
+
+    @Override
+    public void onPageDisappear() {
+        saveData();
     }
     ////--------------------------------------------
     class WeightWatcher implements TextWatcher {
@@ -200,4 +214,5 @@ public class SettingsFragment extends BaseDialog
         }
     }
     //----------------------------------------------
+
 }

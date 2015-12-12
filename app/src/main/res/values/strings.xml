@@ -32,9 +32,11 @@
     <!-- settings fragment -->
     <string name="Settings">Settings</string>
     <string name="return_to_my_location">return to my location</string>
-    <string name="my_weight">My weight</string>
+    <string name="my_weight">My weight:</string>
 
-    <string name="my_activity">My activity</string>
+    <string name="current_activity">Current track activity:</string>
+    <string name="default_activity">Default activity:</string>
+
     <string-array name="activities">
         <item>Hiking</item>
         <item>Jogging</item>
@@ -56,13 +58,13 @@
 
     <string name="speed_unit">Speed unit:</string>
     <string-array name="time_unit">
-        <item>secund</item>
-        <item>minune</item>
+        <item>second</item>
+        <item>minute</item>
         <item>hour</item>
     </string-array>
     <string-array name="time_short_unit">
-        <item>s</item>
-        <item>m</item>
+        <item>sec</item>
+        <item>min</item>
         <item>h</item>
     </string-array>
 

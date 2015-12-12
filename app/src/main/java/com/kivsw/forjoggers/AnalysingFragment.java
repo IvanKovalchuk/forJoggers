@@ -21,17 +21,23 @@ import com.kivsw.dialog.MessageDialog;
  * A simple {@link Fragment} subclass.
  */
 public class AnalysingFragment extends Fragment
-        implements AdapterView.OnItemSelectedListener, SettingsFragment.onSettingsCloseListener
+        implements AdapterView.OnItemSelectedListener,
+        SettingsFragment.onSettingsCloseListener,
+         CustomPagerView.IonPageAppear
 {
 
     GraphView graph;
+    UnitUtils unitUtils;
     LineGraphSeries<DataPoint> series;
     Spinner graphSpiner;
     ArrayAdapter<CharSequence> spinnerAdpter;
+    boolean isVisible=false;
+    boolean needUpdate=true;
 
 
     public AnalysingFragment() {
         super();
+        unitUtils = new UnitUtils(getActivity());
     }
 
 
@@ -55,7 +61,7 @@ public class AnalysingFragment extends Fragment
         spinnerAdpter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         graphSpiner.setAdapter(spinnerAdpter);
         graphSpiner.setOnItemSelectedListener(this);
-        graphSpiner.setSelection(0);
+        graphSpiner.setSelection(2);
 
 
         return rootView;
@@ -96,6 +102,7 @@ public class AnalysingFragment extends Fragment
 
     void showGraph(int num)
     {
+        needUpdate=false;
         Track curentTrack=CurrentTrack.getInstance(getActivity());
         if(curentTrack.getOnChange() instanceof Track)
         {
@@ -118,7 +125,7 @@ public class AnalysingFragment extends Fragment
                         break;
                     case 1: y=loc.getLongitude();
                         break;
-                    case 2: y = loc.getSpeed();
+                    case 2: y = unitUtils.convertSpeed(loc.getSpeed());
                         break;
                     case 3: y=loc.getBearing()+add;
                             if(prevLoc!=null)
@@ -155,9 +162,26 @@ public class AnalysingFragment extends Fragment
 
 
     }
-
+    //----------------------------------------------
+    // SettingsFragment.onSettingsCloseListener
     @Override
     public void onSettingsChanged() {
-        showGraph(graphSpiner.getSelectedItemPosition());
+        needUpdate=true;
+        if(isVisible)
+            showGraph(graphSpiner.getSelectedItemPosition());
+    }
+
+    //----------------------------------------------
+    // CustomPagerView.IonPageAppear
+    @Override
+    public void onPageAppear() {
+        isVisible=true;
+      if(needUpdate)
+          showGraph(graphSpiner.getSelectedItemPosition());
+    }
+
+    @Override
+    public void onPageDisappear() {
+        isVisible=false;
     }
 }

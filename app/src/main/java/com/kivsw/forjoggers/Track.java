@@ -213,7 +213,7 @@ public class Track {
             if(json.has("timeStart") && json.has("timeStop") ) {
                 timeStart = json.getLong("timeStart");
                 timeStop = json.getLong("timeStop");
-                activityType = json.getInt("activityType");
+                setActivityType (json.getInt("activityType"));
                 return true;
             }
         }
@@ -286,49 +286,91 @@ public class Track {
         if(onChange!=null) onChange.onAddPoint();
     }
 
+    public int getActivityType()
+    {return activityType;}
     public void setActivityType(int v)
     {
+        if(v<0) v=0;
+        if(v>2) v=2;
         activityType=v;
     }
 
     public double getСalories(double weight)
     {
-        /**
-         *  Определяем сколько калорий сжигается при ходьбе:
-         Е=0,007 x V^2 + 21,   где V -скорость ходьбы  в м/мин , Е—расход энергии (кал/кг/мин).
-         E=0,0001167 * v^2 + 21, где V -скорость ходьбы  в м/сек
 
-         Определяем сколько сжигается калорий при беге:
-         Е =18,0 x V - 20,   где V—скорость бега (км/час), Е—расход энергии (кал/кг/мин).
-         E=5.0 * v - 20, где V -скорость ходьбы  в м/сек
-         */
 
         Location prevLoc=null;
         double res=0;
         if(mGeoPoints==null) return 0;
 
+        int activityType=getActivityType();
         for(Location loc:mGeoPoints)
         {
             double e=0;
             if(prevLoc!=null && loc.hasSpeed()) {
+                double speed = loc.getSpeed();
                 switch(activityType)
                 {
                     case SettingsKeeper.HIKING:
-                        e=(0.0001167 * loc.getSpeed()*loc.getSpeed()+21);
+                        e=hiking(speed);
                         break;
                     case SettingsKeeper.JOGGING:
-                        e=(5.0 * loc.getSpeed()-20);
+                        e=jogging(speed);
                         break;
-                    case SettingsKeeper.BICYCLING: e=0;
+                    case SettingsKeeper.BICYCLING: e=bicycling(speed);
                         break;
                 }
-                e*=(loc.getTime()-prevLoc.getTime())/60;
+                e*=(loc.getTime()-prevLoc.getTime())/1000;
+                if(e<0) e=0;
             }
             res = res + e;
             prevLoc=loc;
         }
 
-        return res;
+        return res*weight;
+    }
+
+    /** http://gotowalk.blogspot.ru/2014/06/Opredelenie-kolichestva-szhigaemyh-kalorij-pri-hodbe-bege.html
+     *  Определяем сколько калорий сжигается при ходьбе:
+     Е=0,007 x V^2 + 21,   где V -скорость ходьбы  в м/мин , Е—расход энергии (кал/кг/мин).
+
+     Определяем сколько сжигается калорий при беге:
+     Е =18,0 x V - 20,   где V—скорость бега (км/час), Е—расход энергии (кал/кг/мин).
+     */
+    private double hiking(double speed)
+    {
+        speed = speed*60;
+        double e=(0.007 * speed*speed+21)/60;
+        return e;
+    }
+    private double jogging(double speed)
+    {
+        speed = speed*3.6;
+        double e=((5.0 * speed)-20)/60;
+        return e;
+    }
+    private double bicycling(double speed)
+    {
+        // http://sportlib.su/Annuals/Bicycling/1986/p74-75.htm
+        // speed (km per hour)
+        double speeds[]={0, 3.5,    8.5,    9,      10,    15,     20,      25,     30,      35};
+        // enegry (cal) per a second
+        double energy[]={0, 2.58, 3.3,  3.54, 4.2, 6.48, 8.52,  12,   15,    18.12 };
+
+        speed = speed*3.6;
+
+        int i=0;
+        while(i<speeds.length && speed>speeds[i])
+            i++;
+        if(i>=speeds.length) i=speeds.length-1;
+        if(i==0) i=1;
+
+        double k=(energy[i]-energy[i-1])/(speeds[i]-speeds[i-1]);
+        double b= energy[i]-k*speeds[i];
+
+        double r=k*speed+b;
+        if(r<k) r=0;
+        return r;
     }
 
     public void setOnChange(IOnChange onChange)

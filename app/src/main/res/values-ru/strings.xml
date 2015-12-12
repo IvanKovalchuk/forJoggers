@@ -32,9 +32,10 @@
     <!-- settings fragment -->
     <string name="Settings">Настройки</string>
     <string name="return_to_my_location">возвращать в мое положение</string>
-    <string name="my_weight">Мой вес</string>
+    <string name="my_weight">Мой вес:</string>
 
-    <string name="my_activity">Вид деятельности</string>
+    <string name="current_activity">Деятельность текущго трека:</string>
+    <string name="default_activity">Деятельность по умолчанию:</string>
     <string-array name="activities">
         <item>Ходьба</item>
         <item>Бег</item>

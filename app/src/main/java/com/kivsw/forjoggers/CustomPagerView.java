@@ -11,6 +11,13 @@ public class CustomPagerView extends android.support.v4.view.ViewPager {
 
     private boolean enabled= true;
 
+    interface IonPageAppear
+    {
+        void onPageAppear();
+        void onPageDisappear();
+    }
+
+
     public CustomPagerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.enabled = true;

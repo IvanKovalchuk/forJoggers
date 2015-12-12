@@ -20,6 +20,7 @@ public class TrackingService extends Service {
 
     LocationListener mGPSLocationListener=null;
     CurrentTrack currentTrack=null;
+    SettingsKeeper settings=null;
 
     //------------------------------------------------------
 
@@ -48,6 +49,7 @@ public class TrackingService extends Service {
     //-------------------------------------------------------
     public TrackingService() {
         super();
+        settings = SettingsKeeper.getInstance(this);
     }
 
     @Nullable
@@ -96,6 +98,7 @@ public class TrackingService extends Service {
         currentTrack=CurrentTrack.getInstance(this);
 
         currentTrack.clear();
+        currentTrack.setActivityType(settings.getActivityType());
         currentTrack.timeStart=SystemClock.elapsedRealtime();
         mGPSLocationListener = new LocationListener(this);
         Location loc = mGPSLocationListener.getLastknownLocation();

@@ -16,8 +16,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.kivsw.dialog.MessageDialog;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -33,6 +36,7 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -40,7 +44,9 @@ import java.util.Locale;
 
 
 public class MapFragment extends Fragment
-implements SettingsFragment.onSettingsCloseListener
+implements SettingsFragment.onSettingsCloseListener,
+            CustomPagerView.IonPageAppear, View.OnClickListener,
+        MessageDialog.OnCloseListener
 {
 
     private OnFragmentInteractionListener mListener;
@@ -49,6 +55,8 @@ implements SettingsFragment.onSettingsCloseListener
 
     private TextView textTrackInfo;
     ImageView satelliteImageView;
+    TextView fileNameTextView;
+    Button buttonStart, buttonStop;
 
     Polyline originalPath =null, smoothyPath=null;
 
@@ -57,6 +65,7 @@ implements SettingsFragment.onSettingsCloseListener
     private Track currentTrack;
     TrackSmoother trackSmoother;
     private SettingsKeeper settings=null;
+    UnitUtils unitUtils=null;
     private MyGPSLocationListener mGPSLocationListener;
     private MyLocationNewOverlay myLocationoverlay;
     private MyHandler mHandler;
@@ -75,6 +84,7 @@ implements SettingsFragment.onSettingsCloseListener
         super.onCreate(savedInstanceState);
 
         settings = SettingsKeeper.getInstance(getActivity());
+        unitUtils = new UnitUtils(getActivity());
         currentTrack = CurrentTrack.getInstance(getActivity());
         trackSmoother = //new TrackSmootherByLine(currentTrack);
                         new TrackSmootherByPolynom(currentTrack);
@@ -135,6 +145,25 @@ implements SettingsFragment.onSettingsCloseListener
 
         satelliteImageView = (ImageView)rootView.findViewById(R.id.satelliteImageView);
 
+        fileNameTextView = (TextView)rootView.findViewById(R.id.fileNameTextView);
+        updateFileName();
+
+        buttonStart = (Button)rootView.findViewById(R.id.buttonStart);
+        buttonStart.setOnClickListener(this);
+
+        buttonStop = (Button)rootView.findViewById(R.id.buttonStop);
+        buttonStop.setOnClickListener(this);
+        if(TrackingService.isWorking)
+        {
+            buttonStop.setVisibility(View.VISIBLE);
+            buttonStart.setVisibility(View.GONE);
+        }
+        else
+        {
+            buttonStop.setVisibility(View.GONE);
+            buttonStart.setVisibility(View.VISIBLE);
+        }
+
         updateTrack(true);
         if(savedInstanceState!=null)
             isGPS_available = savedInstanceState.getBoolean("isGPS_available",false);
@@ -161,8 +190,7 @@ implements SettingsFragment.onSettingsCloseListener
     {
         super.onResume();
 
-        if(TrackingService.isWorking)
-            onStartTrackingService();
+        onStartStopTrackingService(TrackingService.isWorking);
 
     }
     @Override
@@ -196,14 +224,7 @@ implements SettingsFragment.onSettingsCloseListener
 
     //-------------------------------------
 
-    /** is invoked when the tracking service has been started
-     *
-     */
-    public void onStartTrackingService()
-    {
-        updateTrack(true);
-        mHandler.startTrackUpdate(true);
-    }
+
 
     /**
      * check if mylocation is on the screen and correct visible bounds
@@ -271,11 +292,11 @@ implements SettingsFragment.onSettingsCloseListener
         double time = trackSmoother.getTrackTime()/1000.0;
 
         str.append(getText(R.string.distance));
-        str.append(distanceToStr(distance));
+        str.append(unitUtils.distanceToStr(distance));
         if(BuildConfig.DEBUG)
         {
            str.append(" (");
-           str.append(distanceToStr(currentTrack.getTrackDistance()));
+           str.append(unitUtils.distanceToStr(currentTrack.getTrackDistance()));
             str.append(")");
         }
         str.append("\n");
@@ -294,7 +315,7 @@ implements SettingsFragment.onSettingsCloseListener
 
         if(points.size()>1) {
             str.append(getText(R.string.average_speed));
-            str.append(speedToStr(distance / time));
+            str.append(unitUtils.speedToStr(distance / time));
             str.append("\n");
 
             if(TrackingService.isWorking) {
@@ -311,7 +332,7 @@ implements SettingsFragment.onSettingsCloseListener
                     lastLoc = points.get(points.size() - 1);
                 }
 
-                str.append(speedToStr(lastLoc.getSpeed()));
+                str.append(unitUtils.speedToStr(lastLoc.getSpeed()));
                 str.append("\n");
 
             }
@@ -319,81 +340,8 @@ implements SettingsFragment.onSettingsCloseListener
 
         textTrackInfo.setText(str);
     };
-    private String distanceToStr(double distanceMeters)
-    {
-        double k=1;
-        String unit="";
-        String units[]=getResources().getStringArray(R.array.distance_short_unit);
-        String format="%f";
-        try {
-            int v=settings.getDistanceUnit();
-            unit=units[v];
-            switch(v)
-            {
-                case SettingsKeeper.METERS:
-                    k=1;
-                    format="%.0f ";
-                    break;
-                case SettingsKeeper.KILOMETERS:
-                    k=0.001;
-                    format="%.3f ";
-                    break;
-                case SettingsKeeper.MILES:
-                    k=1/1609.0;
-                    format="%.3f" ;
-                    break;
-            }
-        }catch(Exception e)
-        {
-            return e.toString();
-        }
 
-        return String.format(Locale.US,format, distanceMeters*k) + unit;
-    }
-    private String speedToStr(double speedMetersPerSec)
-    {
-        double k=1;
-        String unit="";
-        String distanceUnits[]=getResources().getStringArray(R.array.distance_short_unit);
-        String timeUnits[]=getResources().getStringArray(R.array.time_short_unit);
-        String format="%.1f";
 
-        try {
-            int speedUnit = settings.getSpeedUnitDistance();
-            unit = distanceUnits[speedUnit];
-            switch (speedUnit) {
-                case SettingsKeeper.METERS:
-                    k = 1;
-                    break;
-                case SettingsKeeper.KILOMETERS:
-                    k = 0.001;
-                    break;
-                case SettingsKeeper.MILES:
-                    k = 1 / 1609.0;
-                    break;
-            }
-
-            speedUnit = settings.getSpeedUnitTime();
-            unit = unit + "/" + timeUnits[speedUnit];
-            switch (speedUnit) {
-                case SettingsKeeper.SECOND:
-                    k = k * 1;
-                    break;
-                case SettingsKeeper.MINUTE:
-                    k = k * 60;
-                    break;
-                case SettingsKeeper.HOUR:
-                    k = k * 3600;
-                    break;
-            }
-        }catch(Exception e)
-        {
-            return e.toString();
-        }
-
-        return String.format(Locale.US,format, speedMetersPerSec*k) + unit;
-
-    }
 
     String getCalloriesStr()
     {
@@ -450,15 +398,65 @@ implements SettingsFragment.onSettingsCloseListener
     {
         boolean r=currentTrack.loadGeoPoint(fileName);
         updateTrack(true);
+        if(r)
+          updateFileName();
 
         return r;
     }
 
     boolean saveTrackToFile(String fileName)
     {
-        return currentTrack.saveGeoPoint(fileName);
+        boolean r= currentTrack.saveGeoPoint(fileName);
+        if(r)
+            updateFileName();
+        return r;
     }
+    /**
+     * start tracking
+     */
+    private void startTrackService()
+    {
+        TrackingService.start(getActivity());
+        CurrentTrack.getInstance(getActivity()).clear();
+        onStartStopTrackingService(true);
+    };
+    /**
+     * stops tracking
+     */
+    private void stopTrackService()
+    {
+        TrackingService.stop(getActivity());
+        onStartStopTrackingService(false);
 
+    };
+    /** is invoked when it's necessary to update the tracking service status
+     *
+     */
+    public void onStartStopTrackingService(boolean isRunning) {
+        if (isRunning) {
+            updateTrack(true);
+            mHandler.startTrackUpdate(true);
+            buttonStart.setVisibility(View.GONE);
+            buttonStop.setVisibility(View.VISIBLE);
+            updateFileName();
+        }
+        else
+        {
+            buttonStop.setVisibility(View.GONE);
+            buttonStart.setVisibility(View.VISIBLE);
+        }
+    }
+    private void updateFileName()
+    {
+        String fn= CurrentTrack.getInstance(getActivity()).fileName;
+        if(fn!=null && !fn.isEmpty()) {
+            File file = new File(fn);
+            fn=file.getName();
+        }
+        if(fn==null || fn.isEmpty())
+            fn="*";
+        fileNameTextView.setText(fn);
+    };
     public static Bitmap RotateBitmap(Bitmap source, float angle)
     {
         Matrix matrix = new Matrix();
@@ -466,11 +464,83 @@ implements SettingsFragment.onSettingsCloseListener
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
+    //----------------------------------------------
+    // SettingsFragment.onSettingsCloseListener
     @Override
     public void onSettingsChanged() {
         updateTrackInfo();
     }
+    //----------------------------------------------
+    // CustomPagerView.IonPageAppear
+    @Override
+    public void onPageAppear() {
 
+    }
+
+    @Override
+    public void onPageDisappear() {
+
+    }
+    //--------------------------------------------
+    // View.OnClickListener
+    //----------------------------------------------------------
+    @Override
+    public void onClick(View v) {
+        switch(v.getId())
+        {
+            case R.id.buttonStart: {
+                StringBuilder problems=new StringBuilder();
+
+                if(!getGPSstatus())
+                    problems.append(getText(R.string.GPRS_has_not_found_location));
+
+                if(CurrentTrack.getInstance(getActivity()).needToBeSaved())
+                    problems.append(getText(R.string.track_may_be_lost));
+
+                if(problems.length()>0) {
+                    problems.append(getText(R.string.Continue));
+                    MessageDialog.newInstance(WARNINGS_AND_START_SERVICE,
+                            getText(R.string.Warning).toString(), problems.toString(),
+                            this)
+                            .show(getFragmentManager(), "");
+                }
+                else
+                    startTrackService();
+            }
+            break;
+            case R.id.buttonStop:
+                stopTrackService();
+                break;
+        }
+    }
+//----------------------------------------------------------
+//-------------------------------
+//-------------------------------
+//  MessageDialog.OnCloseListener
+final static int WARNINGS_AND_START_SERVICE =0;
+
+    @Override
+    public void onClickOk(MessageDialog msg) {
+        switch (msg.getDlgId())
+        {
+            case WARNINGS_AND_START_SERVICE://R.string.track_may_be_lost:
+                startTrackService();
+                break;
+
+        }
+    }
+
+    @Override
+    public void onClickCancel(MessageDialog msg) { }
+
+    @Override
+    public void onClickExtra(MessageDialog msg) { }
+    //-----------------------------------------------------------
+
+
+
+
+    //----------------------------------------------------------
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
