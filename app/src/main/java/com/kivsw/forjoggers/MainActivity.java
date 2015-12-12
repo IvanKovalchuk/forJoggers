@@ -197,6 +197,15 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
 
     }
     //----------------------------------------------------------
+    @Override
+    public void onBackPressed()
+    {
+        if(pager.getCurrentItem()==1)
+            super.onBackPressed();
+        else
+            pager.setCurrentItem(1,true);
+    }
+    //----------------------------------------------------------
     private void processIntent(Intent i)
     {
 

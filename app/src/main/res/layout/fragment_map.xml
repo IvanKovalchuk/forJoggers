@@ -29,15 +29,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Start"
+        android:textSize="30dp"
+        android:textColor="#FFFFFFFF"
         android:id="@+id/buttonStart"
-        android:layout_gravity="center_horizontal|bottom"/>
+        android:layout_gravity="center_horizontal|bottom"
+        android:background="@drawable/start_btn"
+        android:layout_marginBottom="5dp" />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Stop"
+        android:textSize="30dp"
+        android:textColor="#FFFFFFFF"
         android:id="@+id/buttonStop"
         android:layout_gravity="center_horizontal|bottom"
-        />
+        android:background="@drawable/stop_btn"
+        android:layout_marginBottom="5dp" />
 
     <TextView
         android:layout_width="wrap_content"
