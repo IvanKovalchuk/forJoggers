@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity
-implements  FileDialog.OnCloseListener,
+implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingListener,
             MessageDialog.OnCloseListener,SettingsFragment.onSettingsCloseListener
 {
 
@@ -35,6 +35,8 @@ implements  FileDialog.OnCloseListener,
     AnalysingFragment analysingFragment=null;
 
     SettingsKeeper settings;
+
+    TrackingServiceEventReceiver trackingServiceEventReceiver=null;
 
 
 
@@ -104,7 +106,7 @@ implements  FileDialog.OnCloseListener,
     //----------------------------------------------------------
      @Override
     public boolean onPrepareOptionsMenu(Menu menu)
-     { обновить getActivity().supportInvalidateOptionsMenu(); при старте/остановке сервиса
+     {
          MenuItem item=menu.findItem(R.id.action_show_my_location);
 
          item=menu.findItem(R.id.action_load_track);
@@ -177,6 +179,22 @@ implements  FileDialog.OnCloseListener,
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    //----------------------------------------------------------
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        trackingServiceEventReceiver = TrackingServiceEventReceiver.createAndRegister(this, this);
+
+    }
+    //----------------------------------------------------------
+    @Override
+    protected void onStop()
+    {
+        trackingServiceEventReceiver.unregister();
+        super.onStop();
+
     }
     //----------------------------------------------------------
     private void processIntent(Intent i)
@@ -305,7 +323,12 @@ implements  FileDialog.OnCloseListener,
         }
     }
     //--------------------------------------------------------------------------
-
+//TrackingServiceEventReceiver.OnChangingListener
+    public void onServiceStatusChanged(boolean isRunning)
+    {
+        supportInvalidateOptionsMenu();
+        mapFragment.onStartStopTrackingService(isRunning);
+    }
     class MyOnPageChange extends ViewPager.SimpleOnPageChangeListener
     {
         Fragment currentPage =null;

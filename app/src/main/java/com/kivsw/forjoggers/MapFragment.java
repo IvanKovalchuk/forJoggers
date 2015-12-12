@@ -418,7 +418,7 @@ implements SettingsFragment.onSettingsCloseListener,
     {
         TrackingService.start(getActivity());
         CurrentTrack.getInstance(getActivity()).clear();
-        onStartStopTrackingService(true);
+       // onStartStopTrackingService(true);
     };
     /**
      * stops tracking
@@ -426,7 +426,7 @@ implements SettingsFragment.onSettingsCloseListener,
     private void stopTrackService()
     {
         TrackingService.stop(getActivity());
-        onStartStopTrackingService(false);
+        //onStartStopTrackingService(false);
 
     };
     /** is invoked when it's necessary to update the tracking service status

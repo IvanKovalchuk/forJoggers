@@ -105,6 +105,9 @@ public class TrackingService extends Service {
 
         isWorking=true;
         turnIntoForeground();
+
+        TrackingServiceEventReceiver.sendServiceStatus(this, isWorking);
+
     };
 
     private void doStop()
@@ -119,6 +122,8 @@ public class TrackingService extends Service {
         if(currentTrack!=null)
            CurrentTrack.saveTrack();
         currentTrack=null;
+
+        TrackingServiceEventReceiver.sendServiceStatus(this, isWorking);
     };
 
 
