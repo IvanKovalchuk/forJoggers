@@ -104,7 +104,7 @@ implements  FileDialog.OnCloseListener,
     //----------------------------------------------------------
      @Override
     public boolean onPrepareOptionsMenu(Menu menu)
-     {
+     { обновить getActivity().supportInvalidateOptionsMenu(); при старте/остановке сервиса
          MenuItem item=menu.findItem(R.id.action_show_my_location);
 
          item=menu.findItem(R.id.action_load_track);

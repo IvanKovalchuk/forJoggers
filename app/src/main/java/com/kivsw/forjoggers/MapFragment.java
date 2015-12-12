@@ -445,6 +445,7 @@ implements SettingsFragment.onSettingsCloseListener,
             buttonStop.setVisibility(View.GONE);
             buttonStart.setVisibility(View.VISIBLE);
         }
+        getActivity().supportInvalidateOptionsMenu();
     }
     private void updateFileName()
     {
