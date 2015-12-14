@@ -14,7 +14,7 @@
     <string name="current_speed">curr. speed:</string>
     <string name="average_speed">av. speed:</string>
     <string name="energy">energy:</string>
-    <string name="KCal">Kcal</string>
+    <string name="Cal">Cal</string>
 
     <string-array name="graphs">
         <item>latitude</item>

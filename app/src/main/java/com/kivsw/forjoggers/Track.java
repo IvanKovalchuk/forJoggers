@@ -330,13 +330,51 @@ public class Track {
         return res*weight;
     }
 
-    /** http://gotowalk.blogspot.ru/2014/06/Opredelenie-kolichestva-szhigaemyh-kalorij-pri-hodbe-bege.html
-     *  Определяем сколько калорий сжигается при ходьбе:
-     Е=0,007 x V^2 + 21,   где V -скорость ходьбы  в м/мин , Е—расход энергии (кал/кг/мин).
+    //http://www.brianmac.co.uk/energyexp.htm
+    // http://sportlib.su/Annuals/Bicycling/1986/p74-75.htm
+    double workingSpeed[] ={4,  7,  10}, // km per hour
+           workingEnegry[]={105./68/1800, 200./68/1800, 370./68/1800}; // calories per kg per second
+    double joggingSpeed[]= {9,             10,            12,            16},
+           jiggingEnergy[]={320./68/1800,  350./68/1800,  430./68/1800,  550./68/1800};
+    double cyclingSpeed[]= {3.5,       9,            16,           21,           30,       35},
+           cyclingEnergy[]={0.043/60,  120./68/1800, 220./68/1800, 320./68/1800, 0.250/60, 0.302/60};
 
-     Определяем сколько сжигается калорий при беге:
-     Е =18,0 x V - 20,   где V—скорость бега (км/час), Е—расход энергии (кал/кг/мин).
-     */
+    private double getEnergy(double currentSpeed, double speeds[], double energy[])
+    {
+        currentSpeed = currentSpeed*3.6; // translate meters per second to km to hour
+
+        int i=0;
+        while(i<speeds.length && currentSpeed>speeds[i])
+            i++;
+        if(i>=speeds.length){
+            i=speeds.length-1;
+            currentSpeed = speeds[i];
+        }
+        if(currentSpeed<speeds[0]) currentSpeed = speeds[0];
+        if(currentSpeed>speeds[speeds.length-1]) currentSpeed=speeds[speeds.length-1];
+
+        if(i==0) i=1;
+
+        double k=(energy[i]-energy[i-1])/(speeds[i]-speeds[i-1]);
+        double b= energy[i]-k*speeds[i];
+
+        double r=k*currentSpeed+b;
+        if(r<0) r=0;
+        return r;
+    }
+    private double hiking(double speed)
+    {return getEnergy(speed, workingSpeed, workingEnegry);};
+    private double jogging(double speed)
+    {return getEnergy(speed,joggingSpeed,jiggingEnergy);}
+    private double bicycling(double speed)
+    {return getEnergy(speed,cyclingSpeed,cyclingEnergy);}
+
+ /*   // http://gotowalk.blogspot.ru/2014/06/Opredelenie-kolichestva-szhigaemyh-kalorij-pri-hodbe-bege.html
+    // *  Определяем сколько калорий сжигается при ходьбе:
+    // Е=0,007 x V^2 + 21,   где V -скорость ходьбы  в м/мин , Е—расход энергии (кал/кг/мин).
+    // Определяем сколько сжигается калорий при беге:
+    // Е =18,0 x V - 20,   где V—скорость бега (км/час), Е—расход энергии (кал/кг/мин).
+
     private double hiking(double speed)
     {
         speed = speed*60;
@@ -355,7 +393,7 @@ public class Track {
         // speed (km per hour)
         double speeds[]={0, 3.5,    8.5,    9,      10,    15,     20,      25,     30,      35};
         // enegry (cal) per a second
-        double energy[]={0, 2.58, 3.3,  3.54, 4.2, 6.48, 8.52,  12,   15,    18.12 };
+        double energy[]={0, 2.58,   3.3,    3.54,   4.2,   6.48, 8.52,  12,   15,    18.12 };
 
         speed = speed*3.6;
 
@@ -371,7 +409,7 @@ public class Track {
         double r=k*speed+b;
         if(r<k) r=0;
         return r;
-    }
+    }*/
 
     public void setOnChange(IOnChange onChange)
     {

@@ -14,7 +14,7 @@
     <string name="current_speed">тек. скорость:</string>
     <string name="average_speed">ср. скорость:</string>
     <string name="energy">энергия:</string>
-    <string name="KCal">Ккал</string>
+    <string name="Cal">Кал</string>
 
     <string-array name="graphs">
         <item>широта</item>

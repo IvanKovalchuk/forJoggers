@@ -124,7 +124,7 @@ implements SettingsFragment.onSettingsCloseListener,
         mapView.getOverlays().add(originalPath);
 
         smoothyPath =  new Polyline(getActivity());
-        smoothyPath.setColor(0xFF7F3030);
+        smoothyPath.setColor(0x7F7F3030);
         smoothyPath.setWidth(2f);
         mapView.getOverlays().add(smoothyPath);
 
@@ -350,7 +350,7 @@ implements SettingsFragment.onSettingsCloseListener,
 
         if(e>1)
         {
-            res = String.format(Locale.US,"%.0f", e/1000) + getText(R.string.KCal);
+            res = String.format(Locale.US,"%.0f", e) + getText(R.string.Cal);
         }
         return res;
     }
