@@ -493,7 +493,7 @@ implements SettingsFragment.onSettingsCloseListener,
                 StringBuilder problems=new StringBuilder();
 
                 if(!getGPSstatus())
-                    problems.append(getText(R.string.GPRS_has_not_found_location));
+                    problems.append(getText(R.string.GPS_has_not_found_location));
 
                 if(CurrentTrack.getInstance(getActivity()).needToBeSaved())
                     problems.append(getText(R.string.track_may_be_lost));

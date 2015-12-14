@@ -26,7 +26,7 @@
     </string-array>
 
     <string name="track_may_be_lost">The current track has not been saved. Its data will be lost.&lt;br/> &lt;br/> </string>
-    <string name="GPRS_has_not_found_location">GPRS hasn\'t found your location yet.&lt;br/> &lt;br/> </string>
+    <string name="GPS_has_not_found_location">GPS hasn\'t found your location yet.&lt;br/> &lt;br/></string>
     <string name="Continue">Continue?</string>
 
     <!-- settings fragment -->
