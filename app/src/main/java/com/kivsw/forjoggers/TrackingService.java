@@ -1,15 +1,23 @@
 package com.kivsw.forjoggers;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.SimpleTimeZone;
 
 public class TrackingService extends Service {
     public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
@@ -21,6 +29,8 @@ public class TrackingService extends Service {
     LocationListener mGPSLocationListener=null;
     CurrentTrack currentTrack=null;
     SettingsKeeper settings=null;
+    long startTime=0;
+    MyHandler mHandler;
 
     //------------------------------------------------------
 
@@ -50,6 +60,7 @@ public class TrackingService extends Service {
     public TrackingService() {
         super();
         settings = SettingsKeeper.getInstance(this);
+        mHandler = new MyHandler();
     }
 
     @Nullable
@@ -104,7 +115,9 @@ public class TrackingService extends Service {
         Location loc = mGPSLocationListener.getLastknownLocation();
 
         isWorking=true;
+        startTime=SystemClock.elapsedRealtime();
         turnIntoForeground();
+        mHandler.scheduleUpdateNotification();
 
         TrackingServiceEventReceiver.sendServiceStatus(this, isWorking);
 
@@ -118,6 +131,7 @@ public class TrackingService extends Service {
         if(mGPSLocationListener!=null)
             mGPSLocationListener.releaseInstance();
         mGPSLocationListener=null;
+        mHandler.removeUpdateNotification();
 
         if(currentTrack!=null)
            CurrentTrack.saveTrack();
@@ -130,13 +144,35 @@ public class TrackingService extends Service {
     /**
      * sets the foreground mode for this service
      */
+    final private int NOTIFICATION_ID=1;
     void turnIntoForeground()
     {
-        final int id=1;
+
+        startForeground(NOTIFICATION_ID, getNotification());
+    }
+    /**
+     * This is the method that can be called to update the Notification
+     */
+    private void updateNotification()
+    {
+        Notification notification = getNotification();
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(NOTIFICATION_ID, notification);
+    }
+
+    Notification getNotification()
+    {
+
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+        mBuilder.setSmallIcon(R.drawable.tortoise_ltl);
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         mBuilder.setContentTitle(this.getText(R.string.app_name));
+        long workingTime=SystemClock.elapsedRealtime()-startTime;
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        sdf.setTimeZone(new SimpleTimeZone(0, ""));
+        sdf.format(new Date(workingTime));
+        mBuilder.setContentText(sdf.format(new Date(workingTime)));
+
         //mBuilder.setContentText(this.getText(R.string.app_name));
 
 
@@ -151,8 +187,9 @@ public class TrackingService extends Service {
 			    (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 		// notificationId allows you to update the notification later on.
 		mNotificationManager.notify(id, mBuilder.build());*/
-        startForeground(id, mBuilder.build());
+        return mBuilder.build();
     }
+
     //------------------------------------------------------
     class LocationListener extends GPSLocationListener
     {
@@ -170,6 +207,38 @@ public class TrackingService extends Service {
             }
         }
 
+    }
+    //------------------------------------------------------
+    class MyHandler extends Handler {
+        final private int UPDATE_NOTOFICATION = 1;
+
+        MyHandler() {
+            super();
+        }
+
+        public void scheduleUpdateNotification() {
+            removeMessages(UPDATE_NOTOFICATION);
+            sendEmptyMessageDelayed(UPDATE_NOTOFICATION, 1000);
+        }
+
+        ;
+
+        public void removeUpdateNotification() {
+            removeMessages(UPDATE_NOTOFICATION);
+        }
+
+        ;
+
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_NOTOFICATION:
+                    updateNotification();
+                    if (isWorking)
+                        scheduleUpdateNotification();
+                    break;
+            }
+
+        }
     }
 
 }

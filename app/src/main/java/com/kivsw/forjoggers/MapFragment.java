@@ -364,7 +364,7 @@ implements SettingsFragment.onSettingsCloseListener,
         isGPS_available=available;
         if(available) {
             satelliteImageView.setImageResource(R.drawable.satellite_en);
-            mHandler.scheduleLastPositionFix(mGPSLocationListener.UPDATE_INTERVAL * 4);
+            mHandler.scheduleLastPositionFix(mGPSLocationListener.UPDATE_INTERVAL * 5);
         }
         else satelliteImageView.setImageResource(R.drawable.satellite_dis);
     }
@@ -706,7 +706,6 @@ final static int WARNINGS_AND_START_SERVICE =0;
 
                 marker.onLocationChanged(loc,null);
                 sendEmptyMessageDelayed(POINT_ANIMATION, 300);
-
             }
             else
             {
