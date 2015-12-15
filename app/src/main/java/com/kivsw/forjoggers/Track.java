@@ -223,11 +223,10 @@ public class Track {
         return false;
     }
 
-    public long getTrackTime()
+    public long getTrackTime(boolean totalTime)
     {
-
         long t;
-        if((timeStart==0) && (timeStop==0)) {
+        if(((timeStart==0) && (timeStop==0)) || !totalTime) {
             int s = mGeoPoints.size();
             if (s < 2) return 0;
             Location firstLoc = mGeoPoints.get(0),
@@ -244,9 +243,9 @@ public class Track {
 
     };
 
-    public String getTrackTimeStr()
+    public String getTrackTimeStr(boolean totalTime)
     {
-        long t=getTrackTime();
+        long t=getTrackTime(totalTime);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         sdf.setTimeZone(new SimpleTimeZone(0, ""));
         return sdf.format(new Date(t));

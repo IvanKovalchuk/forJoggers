@@ -21,12 +21,14 @@ public abstract class TrackSmoother extends Track
         this.track=null;
     }
 
-    public long getTrackTime()
+    @Override
+    public long getTrackTime(boolean totalTime)
     {
         if(track==null) return 0;
-        return track.getTrackTime();
+        return track.getTrackTime(totalTime);
     };
 
+    @Override
     public int getActivityType(){
         if(track==null) return SettingsKeeper.JOGGING;
         return track.getActivityType();
