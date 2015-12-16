@@ -56,6 +56,9 @@ public class CurrentTrack extends Track {
         if(super.saveGeoPoint(fileName)) {
             this.fileName = fileName;
             settings.setCurrentFileName(fileName);
+
+            GpxConvertor gpx=new GpxConvertor(this);
+            gpx.saveToFile(fileName+".gpx");
             return true;
         }
         return false;
