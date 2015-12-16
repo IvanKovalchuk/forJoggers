@@ -50,7 +50,7 @@ public class GpxConvertor {
 
         serializer.startTag("", "gpx");
         serializer.attribute("", "version", "1.1");
-        serializer.attribute("", "creator", "forJoggers");
+        serializer.attribute("", "creator", BuildConfig.APPLICATION_ID+" "+BuildConfig.VERSION_NAME);
         serializer.attribute("", "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         serializer.attribute("", "xmlns", "http://www.topografix.com/GPX/1/1");
         serializer.attribute("", "xsi:schemaLocation", "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd");
