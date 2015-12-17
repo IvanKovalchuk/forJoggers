@@ -195,7 +195,7 @@ public class TrackingService extends Service {
     {
         LocationListener(Context context)
         {
-            super(context,!false && BuildConfig.DEBUG);
+            super(context,false && BuildConfig.DEBUG);
 
         };
 

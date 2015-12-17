@@ -161,7 +161,7 @@ public class GpxConvertor {
     public void fromGPX(Reader reader) throws Exception
     {
         track.clear();
-        XmlPullParser xpp = android.util.Xml.newPullParser();
+        XmlPullParser xpp = org.xmlpull.v1.XmlPullParserFactory.newInstance().newPullParser();// android.util.Xml.newPullParser();
         xmlCurrentPath.clear();
 
         xpp.setInput(reader);
