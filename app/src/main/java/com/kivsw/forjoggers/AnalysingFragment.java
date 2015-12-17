@@ -174,7 +174,7 @@ public class AnalysingFragment extends Fragment
     @Override
     public void onPageAppear() {
         isVisible=true;
-      if(needUpdate)
+      if(needUpdate && graphSpiner!=null)
           showGraph(graphSpiner.getSelectedItemPosition());
     }
 
