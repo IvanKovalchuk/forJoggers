@@ -21,7 +21,7 @@ public class CurrentTrack extends Track {
             if(fn!=null && !fn.isEmpty())
                track.loadGeoPoint(fn);
             else
-                track.fromJSON(track.settings.getCurrentTrack());
+                track.fromGPX(track.settings.getCurrentTrack());
         }
         return track;
     }
@@ -29,7 +29,7 @@ public class CurrentTrack extends Track {
     static synchronized public void saveTrack()
     {
         if(track==null) return;
-        track.settings.setCurrentTrack( track.toJSON());
+        track.settings.setCurrentTrack( track.toGPX());
     }
 
     private CurrentTrack()
@@ -53,12 +53,13 @@ public class CurrentTrack extends Track {
      */
     public boolean saveGeoPoint(String fileName)
     {
-        if(super.saveGeoPoint(fileName)) {
+      /*  if(!fileName.matches(".*\\.gpx$"))
+            fileName = fileName+".gpx";*/
+
+            if(super.saveGeoPoint(fileName)) {
             this.fileName = fileName;
             settings.setCurrentFileName(fileName);
 
-            GpxConvertor gpx=new GpxConvertor(this);
-            gpx.saveToFile(fileName+".gpx");
             return true;
         }
         return false;
@@ -70,7 +71,11 @@ public class CurrentTrack extends Track {
      * @return true if the loading was successful
      */
     public boolean loadGeoPoint(String fileName) {
-        if( super.loadGeoPoint(fileName)) {
+        boolean r=false;
+        r=super.loadGeoPoint(fileName);
+
+        if(r)
+        {
             this.fileName = fileName;
             settings.setCurrentFileName(fileName);
             return true;

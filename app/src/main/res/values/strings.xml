@@ -22,7 +22,6 @@
         <item>speed</item>
         <item>bearing</item>
         <item>turn</item>
-        <item>accuracy</item>
     </string-array>
 
     <string name="track_may_be_lost">The current track has not been saved. Its data will be lost.&lt;br/> &lt;br/> </string>

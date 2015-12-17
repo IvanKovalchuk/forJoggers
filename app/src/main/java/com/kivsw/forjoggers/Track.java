@@ -3,11 +3,10 @@ package com.kivsw.forjoggers;
 import android.location.Location;
 import android.os.SystemClock;
 
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +42,12 @@ public class Track {
      */
     public boolean saveGeoPoint(String fileName)
     {
-        try {
+        if(fileName.matches(".*\\.gpx$"))
+            fileName = fileName+".gpx";
+        GpxConvertor gpx=new GpxConvertor(this);
+        return gpx.saveToFile(fileName);
+
+       /* try {
             FileWriter writer = new FileWriter(fileName);
             String str=toJSON();
             writer.write(str);
@@ -55,7 +59,7 @@ public class Track {
         }
 
 
-        return true;
+        return true;*/
     };
     //----------------------------------------------------
     /**
@@ -65,7 +69,12 @@ public class Track {
      */
     public boolean loadGeoPoint(String fileName)
     {
-        try {
+
+        GpxConvertor gpx=new GpxConvertor(this);
+        boolean r= gpx.loadFromFile(fileName);
+        return r;
+
+        /*try {
             File file = new File(fileName);
 
             StringBuilder data=new StringBuilder();
@@ -88,11 +97,37 @@ public class Track {
         }
 
 
-        return true;
+        return true;*/
     };
+    String toGPX()
+    {
+        GpxConvertor gpx=new GpxConvertor(this);
+        Writer wr= new StringWriter();
+        try {
+            gpx.toGPX(wr);
+            return wr.toString();
+        }catch(Exception e)
+        {
+            return "";
+        }
+
+    }
+    boolean fromGPX(String str)
+    {
+        GpxConvertor gpx=new GpxConvertor(this);
+        Reader rd= new StringReader(str);
+        try {
+            gpx.fromGPX(rd);
+            return true;
+        }catch(Exception e)
+        {
+            clear();
+        }
+        return false;
+    }
     //----------------------------------------------------
 
-    String toJSON()
+   /* String toJSON()
     {
         StringBuffer builder=new StringBuffer();
         final String separator=",\n";
@@ -221,7 +256,7 @@ public class Track {
         {e.toString();  }
 
         return false;
-    }
+    }*/
 
     public long getTrackTime(boolean totalTime)
     {

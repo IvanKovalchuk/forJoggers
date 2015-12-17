@@ -22,7 +22,6 @@
         <item>скорость</item>
         <item>направление</item>
         <item>поворот</item>
-        <item>точность</item>
     </string-array>
 
     <string name="track_may_be_lost">Текущий трек не сохранен, данные будут потеряны.&lt;br/> &lt;br/>  </string>

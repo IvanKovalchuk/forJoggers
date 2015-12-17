@@ -50,6 +50,7 @@ implements SettingsFragment.onSettingsCloseListener,
 {
 
     private OnFragmentInteractionListener mListener;
+    private static long savingTime=0, savedPointIndex =0;
 
     private MapView mapView=null;
 
@@ -165,8 +166,10 @@ implements SettingsFragment.onSettingsCloseListener,
         }
 
         updateTrack(true);
-        if(savedInstanceState!=null)
-            isGPS_available = savedInstanceState.getBoolean("isGPS_available",false);
+        if(savedInstanceState!=null) {
+            isGPS_available = savedInstanceState.getBoolean("isGPS_available", false);
+            savedPointIndex = savedInstanceState.getInt("pointIndex", 0);
+        }
         setGSPstatus(isGPS_available);
 
         return rootView;
@@ -175,6 +178,9 @@ implements SettingsFragment.onSettingsCloseListener,
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("isGPS_available", isGPS_available);
+        outState.putInt("pointIndex", mHandler.pointIndex);
+        savedPointIndex = mHandler.pointIndex;
+        savingTime=SystemClock.elapsedRealtime();
     }
 
     @Override
@@ -197,9 +203,27 @@ implements SettingsFragment.onSettingsCloseListener,
     public void onPause()
     {
         super.onPause();
+    }
+    @Override
+    public void onStart()
+    {
+        super.onStart();
 
+        if(SystemClock.elapsedRealtime() - savingTime <30000) {
+            if(savedPointIndex>0)
+            {
+                mHandler.startPointAnimation();
+                mHandler.pointIndex = (int)savedPointIndex;
+            }
+        }
+    }
+    @Override
+    public void onStop()
+    {
+        savedPointIndex =  mHandler.pointIndex;
+        savingTime=SystemClock.elapsedRealtime();
+        super.onStop();
         mHandler.deleteAllMessages();
-
     }
 
     @Override
@@ -259,15 +283,19 @@ implements SettingsFragment.onSettingsCloseListener,
     }
     public void animateTrack()
     {
-        mHandler.startPointAnimation();
+        ArrayList<Location> points=currentTrack.getGeoPoints();
+        if(points!=null && points.size()>0) {
+            showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
+            mHandler.startPointAnimation();
+        }
     }
 
     /**
      *
      */
-    void setTrack(String json)
+    void setTrack(String gpx)
     {
-        currentTrack.fromJSON(json);
+        currentTrack.fromGPX(gpx);
         updateTrack(true);
     }
 
@@ -651,6 +679,7 @@ final static int WARNINGS_AND_START_SERVICE =0;
         {
             removeMessages(RESTORE_POSITION);
             removeMessages(POINT_ANIMATION);
+            removeAnimation();
             removeMessages(UPDATE_TRACK);
             removeMessages(LAST_LOCATION_FIX_TIMEOUT);
 
@@ -663,12 +692,12 @@ final static int WARNINGS_AND_START_SERVICE =0;
         public void scheduleIfNecessaryRestoringPosition()
         {
             if(!hasMessages(RESTORE_POSITION))
-                sendEmptyMessageDelayed(RESTORE_POSITION, 7000);
+                sendEmptyMessageDelayed(RESTORE_POSITION, 5000);
         }
         public void scheduleRestoringPosition()
         {
             removeMessages(RESTORE_POSITION);
-            sendEmptyMessageDelayed(RESTORE_POSITION, 7000);
+            sendEmptyMessageDelayed(RESTORE_POSITION, 5000);
         }
         public void scheduleLastPositionFix(int timeout)
         {
@@ -710,11 +739,18 @@ final static int WARNINGS_AND_START_SERVICE =0;
             else
             {
                 //marker.remove(mapView);
-                mapView.getOverlays().remove(marker);
-                marker=null;
-                mapView.invalidate();
+               removeAnimation();
             }
         }
+        void removeAnimation()
+        {
+            if(marker==null) return;
+            mapView.getOverlays().remove(marker);
+            marker=null;
+            mapView.invalidate();
+            pointIndex=0;
+        }
+
         public Bitmap rotateBitmap(Bitmap source, float angle)
         {
             Matrix matrix = new Matrix();

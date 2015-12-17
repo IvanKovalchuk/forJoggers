@@ -142,8 +142,6 @@ public class AnalysingFragment extends Fragment
                             if(prevLoc!=null && prevLoc.hasBearing() && loc.hasBearing())
                                 y=Track.turn(prevLoc.getBearing(),loc.getBearing());
                         break;
-                    case 5: y=loc.getAccuracy();
-                        break;
                 }
                 data[i++]=new DataPoint((loc.getTime()-t0)/1000, y);
                 prevLoc = loc;

@@ -11,9 +11,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
@@ -223,7 +220,7 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
         if(dir==null)
             dir=Environment.getExternalStorageDirectory().getAbsolutePath();
         FileDialog fd;
-        fd=FileDialog.newInstance(1,FileDialog.TypeDialog.SAVE , dir, "*", this);
+        fd=FileDialog.newInstance(1, FileDialog.TypeDialog.SAVE, dir, "*.gpx", this);
         fd.show(getSupportFragmentManager(), "");
     }
 
@@ -233,7 +230,7 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
         if(dir==null)
             dir=Environment.getExternalStorageDirectory().getAbsolutePath();
         FileDialog fd;
-        fd = FileDialog.newInstance(2, FileDialog.TypeDialog.OPEN, dir, "*", this);
+        fd = FileDialog.newInstance(2, FileDialog.TypeDialog.OPEN, dir, "*.gpx", this);
         fd.show(getSupportFragmentManager(), "");
     }
 
@@ -242,14 +239,14 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
     @Override
     public void onClickOk(FileDialog dlg, String fileName) {
 
-        File f=new File(fileName);
-        if(f.exists())
-          settings.setLastPath(f.getParent());
-
+        boolean success=false;
         switch(dlg.getDlgId())
         {
             case 1:
-                if(!mapFragment.saveTrackToFile(fileName))
+                if(!fileName.matches(".*\\.gpx$"))
+                    fileName=fileName+".gpx";
+                success=mapFragment.saveTrackToFile(fileName);
+                if(!success)
                 {
                     String msg=String.format(getText(R.string.cannot_save_file).toString(),fileName);
                     MessageDialog.newInstance(getText(R.string.Error).toString(),msg)
@@ -257,14 +254,19 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
                 }
                 break;
             case 2:
-                if(!mapFragment.loadTrackFromFile(fileName))
+                success=mapFragment.loadTrackFromFile(fileName);
+                if(!success)
                 {
                     String msg=String.format(getText(R.string.cannot_load_file).toString(),fileName);
                     MessageDialog.newInstance(getText(R.string.Error).toString(),msg)
                             .show(getSupportFragmentManager(), "");
                 }
-
                 break;
+        }
+        if(success) {
+            File f = new File(fileName);
+            if (f.exists())
+                settings.setLastPath(f.getParent());
         }
     }
 
