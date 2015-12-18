@@ -63,7 +63,7 @@ implements SettingsFragment.onSettingsCloseListener,
 
     private View rootView;
 
-    private Track currentTrack;
+    private CurrentTrack currentTrack;
     TrackSmoother trackSmoother;
     private SettingsKeeper settings=null;
     UnitUtils unitUtils=null;
@@ -426,8 +426,11 @@ implements SettingsFragment.onSettingsCloseListener,
     {
         boolean r=currentTrack.loadGeoPoint(fileName);
         updateTrack(true);
-        if(r)
-          updateFileName();
+        updateFileName();
+
+        ArrayList<Location> points=currentTrack.getGeoPoints();
+        if(points!=null && points.size()>0)
+            showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
 
         return r;
     }
@@ -477,7 +480,8 @@ implements SettingsFragment.onSettingsCloseListener,
     }
     private void updateFileName()
     {
-        String fn= CurrentTrack.getInstance(getActivity()).fileName;
+
+        String fn= currentTrack.fileName;
         if(fn!=null && !fn.isEmpty()) {
             File file = new File(fn);
             fn=file.getName();

@@ -80,6 +80,13 @@ public class CurrentTrack extends Track {
             settings.setCurrentFileName(fileName);
             return true;
         }
+        else
+        {
+            this.fileName="";
+            settings.setCurrentFileName(this.fileName);
+            clear();
+        }
+
         return false;
     }
 

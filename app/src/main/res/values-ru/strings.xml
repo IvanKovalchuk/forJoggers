@@ -8,7 +8,6 @@
 
     <string name="cannot_save_file">Не удается сохранить файл %s</string>
     <string name="cannot_load_file">Не удается загрузить файл %s</string>
-    <string name="show_my_location">Мое положение</string>
     <string name="time">время:</string>
     <string name="distance">дистанция:</string>
     <string name="current_speed">тек. скорость:</string>
@@ -23,6 +22,7 @@
         <item>направление</item>
         <item>поворот</item>
     </string-array>
+    <string name="degree">град.</string>
 
     <string name="track_may_be_lost">Текущий трек не сохранен, данные будут потеряны.&lt;br/> &lt;br/>  </string>
     <string name="GPS_has_not_found_location">GPS еще не определило ваше местоположние.&lt;br/> &lt;br/>  </string>

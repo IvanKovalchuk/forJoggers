@@ -42,8 +42,8 @@ public class Track {
      */
     public boolean saveGeoPoint(String fileName)
     {
-        if(fileName.matches(".*\\.gpx$"))
-            fileName = fileName+".gpx";
+       /* if(!fileName.matches(".*\\.gpx$"))
+            fileName = fileName+".gpx";*/
         GpxConvertor gpx=new GpxConvertor(this);
         return gpx.saveToFile(fileName);
 

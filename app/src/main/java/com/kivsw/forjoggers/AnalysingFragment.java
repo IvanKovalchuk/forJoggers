@@ -13,9 +13,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LabelFormatter;
+import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kivsw.dialog.MessageDialog;
+
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,6 +31,7 @@ public class AnalysingFragment extends Fragment
 {
 
     GraphView graph;
+    MyLabelFormatter myFormatter;
     UnitUtils unitUtils;
     LineGraphSeries<DataPoint> series;
     Spinner graphSpiner;
@@ -37,7 +42,7 @@ public class AnalysingFragment extends Fragment
 
     public AnalysingFragment() {
         super();
-        unitUtils = new UnitUtils(getActivity());
+
     }
 
 
@@ -50,6 +55,10 @@ public class AnalysingFragment extends Fragment
         graph =(GraphView)rootView.findViewById(R.id.graph);
         series = new LineGraphSeries<DataPoint>();
         graph.addSeries(series);
+        String t[]=getActivity().getResources().getStringArray(R.array.time_short_unit);
+        graph.getGridLabelRenderer().setHorizontalAxisTitle(t[0]);
+        myFormatter = new MyLabelFormatter();
+        graph.getGridLabelRenderer().setLabelFormatter(myFormatter);
         //graph.getViewport().setScalable(true);
         //graph.getViewport().setScrollable(true);
 
@@ -92,6 +101,7 @@ public class AnalysingFragment extends Fragment
         super.onAttach(activity);
 
         try {
+            unitUtils = new UnitUtils(getActivity());
             ((MainActivity)getActivity()).analysingFragment=this;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -114,7 +124,7 @@ public class AnalysingFragment extends Fragment
             long t0 = curentTrack.getGeoPoints().get(0).getTime();
             int i=0;
             Location prevLoc=null;
-            double prev=0, add=0;
+            double prev=0, add=0, lastX=1;
             for(Location loc:curentTrack.getGeoPoints())
             {
 
@@ -143,11 +153,34 @@ public class AnalysingFragment extends Fragment
                                 y=Track.turn(prevLoc.getBearing(),loc.getBearing());
                         break;
                 }
-                data[i++]=new DataPoint((loc.getTime()-t0)/1000, y);
+                lastX=(loc.getTime()-t0)/1000;
+                data[i++]=new DataPoint(lastX, y);
                 prevLoc = loc;
+            };
+            switch(num)
+            {
+                case 0:
+                case 1:myFormatter.yFormat="%.4f";
+                       graph.getGridLabelRenderer().setVerticalAxisTitle(getText(R.string.degree).toString());
+                       break;
+                case 3:
+                case 4:myFormatter.yFormat="%.0f";
+                       graph.getGridLabelRenderer().setVerticalAxisTitle(getText(R.string.degree).toString());
+                       break;
+                case 2:
+                       myFormatter.yFormat="%.1f";
+                       graph.getGridLabelRenderer().setVerticalAxisTitle(unitUtils.speedUnit(false));
+                       break;
             }
+
             //graph.getViewport().setXAxisBoundsManual(false);
             //graph.getViewport().setYAxisBoundsManual(false);
+            graph.getGridLabelRenderer().setLabelVerticalWidth(null);
+            graph.getViewport().setXAxisBoundsManual(true);
+            graph.getViewport().setMinX(0);
+            graph.getViewport().setMaxX(lastX*1.1+1);
+           // graph.getGridLabelRenderer().invalidate(false,false);
+
             try {
                 series.resetData(data);
             }catch(Exception e)
@@ -182,4 +215,22 @@ public class AnalysingFragment extends Fragment
     public void onPageDisappear() {
         isVisible=false;
     }
+
+    //------------------------------------------------
+    class MyLabelFormatter implements LabelFormatter {
+        Viewport viewport=null;
+        String xFormat="%.0f", yFormat="%.3f";
+
+    public String formatLabel(double value, boolean isValueX)
+    {
+        if(isValueX) return String.format(Locale.US,xFormat,value);
+        else return String.format(Locale.US, yFormat,value);
+    };
+
+
+    public void setViewport(Viewport viewport)
+    {
+        this.viewport = viewport;
+    };
+}
 }
