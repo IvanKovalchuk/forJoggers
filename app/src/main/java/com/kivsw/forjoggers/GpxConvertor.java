@@ -67,7 +67,8 @@ public class GpxConvertor {
         serializer.startTag("", "extensions");
         serializer.startTag("","forJoggers")
                  .attribute("", "timeStart", String.valueOf(track.timeStart))
-                 .attribute("", "timeStop", String.valueOf(track.timeStop));
+                 .attribute("", "timeStop", String.valueOf(track.timeStop))
+                 .attribute("", "activityType", String.valueOf(track.getActivityType()));
         serializer.endTag("", "forJoggers");
         serializer.text("\n");
         serializer.endTag("", "extensions");
@@ -183,6 +184,10 @@ public class GpxConvertor {
                         }catch(Exception e){}
                         try {
                           track.timeStop = Long.parseLong(xpp.getAttributeValue("", "timeStop"));
+                        }catch(Exception e){}
+                        try {
+                            int a = Integer.parseInt(xpp.getAttributeValue("", "activityType"));
+                            track.setActivityType(a);
                         }catch(Exception e){}
                     }
 
