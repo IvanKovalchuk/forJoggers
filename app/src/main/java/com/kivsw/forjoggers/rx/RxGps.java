@@ -10,6 +10,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.subjects.BehaviorSubject;
 
+
 /**
  * create an observable for GPS
  *
@@ -65,7 +66,6 @@ public class RxGps {
         public RxGPSLocationListener(Context context)
         {
             super(context,  true && BuildConfig.DEBUG);
-            this.subscriber=subscriber;
 
         }
         void setSubscriber(Subscriber<? super Location> subscriber)

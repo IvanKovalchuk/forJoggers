@@ -78,7 +78,7 @@ implements SettingsFragment.onSettingsCloseListener,
     private SettingsKeeper settings=null;
     UnitUtils unitUtils=null;
     //private MyGPSLocationListener mGPSLocationListener;
-    private MyLocationNewOverlay myLocationoverlay;
+    private CurrentLocationOverlay myLocationoverlay;
     private MyHandler mHandler;
     boolean isGPS_available=false;
 
@@ -122,10 +122,7 @@ implements SettingsFragment.onSettingsCloseListener,
         mapView.setMultiTouchControls(true);
 
         // My Location Overlay
-        myLocationoverlay = new MyLocationNewOverlay(getActivity(), mapView);
-        //myLocationoverlay.enableMyLocation(mGPSLocationListener); // not on by default
-        myLocationoverlay.disableFollowLocation();
-        myLocationoverlay.setDrawAccuracyEnabled(true);
+        myLocationoverlay = new CurrentLocationOverlay(getActivity(), mapView);
         mapView.getOverlays().add(myLocationoverlay);
 
         // path overlay
@@ -512,7 +509,7 @@ implements SettingsFragment.onSettingsCloseListener,
 
     public void setCurrentLocation(Location location)
     {
-        myLocationoverlay.onLocationChanged(location,null);
+        myLocationoverlay.setLocation(location);//onLocationChanged(location,null);
     };
     //----------------------------------------------
     // SettingsFragment.onSettingsCloseListener
@@ -818,5 +815,6 @@ final static int WARNINGS_AND_START_SERVICE =0;
         }
 
     }
+
 
 }

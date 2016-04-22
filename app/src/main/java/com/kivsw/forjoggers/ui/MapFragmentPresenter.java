@@ -44,6 +44,7 @@ public class MapFragmentPresenter {
             rxGps= RxGps.getGprsObservable(context).subscribe(new Action1<Location>() {
                 @Override
                 public void call(Location location) {
+                    if(location==null) return;
                     long t=location.getTime();
                     long ct= System.currentTimeMillis();
                     Long.valueOf(t-ct);
