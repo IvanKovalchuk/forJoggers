@@ -1,12 +1,9 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +18,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kivsw.dialog.MessageDialog;
+import com.kivsw.forjoggers.BuildConfig;
+import com.kivsw.forjoggers.CurrentTrack;
+import com.kivsw.forjoggers.CustomPagerView;
+import com.kivsw.forjoggers.MainActivity;
+import com.kivsw.forjoggers.R;
+import com.kivsw.forjoggers.SettingsFragment;
+import com.kivsw.forjoggers.Track;
+import com.kivsw.forjoggers.TrackSmoother;
+import com.kivsw.forjoggers.TrackSmootherByPolynom;
+import com.kivsw.forjoggers.TrackingService;
+import com.kivsw.forjoggers.UnitUtils;
+import com.kivsw.forjoggers.helper.GPSLocationListener;
+import com.kivsw.forjoggers.helper.SettingsKeeper;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -45,7 +55,7 @@ import java.util.Locale;
 
 public class MapFragment extends Fragment
 implements SettingsFragment.onSettingsCloseListener,
-            CustomPagerView.IonPageAppear, View.OnClickListener,
+        CustomPagerView.IonPageAppear, View.OnClickListener,
         MessageDialog.OnCloseListener
 {
 
@@ -67,7 +77,7 @@ implements SettingsFragment.onSettingsCloseListener,
     TrackSmoother trackSmoother;
     private SettingsKeeper settings=null;
     UnitUtils unitUtils=null;
-    private MyGPSLocationListener mGPSLocationListener;
+    //private MyGPSLocationListener mGPSLocationListener;
     private MyLocationNewOverlay myLocationoverlay;
     private MyHandler mHandler;
     boolean isGPS_available=false;
@@ -90,7 +100,7 @@ implements SettingsFragment.onSettingsCloseListener,
         trackSmoother = //new TrackSmootherByLine(currentTrack);
                         new TrackSmootherByPolynom(currentTrack);
 
-        mGPSLocationListener = new MyGPSLocationListener(getActivity());
+        // mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler=new MyHandler();
 
 
@@ -113,7 +123,7 @@ implements SettingsFragment.onSettingsCloseListener,
 
         // My Location Overlay
         myLocationoverlay = new MyLocationNewOverlay(getActivity(), mapView);
-        myLocationoverlay.enableMyLocation(mGPSLocationListener); // not on by default
+        //myLocationoverlay.enableMyLocation(mGPSLocationListener); // not on by default
         myLocationoverlay.disableFollowLocation();
         myLocationoverlay.setDrawAccuracyEnabled(true);
         mapView.getOverlays().add(myLocationoverlay);
@@ -165,6 +175,7 @@ implements SettingsFragment.onSettingsCloseListener,
             buttonStart.setVisibility(View.VISIBLE);
         }
 
+
         updateTrack(true);
         if(savedInstanceState!=null) {
             isGPS_available = savedInstanceState.getBoolean("isGPS_available", false);
@@ -187,7 +198,7 @@ implements SettingsFragment.onSettingsCloseListener,
      public void onDestroy()
      {
          super.onDestroy();
-         mGPSLocationListener.releaseInstance();
+         //mGPSLocationListener.releaseInstance();
          trackSmoother.release();
      }
 
@@ -208,6 +219,7 @@ implements SettingsFragment.onSettingsCloseListener,
     public void onStart()
     {
         super.onStart();
+        MapFragmentPresenter.getInstance(getActivity()).setUI(this);
 
         if(SystemClock.elapsedRealtime() - savingTime <30000) {
             if(savedPointIndex>0)
@@ -222,6 +234,7 @@ implements SettingsFragment.onSettingsCloseListener,
     {
         savedPointIndex =  mHandler.pointIndex;
         savingTime=SystemClock.elapsedRealtime();
+        MapFragmentPresenter.getInstance(getActivity()).setUI(null);
         super.onStop();
         mHandler.deleteAllMessages();
     }
@@ -260,14 +273,14 @@ implements SettingsFragment.onSettingsCloseListener,
     };
     public void showMyLocation()
     {
-        if(mGPSLocationListener.getLastKnownLocation()==null) return;
+        if(myLocationoverlay.getLastFix()==null) return;
         GeoPoint topLeftGpt     = (GeoPoint) mapView.getProjection().fromPixels(0, 0);
         GeoPoint bottomRightGpt = (GeoPoint) mapView.getProjection().fromPixels(
                 mapView.getWidth(), mapView.getHeight());
 
         BoundingBoxE6 bounding=mapView.getBoundingBox();
 
-        GeoPoint cl=new GeoPoint(mGPSLocationListener.getLastKnownLocation());
+        GeoPoint cl=new GeoPoint(myLocationoverlay.getLastFix());
         boolean r= bounding.contains(cl);
         if(!r)
         {
@@ -392,7 +405,7 @@ implements SettingsFragment.onSettingsCloseListener,
         isGPS_available=available;
         if(available) {
             satelliteImageView.setImageResource(R.drawable.satellite_en);
-            mHandler.scheduleLastPositionFix(mGPSLocationListener.UPDATE_INTERVAL * 5);
+            mHandler.scheduleLastPositionFix(GPSLocationListener.UPDATE_INTERVAL * 5);
         }
         else satelliteImageView.setImageResource(R.drawable.satellite_dis);
     }
@@ -422,7 +435,7 @@ implements SettingsFragment.onSettingsCloseListener,
         mapView.invalidate();
     }
 
-    boolean loadTrackFromFile(String fileName)
+    public boolean loadTrackFromFile(String fileName)
     {
         boolean r=currentTrack.loadGeoPoint(fileName);
         updateTrack(true);
@@ -435,7 +448,7 @@ implements SettingsFragment.onSettingsCloseListener,
         return r;
     }
 
-    boolean saveTrackToFile(String fileName)
+    public boolean saveTrackToFile(String fileName)
     {
         boolean r= currentTrack.saveGeoPoint(fileName);
         if(r)
@@ -481,7 +494,7 @@ implements SettingsFragment.onSettingsCloseListener,
     private void updateFileName()
     {
 
-        String fn= currentTrack.fileName;
+        String fn= currentTrack.getFileName();
         if(fn!=null && !fn.isEmpty()) {
             File file = new File(fn);
             fn=file.getName();
@@ -497,6 +510,10 @@ implements SettingsFragment.onSettingsCloseListener,
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
+    public void setCurrentLocation(Location location)
+    {
+        myLocationoverlay.onLocationChanged(location,null);
+    };
     //----------------------------------------------
     // SettingsFragment.onSettingsCloseListener
     @Override
@@ -610,7 +627,7 @@ final static int WARNINGS_AND_START_SERVICE =0;
             return false;
         }
     }
-    //----------------------------------------
+/*    //----------------------------------------
     class MyGPSLocationListener extends GPSLocationListener
             implements IMyLocationProvider
     {
@@ -669,7 +686,7 @@ final static int WARNINGS_AND_START_SERVICE =0;
             return super.getLastknownLocation();
         }
     }
-    //----------------------------------------
+    //----------------------------------------*/
 
     class MyHandler extends Handler
     {

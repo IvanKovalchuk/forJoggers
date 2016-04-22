@@ -27,7 +27,7 @@ public class TrackSmootherByLine extends TrackSmoother{
            lngApproximator=new LineApproximator();
     }
 
-    ArrayList<Location> getGeoPoints()
+    public ArrayList<Location> getGeoPoints()
     {
         if(mGeoPoints==null)
             doSmooth();

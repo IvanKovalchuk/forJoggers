@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class TrackSmootherByPolynom extends TrackSmootherByLine{
 
-    TrackSmootherByPolynom(Track track)
+    public TrackSmootherByPolynom(Track track)
     {
         super(track);
         deltaT=20000; deltaDistance=600;

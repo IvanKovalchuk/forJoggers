@@ -2,12 +2,15 @@ package com.kivsw.forjoggers;
 
 import android.content.Context;
 
+import com.kivsw.forjoggers.helper.SettingsKeeper;
+
 /**
  * Created by ivan on 20.11.15.
  */
 public class CurrentTrack extends Track {
     static private CurrentTrack track=null;
     SettingsKeeper settings=null;
+
     String fileName;
 
     static synchronized  public CurrentTrack getInstance(Context context)
@@ -36,6 +39,10 @@ public class CurrentTrack extends Track {
     {
         super();
         fileName="";
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     @Override

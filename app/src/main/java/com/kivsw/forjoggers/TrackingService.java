@@ -15,6 +15,9 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
+import com.kivsw.forjoggers.helper.GPSLocationListener;
+import com.kivsw.forjoggers.helper.SettingsKeeper;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.SimpleTimeZone;

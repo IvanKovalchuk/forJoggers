@@ -1,7 +1,6 @@
 package com.kivsw.forjoggers;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -14,7 +13,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.kivsw.dialog.BaseDialog;
+import com.kivsw.forjoggers.helper.SettingsKeeper;
 
 
 public class SettingsFragment extends Fragment
@@ -24,7 +23,7 @@ implements CustomPagerView.IonPageAppear
     SettingsKeeper settings;
 
 
-    interface onSettingsCloseListener
+    public interface onSettingsCloseListener
     {
         void onSettingsChanged();
     }

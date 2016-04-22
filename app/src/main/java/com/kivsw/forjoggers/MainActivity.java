@@ -14,6 +14,8 @@ import android.view.MenuItem;
 
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
+import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.ui.MapFragment;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
 
     private ViewPager pager;
     SettingsFragment settingsFragment=null;
-    MapFragment mapFragment=null;
+    public MapFragment mapFragment=null;
     AnalysingFragment analysingFragment=null;
 
     SettingsKeeper settings;

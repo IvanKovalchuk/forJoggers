@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -144,7 +144,7 @@ public class SettingsKeeper {
      *
      * @return
      */
-    static final int HIKING=0, JOGGING=1, BICYCLING=2;
+    public static final int HIKING=0, JOGGING=1, BICYCLING=2;
     public int getActivityType()
     {
         return sharedPreferences.getInt("activityType", 1);
@@ -156,7 +156,7 @@ public class SettingsKeeper {
         e.commit();
     }
     //-------------------------------------------------------------
-    static final int METERS=0, KILOMETERS=1, MILES=2;
+    public static final int METERS=0, KILOMETERS=1, MILES=2;
     public int getDistanceUnit()
     {
         return sharedPreferences.getInt("distanceUnit", 1);
@@ -168,7 +168,7 @@ public class SettingsKeeper {
         e.commit();
     }
     //-------------------------------------------------------------
-    static final int SECOND=0, MINUTE=1, HOUR=2;
+    public static final int SECOND=0, MINUTE=1, HOUR=2;
     public int getSpeedUnitTime()
     {
         return sharedPreferences.getInt("timeUnit", 1);

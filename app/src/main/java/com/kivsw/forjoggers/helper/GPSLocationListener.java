@@ -1,10 +1,12 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.helper;
 
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+
+import com.kivsw.forjoggers.R;
 
 import java.util.List;
 
@@ -16,10 +18,10 @@ public class GPSLocationListener implements android.location.LocationListener{
     LocationManager locationManager=null;
     private boolean useNetWorkProvider=false;//BuildConfig.DEBUG;
     Location emulateLocation=null;
-    final public int UPDATE_INTERVAL=1000;
+    final static public int UPDATE_INTERVAL=1000;
 
 
-    GPSLocationListener(Context context, boolean useNetWorkProvider )
+    public GPSLocationListener(Context context, boolean useNetWorkProvider )
     {
         super();
         this.useNetWorkProvider=useNetWorkProvider;

@@ -2,6 +2,8 @@ package com.kivsw.forjoggers;
 
 import android.content.Context;
 
+import com.kivsw.forjoggers.helper.SettingsKeeper;
+
 import java.util.Locale;
 
 /**
@@ -13,7 +15,7 @@ public class UnitUtils {
     SettingsKeeper settings;
     Context context;
 
-    UnitUtils(Context context)
+    public UnitUtils(Context context)
     {
         this.context = context;
         this.settings = SettingsKeeper.getInstance(context);

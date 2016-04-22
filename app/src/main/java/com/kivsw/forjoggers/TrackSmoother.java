@@ -1,5 +1,7 @@
 package com.kivsw.forjoggers;
 
+import com.kivsw.forjoggers.helper.SettingsKeeper;
+
 /**
  * Created by ivan on 03.12.15.
  */

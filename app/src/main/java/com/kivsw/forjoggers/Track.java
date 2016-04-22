@@ -3,6 +3,8 @@ package com.kivsw.forjoggers;
 import android.location.Location;
 import android.os.SystemClock;
 
+import com.kivsw.forjoggers.helper.SettingsKeeper;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -112,7 +114,7 @@ public class Track {
         }
 
     }
-    boolean fromGPX(String str)
+    public boolean fromGPX(String str)
     {
         GpxConvertor gpx=new GpxConvertor(this);
         Reader rd= new StringReader(str);
@@ -308,7 +310,7 @@ public class Track {
 
     public void clear()
     {
-        activityType=SettingsKeeper.JOGGING;
+        activityType= SettingsKeeper.JOGGING;
         mGeoPoints.clear();
         timeStart=0; timeStop=0;
         if(onChange!=null)
@@ -454,7 +456,7 @@ public class Track {
         return this.onChange;
     }
 
-    ArrayList<Location> getGeoPoints()
+    public ArrayList<Location> getGeoPoints()
     {
         return mGeoPoints;
     }
