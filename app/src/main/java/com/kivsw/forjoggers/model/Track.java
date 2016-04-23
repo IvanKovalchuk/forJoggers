@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.model;
 
 import android.location.Location;
 import android.os.SystemClock;

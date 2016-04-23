@@ -1,13 +1,18 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.model;
 
 import android.location.Location;
+
+import com.kivsw.forjoggers.model.LineApproximator;
+import com.kivsw.forjoggers.model.Track;
+import com.kivsw.forjoggers.model.TrackSmoother;
+import com.kivsw.forjoggers.model.iApproximator;
 
 import java.util.ArrayList;
 
 /**
  * Created by ivan on 02.12.15.
  */
-public class TrackSmootherByLine extends TrackSmoother{
+public class TrackSmootherByLine extends TrackSmoother {
 
     //protected ArrayList<Location> mGeoPoints=null;
     iApproximator latApproximator=null, lngApproximator=null;

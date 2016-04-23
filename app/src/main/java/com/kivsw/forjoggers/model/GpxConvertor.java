@@ -1,6 +1,9 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.model;
 
 import android.location.Location;
+
+import com.kivsw.forjoggers.BuildConfig;
+import com.kivsw.forjoggers.model.Track;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlSerializer;

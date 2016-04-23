@@ -19,14 +19,12 @@ import android.widget.TextView;
 
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
-import com.kivsw.forjoggers.CurrentTrack;
+import com.kivsw.forjoggers.model.CurrentTrack;
 import com.kivsw.forjoggers.CustomPagerView;
 import com.kivsw.forjoggers.MainActivity;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.SettingsFragment;
-import com.kivsw.forjoggers.Track;
-import com.kivsw.forjoggers.TrackSmoother;
-import com.kivsw.forjoggers.TrackSmootherByPolynom;
+import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.TrackingService;
 import com.kivsw.forjoggers.UnitUtils;
 import com.kivsw.forjoggers.helper.GPSLocationListener;
@@ -73,8 +71,6 @@ implements SettingsFragment.onSettingsCloseListener,
 
     private View rootView;
 
-    private CurrentTrack currentTrack;
-    TrackSmoother trackSmoother;
     private SettingsKeeper settings=null;
     UnitUtils unitUtils=null;
     //private MyGPSLocationListener mGPSLocationListener;
@@ -96,9 +92,6 @@ implements SettingsFragment.onSettingsCloseListener,
 
         settings = SettingsKeeper.getInstance(getActivity());
         unitUtils = new UnitUtils(getActivity());
-        currentTrack = CurrentTrack.getInstance(getActivity());
-        trackSmoother = //new TrackSmootherByLine(currentTrack);
-                        new TrackSmootherByPolynom(currentTrack);
 
         // mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler=new MyHandler();
@@ -178,7 +171,7 @@ implements SettingsFragment.onSettingsCloseListener,
             isGPS_available = savedInstanceState.getBoolean("isGPS_available", false);
             savedPointIndex = savedInstanceState.getInt("pointIndex", 0);
         }
-        setGSPstatus(isGPS_available);
+        setGPSstatus(isGPS_available);
 
         return rootView;
     }
@@ -196,7 +189,7 @@ implements SettingsFragment.onSettingsCloseListener,
      {
          super.onDestroy();
          //mGPSLocationListener.releaseInstance();
-         trackSmoother.release();
+        // trackSmoother.release();
      }
 
     @Override
@@ -256,7 +249,6 @@ implements SettingsFragment.onSettingsCloseListener,
         mListener = null;
     }
 
-    //-------------------------------------
 
 
 
@@ -397,7 +389,7 @@ implements SettingsFragment.onSettingsCloseListener,
      *
      * @param available
      */
-    private void setGSPstatus(boolean available)
+    private void setGPSstatus(boolean available)
     {
         isGPS_available=available;
         if(available) {
@@ -473,7 +465,7 @@ implements SettingsFragment.onSettingsCloseListener,
     /** is invoked when it's necessary to update the tracking service status
      *
      */
-    public void onStartStopTrackingService(boolean isRunning) {
+   /* public void onStartStopTrackingService(boolean isRunning) {
         if (isRunning) {
             updateTrack(true);
             mHandler.startTrackUpdate(true);
@@ -487,7 +479,7 @@ implements SettingsFragment.onSettingsCloseListener,
             buttonStart.setVisibility(View.VISIBLE);
         }
         getActivity().supportInvalidateOptionsMenu();
-    }
+    }*/
     private void updateFileName()
     {
 
@@ -536,52 +528,55 @@ implements SettingsFragment.onSettingsCloseListener,
         switch(v.getId())
         {
             case R.id.buttonStart: {
-                StringBuilder problems=new StringBuilder();
-
-                if(!getGPSstatus())
-                    problems.append(getText(R.string.GPS_has_not_found_location));
-
-                if(CurrentTrack.getInstance(getActivity()).needToBeSaved())
-                    problems.append(getText(R.string.track_may_be_lost));
-
-                if(problems.length()>0) {
-                    problems.append(getText(R.string.Continue));
-                    MessageDialog.newInstance(WARNINGS_AND_START_SERVICE,
-                            getText(R.string.Warning).toString(), problems.toString(),
-                            this)
-                            .show(getFragmentManager(), "");
-                }
-                else
-                    startTrackService();
+                  MapFragmentPresenter.getInstance(getActivity()).onStartClick();
             }
             break;
             case R.id.buttonStop:
-                stopTrackService();
+                //stopTrackService();
+                MapFragmentPresenter.getInstance(getActivity()).onStopClick();
                 break;
         }
     }
+
 //----------------------------------------------------------
 //-------------------------------
 //-------------------------------
+public void showStartButton()
+{
+    buttonStart.setVisibility(View.VISIBLE);
+    buttonStop.setVisibility(View.GONE);
+}
+public void showStopButton()
+{
+    buttonStop.setVisibility(View.VISIBLE);
+    buttonStart.setVisibility(View.GONE);
+}
+/** shows a message Dialog
+ *
+ * @param id
+ * @param caption
+ * @param message
+ */
+public void showMessageDialog(int id, String caption, String message)
+{
+    MessageDialog.newInstance(id, caption, message, this)
+            .show(getFragmentManager(), "");
+}
+//---------------------------------
 //  MessageDialog.OnCloseListener
-final static int WARNINGS_AND_START_SERVICE =0;
 
     @Override
     public void onClickOk(MessageDialog msg) {
-        switch (msg.getDlgId())
-        {
-            case WARNINGS_AND_START_SERVICE://R.string.track_may_be_lost:
-                startTrackService();
-                break;
-
-        }
+        MapFragmentPresenter.getInstance(getActivity()).onMessageBoxClose(msg.getDlgId(), true);
     }
 
     @Override
-    public void onClickCancel(MessageDialog msg) { }
+    public void onClickCancel(MessageDialog msg)
+    { MapFragmentPresenter.getInstance(getActivity()).onMessageBoxClose(msg.getDlgId(), false); }
 
     @Override
-    public void onClickExtra(MessageDialog msg) { }
+    public void onClickExtra(MessageDialog msg)
+    { MapFragmentPresenter.getInstance(getActivity()).onMessageBoxClose(msg.getDlgId(), false); }
     //-----------------------------------------------------------
 
 
@@ -642,7 +637,7 @@ final static int WARNINGS_AND_START_SERVICE =0;
 
                 mHandler.scheduleIfNecessaryRestoringPosition();
                 if(loc.getProvider().equals(LocationManager.GPS_PROVIDER)) {
-                    setGSPstatus(true);
+                    setGPSstatus(true);
 
                 }
             }
@@ -656,10 +651,10 @@ final static int WARNINGS_AND_START_SERVICE =0;
             switch(status) {
                 case     LocationProvider.TEMPORARILY_UNAVAILABLE:
                 case     LocationProvider.OUT_OF_SERVICE:
-                    setGSPstatus(false);
+                    setGPSstatus(false);
                     break;
                 case   LocationProvider.AVAILABLE:
-                    //setGSPstatus(1);
+                    //setGPSstatus(1);
                     break;
             }
 
@@ -697,13 +692,13 @@ final static int WARNINGS_AND_START_SERVICE =0;
         {
             removeMessages(RESTORE_POSITION);
             removeMessages(POINT_ANIMATION);
-            removeAnimation();
+            //removeAnimation();
             removeMessages(UPDATE_TRACK);
             removeMessages(LAST_LOCATION_FIX_TIMEOUT);
 
-            if(marker!=null)
+          /*  if(marker!=null)
                mapView.getOverlays().remove(marker);
-            marker=null;
+            marker=null;*/
 
         }
 
@@ -723,7 +718,7 @@ final static int WARNINGS_AND_START_SERVICE =0;
             sendEmptyMessageDelayed(LAST_LOCATION_FIX_TIMEOUT, timeout);
         }
 
-        private int pointIndex=0;
+      /*  private int pointIndex=0;
         MyLocationNewOverlay marker=null;
         IMyLocationProvider fakeProvider=new IMyLocationProvider(){
             Location loc=new Location("fake");
@@ -767,7 +762,7 @@ final static int WARNINGS_AND_START_SERVICE =0;
             marker=null;
             mapView.invalidate();
             pointIndex=0;
-        }
+        }*/
 
         public Bitmap rotateBitmap(Bitmap source, float angle)
         {
@@ -800,15 +795,15 @@ final static int WARNINGS_AND_START_SERVICE =0;
                 case RESTORE_POSITION:
                     checkMyLocationVisibility();
                     break;
-                case POINT_ANIMATION:
-                     nextPointAnimation();
-                     break;
+               /* case POINT_ANIMATION:
+                     //nextPointAnimation();
+                     break;*/
                 case UPDATE_TRACK:
                     updateTrack(false);
                     startTrackUpdate(TrackingService.isWorking);
                     break;
                 case LAST_LOCATION_FIX_TIMEOUT:
-                    setGSPstatus(false);
+                    setGPSstatus(false);
                     break;
             }
 

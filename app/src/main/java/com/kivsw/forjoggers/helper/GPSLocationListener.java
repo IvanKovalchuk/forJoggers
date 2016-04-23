@@ -14,7 +14,7 @@ import java.util.List;
  * Created by ivan on 12.11.15.
  */
 public class GPSLocationListener implements android.location.LocationListener{
-    Context context=null;
+    //Context context=null;
     LocationManager locationManager=null;
     private boolean useNetWorkProvider=false;//BuildConfig.DEBUG;
     Location emulateLocation=null;
@@ -34,7 +34,7 @@ public class GPSLocationListener implements android.location.LocationListener{
            LocationManager locationManager = (LocationManager)
                     context.getSystemService(Context.LOCATION_SERVICE);
 
-            context = context.getApplicationContext();
+           // context = context.getApplicationContext();
             listener.locationManager = locationManager;
 
             try {

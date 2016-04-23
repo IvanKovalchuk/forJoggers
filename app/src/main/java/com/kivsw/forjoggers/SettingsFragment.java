@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.model.CurrentTrack;
 
 
 public class SettingsFragment extends Fragment

@@ -1,13 +1,17 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.model;
 
 import android.location.Location;
+
+import com.kivsw.forjoggers.model.PolinomApproximator;
+import com.kivsw.forjoggers.model.Track;
+import com.kivsw.forjoggers.model.TrackSmootherByLine;
 
 import java.util.ArrayList;
 
 /**
  * Created by ivan on 04.12.15.
  */
-public class TrackSmootherByPolynom extends TrackSmootherByLine{
+public class TrackSmootherByPolynom extends TrackSmootherByLine {
 
     public TrackSmootherByPolynom(Track track)
     {

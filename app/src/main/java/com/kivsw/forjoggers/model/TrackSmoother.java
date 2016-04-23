@@ -1,6 +1,7 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.model;
 
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.model.Track;
 
 /**
  * Created by ivan on 03.12.15.

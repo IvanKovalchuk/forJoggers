@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.kivsw.forjoggers.helper.GPSLocationListener;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.model.CurrentTrack;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,7 +31,6 @@ public class TrackingService extends Service {
     public static boolean isWorking=false;
 
     LocationListener mGPSLocationListener=null;
-    CurrentTrack currentTrack=null;
     SettingsKeeper settings=null;
     long startTime=0;
     MyHandler mHandler;
@@ -109,20 +109,10 @@ public class TrackingService extends Service {
     //-----------------------------------------
     private void doStart()
     {
-        currentTrack=CurrentTrack.getInstance(this);
 
-        currentTrack.clear();
-        currentTrack.setActivityType(settings.getActivityType());
-        currentTrack.timeStart=SystemClock.elapsedRealtime();
-        mGPSLocationListener = new LocationListener(this);
-        Location loc = mGPSLocationListener.getLastknownLocation();
 
         isWorking=true;
-        startTime=SystemClock.elapsedRealtime();
         turnIntoForeground();
-        mHandler.scheduleUpdateNotification();
-
-        TrackingServiceEventReceiver.sendServiceStatus(this, isWorking);
 
     };
 

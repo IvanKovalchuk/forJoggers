@@ -2,13 +2,16 @@ package com.kivsw.forjoggers.rx;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.SystemClock;
 
 import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.helper.GPSLocationListener;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 
 /**
@@ -18,7 +21,9 @@ import rx.subjects.BehaviorSubject;
 public class RxGps {
 
     static RxGPSLocationListener gpsListener=null;
-    static BehaviorSubject gpsObservable=null;
+    static BehaviorSubject gpsUiObservable=null;
+    static PublishSubject gpsObservable=null;
+    static long lastLocationTime=0; // when the last location was received
 
     /**
      * return the observable that emits the current location
@@ -31,7 +36,7 @@ public class RxGps {
 
         final Context context = aContext.getApplicationContext();
         gpsListener = new RxGPSLocationListener(context);
-        gpsObservable= BehaviorSubject.create(gpsListener.getLastknownLocation());
+        gpsObservable= PublishSubject.create();
 
         Observable.create(new Observable.OnSubscribe<Location>() {
             @Override
@@ -39,9 +44,31 @@ public class RxGps {
               gpsListener.setSubscriber(subscriber);
             }
         })
+                .filter(new Func1<Location, Boolean>() {  // remembers the time when the last location was received
+                    @Override
+                    public Boolean call(Location location) {
+                        lastLocationTime = SystemClock.elapsedRealtime();
+                        return true;// really I don't filter
+                    }
+                })
                 .subscribe(gpsObservable);
 
         return gpsObservable;
+    }
+
+    /**
+     * returns observable (BehaviorSubject) for UI. At first It emits last known location
+     * @param aContext
+     * @return
+     */
+    public static Observable<Location> getGprsUiObservable(Context aContext)
+    {
+        if(gpsUiObservable!=null) return gpsUiObservable;
+
+        gpsUiObservable = BehaviorSubject.create(gpsListener.getLastknownLocation());
+        getGprsObservable(aContext).subscribe(gpsUiObservable);
+
+        return gpsUiObservable;
     }
 
     /**
@@ -55,12 +82,20 @@ public class RxGps {
             gpsListener = null;
         }
         gpsObservable=null;
+        gpsUiObservable=null;
     }
 
     /**
+     * @return true if GPS is giving the current location properly
+     */
+    public static boolean isGPSavailable()
+    {
+        return (lastLocationTime+GPSLocationListener.UPDATE_INTERVAL*5) < SystemClock.elapsedRealtime();
+    }
+    /**
      *  a listener for Android GPS system
      */
-    static class RxGPSLocationListener extends GPSLocationListener
+     static protected class RxGPSLocationListener extends GPSLocationListener
     {
         Subscriber<? super Location> subscriber=null;
         public RxGPSLocationListener(Context context)

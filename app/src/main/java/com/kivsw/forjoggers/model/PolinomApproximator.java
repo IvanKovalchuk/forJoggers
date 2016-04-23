@@ -1,9 +1,11 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.model;
+
+import com.kivsw.forjoggers.model.iApproximator;
 
 /**
  * Created by ivan on 08.12.15.
  */
-public class PolinomApproximator implements  iApproximator{
+public class PolinomApproximator implements iApproximator {
     final int MAX_POLYNOM_POWER=100;
     private int FNr;
     private int FPowPol;//

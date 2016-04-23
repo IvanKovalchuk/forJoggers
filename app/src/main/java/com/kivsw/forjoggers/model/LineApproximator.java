@@ -1,9 +1,11 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.model;
+
+import com.kivsw.forjoggers.model.iApproximator;
 
 /**
  * Created by ivan on 03.12.15.
  */
-public class LineApproximator implements  iApproximator{
+public class LineApproximator implements iApproximator {
 
     private int N=0;
     private double SumX=0,  //  Xi

@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.model;
 
 import android.content.Context;
 
@@ -13,7 +13,7 @@ public class CurrentTrack extends Track {
 
     String fileName;
 
-    static synchronized  public CurrentTrack getInstance(Context context)
+    static synchronized  CurrentTrack getInstance(Context context)
     {
         if(track==null)
         {

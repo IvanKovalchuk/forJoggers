@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.model.CurrentTrack;
 import com.kivsw.forjoggers.ui.MapFragment;
 
 import java.io.File;
