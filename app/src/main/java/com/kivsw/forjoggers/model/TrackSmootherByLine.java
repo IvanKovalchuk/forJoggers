@@ -2,11 +2,6 @@ package com.kivsw.forjoggers.model;
 
 import android.location.Location;
 
-import com.kivsw.forjoggers.model.LineApproximator;
-import com.kivsw.forjoggers.model.Track;
-import com.kivsw.forjoggers.model.TrackSmoother;
-import com.kivsw.forjoggers.model.iApproximator;
-
 import java.util.ArrayList;
 
 /**
@@ -42,7 +37,7 @@ public class TrackSmootherByLine extends TrackSmoother {
     /**
      *  when a new points was added
      */
-    @Override
+ /*   @Override
     public void onAddPoint() {
         mGeoPoints=null;
     }
@@ -50,10 +45,10 @@ public class TrackSmootherByLine extends TrackSmoother {
     /**
      *  when points were cleared
      */
-    @Override
+  /*  @Override
     public void onClear() {
         mGeoPoints=null;
-    }
+    }*/
 
     //-----------------------------------------------------
 

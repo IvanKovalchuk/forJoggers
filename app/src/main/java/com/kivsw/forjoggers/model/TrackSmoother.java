@@ -1,13 +1,12 @@
 package com.kivsw.forjoggers.model;
 
 import com.kivsw.forjoggers.helper.SettingsKeeper;
-import com.kivsw.forjoggers.model.Track;
 
 /**
  * Created by ivan on 03.12.15.
  */
 public abstract class TrackSmoother extends Track
-        implements Track.IOnChange {
+{
     protected Track track;
 
     TrackSmoother(Track track)
@@ -15,7 +14,7 @@ public abstract class TrackSmoother extends Track
         super();
         mGeoPoints=null;
         this.track=track;
-        track.setOnChange(this);
+        //track.setOnChange(this);
     };
 
     public void release()
@@ -24,6 +23,15 @@ public abstract class TrackSmoother extends Track
         this.track=null;
     }
 
+    /**
+     * checks if newTrack has new data compared with track
+     * @param newTrack
+     * @return
+     */
+    boolean needRecalculate(Track newTrack)
+    {
+        return newTrack.getGeoPoints().size()!=track.getGeoPoints().size();
+    }
     @Override
     public long getTrackTime(boolean totalTime)
     {
@@ -37,12 +45,11 @@ public abstract class TrackSmoother extends Track
         return track.getActivityType();
     };
 
-
-
-    @Override
+    abstract void doSmooth();
+  /*  @Override
     abstract public void onAddPoint();
 
     @Override
-    abstract public void onClear();
+    abstract public void onClear();*/
 
 }

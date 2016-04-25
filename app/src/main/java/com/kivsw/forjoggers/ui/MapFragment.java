@@ -54,30 +54,27 @@ import java.util.Locale;
 public class MapFragment extends Fragment
 implements SettingsFragment.onSettingsCloseListener,
         CustomPagerView.IonPageAppear, View.OnClickListener,
-        MessageDialog.OnCloseListener
-{
+        MessageDialog.OnCloseListener {
 
     private OnFragmentInteractionListener mListener;
-    private static long savingTime=0, savedPointIndex =0;
+    private static long savingTime = 0, savedPointIndex = 0;
 
-    private MapView mapView=null;
+    private MapView mapView = null;
 
     private TextView textTrackInfo;
     ImageView satelliteImageView;
     TextView fileNameTextView;
     Button buttonStart, buttonStop;
 
-    Polyline originalPath =null, smoothyPath=null;
+    Polyline originalPath = null, smoothyPath = null;
 
     private View rootView;
 
-    private SettingsKeeper settings=null;
-    UnitUtils unitUtils=null;
-    //private MyGPSLocationListener mGPSLocationListener;
+    private SettingsKeeper settings = null;
+    UnitUtils unitUtils = null;
+
     private CurrentLocationOverlay myLocationoverlay;
     private MyHandler mHandler;
-    boolean isGPS_available=false;
-
 
 
     public MapFragment() {
@@ -94,7 +91,7 @@ implements SettingsFragment.onSettingsCloseListener,
         unitUtils = new UnitUtils(getActivity());
 
         // mGPSLocationListener = new MyGPSLocationListener(getActivity());
-        mHandler=new MyHandler();
+        mHandler = new MyHandler();
 
 
     }
@@ -103,12 +100,12 @@ implements SettingsFragment.onSettingsCloseListener,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        rootView=inflater.inflate(R.layout.fragment_map, container, false);
+        rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
         mapView = (MapView) rootView.findViewById(R.id.map);
         //mapView.setTileSource(TileSourceFactory.MAPNIK);
         //mapView.setTileSource(TileSourceFactory.CYCLEMAP);
-        OnlineTileSourceBase tileSource=null;
+        OnlineTileSourceBase tileSource = null;
         tileSource = TileSourceFactory.MAPNIK;//CYCLEMAP;//CLOUDMADESMALLTILES;//MAPQUESTAERIAL;//MAPQUESTOSM;//PUBLIC_TRANSPORT;
         mapView.setTileSource(tileSource);
         //mapView.setBuiltInZoomControls(true);
@@ -124,106 +121,87 @@ implements SettingsFragment.onSettingsCloseListener,
         originalPath.setWidth(3f);
         mapView.getOverlays().add(originalPath);
 
-        smoothyPath =  new Polyline(getActivity());
+        smoothyPath = new Polyline(getActivity());
         smoothyPath.setColor(0x7F7F3030);
         smoothyPath.setWidth(2f);
         mapView.getOverlays().add(smoothyPath);
 
-        CompassOverlay compass=new CompassOverlay(getActivity(), mapView);
+        CompassOverlay compass = new CompassOverlay(getActivity(), mapView);
         mapView.getOverlays().add(compass);
 
         IMapController mapController = mapView.getController();
         mapController.setZoom(settings.getZoomLevel());
-        GeoPoint c=new GeoPoint(settings.getLastLatitude(), settings.getLastLongitude());
+        GeoPoint c = new GeoPoint(settings.getLastLatitude(), settings.getLastLongitude());
         mapController.setCenter(c);
         mHandler.scheduleRestoringPosition();
         /*if(mGPSLocationListener.getLastKnownLocation()!=null)
            mapController.animateTo(new GeoPoint(mGPSLocationListener.getLastKnownLocation()));*/
         mapView.setMapListener(new MapListener());
 
-        textTrackInfo = (TextView)rootView.findViewById(R.id.textTrackInfo);
+        textTrackInfo = (TextView) rootView.findViewById(R.id.textTrackInfo);
         textTrackInfo.setText("");
 
-        satelliteImageView = (ImageView)rootView.findViewById(R.id.satelliteImageView);
+        satelliteImageView = (ImageView) rootView.findViewById(R.id.satelliteImageView);
 
-        fileNameTextView = (TextView)rootView.findViewById(R.id.fileNameTextView);
+        fileNameTextView = (TextView) rootView.findViewById(R.id.fileNameTextView);
         updateFileName();
 
-        buttonStart = (Button)rootView.findViewById(R.id.buttonStart);
+        buttonStart = (Button) rootView.findViewById(R.id.buttonStart);
         buttonStart.setOnClickListener(this);
 
-        buttonStop = (Button)rootView.findViewById(R.id.buttonStop);
+        buttonStop = (Button) rootView.findViewById(R.id.buttonStop);
         buttonStop.setOnClickListener(this);
-        if(TrackingService.isWorking)
-        {
+        if (TrackingService.isWorking) {
             buttonStop.setVisibility(View.VISIBLE);
             buttonStart.setVisibility(View.GONE);
-        }
-        else
-        {
+        } else {
             buttonStop.setVisibility(View.GONE);
             buttonStart.setVisibility(View.VISIBLE);
         }
 
 
-        updateTrack(true);
-        if(savedInstanceState!=null) {
-            isGPS_available = savedInstanceState.getBoolean("isGPS_available", false);
-            savedPointIndex = savedInstanceState.getInt("pointIndex", 0);
+        if (savedInstanceState != null) {
+
         }
-        setGPSstatus(isGPS_available);
 
         return rootView;
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("isGPS_available", isGPS_available);
-        outState.putInt("pointIndex", mHandler.pointIndex);
-        savedPointIndex = mHandler.pointIndex;
-        savingTime=SystemClock.elapsedRealtime();
+
     }
 
     @Override
-     public void onDestroy()
-     {
-         super.onDestroy();
-         //mGPSLocationListener.releaseInstance();
+    public void onDestroy() {
+        super.onDestroy();
+        //mGPSLocationListener.releaseInstance();
         // trackSmoother.release();
-     }
+    }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
-        onStartStopTrackingService(TrackingService.isWorking);
+        MapFragmentPresenter.getInstance(getActivity()).setTrackingStatus();
 
     }
+
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
     }
+
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         super.onStart();
         MapFragmentPresenter.getInstance(getActivity()).setUI(this);
 
-        if(SystemClock.elapsedRealtime() - savingTime <30000) {
-            if(savedPointIndex>0)
-            {
-                mHandler.startPointAnimation();
-                mHandler.pointIndex = (int)savedPointIndex;
-            }
-        }
     }
+
     @Override
-    public void onStop()
-    {
-        savedPointIndex =  mHandler.pointIndex;
-        savingTime=SystemClock.elapsedRealtime();
+    public void onStop() {
         MapFragmentPresenter.getInstance(getActivity()).setUI(null);
         super.onStop();
         mHandler.deleteAllMessages();
@@ -234,9 +212,9 @@ implements SettingsFragment.onSettingsCloseListener,
         super.onAttach(activity);
 
         try {
-            ((MainActivity)getActivity()).mapFragment=this;
-            if(activity instanceof OnFragmentInteractionListener)
-               mListener = (OnFragmentInteractionListener) activity;
+            ((MainActivity) getActivity()).mapFragment = this;
+            if (activity instanceof OnFragmentInteractionListener)
+                mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -250,83 +228,78 @@ implements SettingsFragment.onSettingsCloseListener,
     }
 
 
-
-
     /**
      * check if mylocation is on the screen and correct visible bounds
      */
-    void checkMyLocationVisibility()
-    {
-        if(!settings.getReturnToMyLocation()) return;
+    void checkMyLocationVisibility() {
+        if (!settings.getReturnToMyLocation()) return;
         showMyLocation();
-    };
-    public void showMyLocation()
-    {
-        if(myLocationoverlay.getLastFix()==null) return;
-        GeoPoint topLeftGpt     = (GeoPoint) mapView.getProjection().fromPixels(0, 0);
+    }
+
+    ;
+
+    public void showMyLocation() {
+        if (myLocationoverlay.getLastFix() == null) return;
+        GeoPoint topLeftGpt = (GeoPoint) mapView.getProjection().fromPixels(0, 0);
         GeoPoint bottomRightGpt = (GeoPoint) mapView.getProjection().fromPixels(
                 mapView.getWidth(), mapView.getHeight());
 
-        BoundingBoxE6 bounding=mapView.getBoundingBox();
+        BoundingBoxE6 bounding = mapView.getBoundingBox();
 
-        GeoPoint cl=new GeoPoint(myLocationoverlay.getLastFix());
-        boolean r= bounding.contains(cl);
-        if(!r)
-        {
+        GeoPoint cl = new GeoPoint(myLocationoverlay.getLastFix());
+        boolean r = bounding.contains(cl);
+        if (!r) {
             showLocation(cl.getLatitude(), cl.getLongitude());
         }
     }
-    public void showLocation(double lat, double lon)
-    {
+
+    public void showLocation(double lat, double lon) {
         IMapController mapController = mapView.getController();
-        GeoPoint cl=new GeoPoint(lat,lon);
+        GeoPoint cl = new GeoPoint(lat, lon);
         mapController.animateTo(cl);
         settings.setZoomLevel(settings.getZoomLevel(), cl.getLatitude(), cl.getLongitude());
     }
-    public void animateTrack()
+    /*public void animateTrack()
     {
         ArrayList<Location> points=currentTrack.getGeoPoints();
         if(points!=null && points.size()>0) {
             showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
             mHandler.startPointAnimation();
         }
-    }
+    }*/
 
     /**
      *
-     */
-    void setTrack(String gpx)
-    {
-        currentTrack.fromGPX(gpx);
-        updateTrack(true);
-    }
+     *
+     void setTrack(String gpx)
+     {
+     currentTrack.fromGPX(gpx);
+     updateTrack(true);
+     }*/
 
 
     /**
      * update the CurrentTrack if it's necessary
      */
-    void updateTrack(boolean always)
+    /*void updateTrack(boolean always)
     {
         if(always || currentTrack.getGeoPoints().size() != originalPath.getNumberOfPoints()) {
             putCurrentTrackOnMap();
         }
         updateTrackInfo();
-    }
-
-    private void updateTrackInfo()
-    {
-        StringBuilder str=new StringBuilder();
+    }*/
+    public void updateTrackInfo(Track currentTrack, Track trackSmoother) {
+        StringBuilder str = new StringBuilder();
         ArrayList<Location> points = trackSmoother.getGeoPoints();
 
         double distance = trackSmoother.getTrackDistance();
-        double time = trackSmoother.getTrackTime(false)/1000.0;
+        double time = trackSmoother.getTrackTime(false) / 1000.0;
 
         str.append(getText(R.string.distance));
         str.append(unitUtils.distanceToStr(distance));
-        if(BuildConfig.DEBUG)
-        {
-           str.append(" (");
-           str.append(unitUtils.distanceToStr(currentTrack.getTrackDistance()));
+        if (BuildConfig.DEBUG) {
+            str.append(" (");
+            str.append(unitUtils.distanceToStr(currentTrack.getTrackDistance()));
             str.append(")");
         }
         str.append("\n");
@@ -335,30 +308,28 @@ implements SettingsFragment.onSettingsCloseListener,
         str.append(trackSmoother.getTrackTimeStr(true));
         str.append("\n");
 
-        String energy=getCalloriesStr();
-        if(energy!=null)
-        {
+        String energy = getCalloriesStr(trackSmoother);
+        if (energy != null) {
             str.append(getText(R.string.energy));
             str.append(energy);
             str.append("\n");
         }
 
-        if(points.size()>1) {
+        if (points.size() > 1) {
             str.append(getText(R.string.average_speed));
             str.append(unitUtils.speedToStr(distance / time));
             str.append("\n");
 
-            if(TrackingService.isWorking) {
+            if (TrackingService.isWorking) {
                 str.append(getText(R.string.current_speed));
 
-                Location lastLoc=null;
-                if(!currentTrack.getGeoPoints().isEmpty())
-                {
-                    lastLoc=currentTrack.getGeoPoints().get(currentTrack.getGeoPoints().size()-1);
-                    if(!lastLoc.hasSpeed()) lastLoc=null;
-                };
-                if(lastLoc==null)
-                {
+                Location lastLoc = null;
+                if (!currentTrack.getGeoPoints().isEmpty()) {
+                    lastLoc = currentTrack.getGeoPoints().get(currentTrack.getGeoPoints().size() - 1);
+                    if (!lastLoc.hasSpeed()) lastLoc = null;
+                }
+                ;
+                if (lastLoc == null) {
                     lastLoc = points.get(points.size() - 1);
                 }
 
@@ -369,64 +340,58 @@ implements SettingsFragment.onSettingsCloseListener,
         }
 
         textTrackInfo.setText(str);
-    };
+    }
+
+    ;
 
 
+    String getCalloriesStr(Track trackSmoother) {
+        double e = trackSmoother.getСalories(settings.getMyWeightKg());
+        String res = null;
 
-    String getCalloriesStr()
-    {
-         double e= trackSmoother.getСalories(settings.getMyWeightKg());
-        String res=null;
-
-        if(e>1)
-        {
-            res = String.format(Locale.US,"%.0f", e) + getText(R.string.Cal);
+        if (e > 1) {
+            res = String.format(Locale.US, "%.0f", e) + getText(R.string.Cal);
         }
         return res;
     }
 
     /**
-     *
      * @param available
      */
-    private void setGPSstatus(boolean available)
-    {
-        isGPS_available=available;
-        if(available) {
+    public void setGPSstatus(boolean available) {
+        if (available) {
             satelliteImageView.setImageResource(R.drawable.satellite_en);
             mHandler.scheduleLastPositionFix(GPSLocationListener.UPDATE_INTERVAL * 5);
-        }
-        else satelliteImageView.setImageResource(R.drawable.satellite_dis);
-    }
-    public boolean getGPSstatus()
-    {
-        return isGPS_available;
+        } else satelliteImageView.setImageResource(R.drawable.satellite_dis);
     }
 
-    private void putCurrentTrackOnMap()
-    {
+    public void putCurrentTrackOnMap(Track currentTrack) {
 
         //OverlayManager om=mapView.getOverlayManager();
-        ArrayList<GeoPoint> points=new ArrayList<GeoPoint>(currentTrack.getGeoPoints().size());
+        ArrayList<GeoPoint> points = new ArrayList<GeoPoint>(currentTrack.getGeoPoints().size());
 
-        for(Location l:currentTrack.getGeoPoints()) {
+        for (Location l : currentTrack.getGeoPoints()) {
             points.add(new GeoPoint(l));
         }
         originalPath.setPoints(points);
 
-        points.clear();
+        mapView.postInvalidate();
+    }
+
+    public void putSmoothTrackOnMao(Track trackSmoother)
+    {
+        ArrayList<GeoPoint> points = new ArrayList<GeoPoint>(trackSmoother.getGeoPoints().size());
         for(Location l:trackSmoother.getGeoPoints()) {
             points.add(new GeoPoint(l));
         }
         smoothyPath.setPoints(points);
-        //om.add(originalPath);
 
-        mapView.invalidate();
+        mapView.postInvalidate();
     }
 
     public boolean loadTrackFromFile(String fileName)
     {
-        boolean r=currentTrack.loadGeoPoint(fileName);
+      /*  boolean r=currentTrack.loadGeoPoint(fileName);
         updateTrack(true);
         updateFileName();
 
@@ -434,34 +399,17 @@ implements SettingsFragment.onSettingsCloseListener,
         if(points!=null && points.size()>0)
             showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
 
-        return r;
+        return r;*/
     }
 
     public boolean saveTrackToFile(String fileName)
     {
-        boolean r= currentTrack.saveGeoPoint(fileName);
+       /* boolean r= currentTrack.saveGeoPoint(fileName);
         if(r)
             updateFileName();
-        return r;
+        return r;*/
     }
-    /**
-     * start tracking
-     */
-    private void startTrackService()
-    {
-        TrackingService.start(getActivity());
-        CurrentTrack.getInstance(getActivity()).clear();
-       // onStartStopTrackingService(true);
-    };
-    /**
-     * stops tracking
-     */
-    private void stopTrackService()
-    {
-        TrackingService.stop(getActivity());
-        //onStartStopTrackingService(false);
 
-    };
     /** is invoked when it's necessary to update the tracking service status
      *
      */
@@ -483,14 +431,14 @@ implements SettingsFragment.onSettingsCloseListener,
     private void updateFileName()
     {
 
-        String fn= currentTrack.getFileName();
+       /* String fn= currentTrack.getFileName();
         if(fn!=null && !fn.isEmpty()) {
             File file = new File(fn);
             fn=file.getName();
         }
         if(fn==null || fn.isEmpty())
             fn="*";
-        fileNameTextView.setText(fn);
+        fileNameTextView.setText(fn);*/
     };
     public static Bitmap RotateBitmap(Bitmap source, float angle)
     {
@@ -798,10 +746,10 @@ public void showMessageDialog(int id, String caption, String message)
                /* case POINT_ANIMATION:
                      //nextPointAnimation();
                      break;*/
-                case UPDATE_TRACK:
+               /* case UPDATE_TRACK:
                     updateTrack(false);
                     startTrackUpdate(TrackingService.isWorking);
-                    break;
+                    break;*/
                 case LAST_LOCATION_FIX_TIMEOUT:
                     setGPSstatus(false);
                     break;

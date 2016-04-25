@@ -3,11 +3,9 @@ package com.kivsw.forjoggers.ui;
 import android.content.Context;
 import android.location.Location;
 
-import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.helper.GPSLocationListener;
-import com.kivsw.forjoggers.model.CurrentTrack;
 import com.kivsw.forjoggers.model.DataModel;
+import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.rx.RxGps;
 
 import rx.Subscription;
@@ -59,10 +57,29 @@ public class MapFragmentPresenter {
                     fragment.setCurrentLocation(location);
                 }
             });
+
+            mapFragment.setGPSstatus(RxGps.isGPSavailable());
+            onCurrentTrackUpdate(DataModel.getInstance(context).getCurrentTrack());
+            onSmoothTrackUpdate(DataModel.getInstance(context).getTrackSmoother());
+
         }
 
     }
     //----------------------------------------------------------
+
+    /**
+     *  shows the stop button or the start button
+     */
+    public void setTrackingStatus()
+    {
+        if(mapFragment==null) return;
+
+        if(DataModel.getInstance(context).isTracking())
+            mapFragment.showStopButton();
+        else
+            mapFragment.showStartButton();
+
+    }
     /**
      * starts recording a new track
      */
@@ -114,8 +131,28 @@ public class MapFragmentPresenter {
         mapFragment.showStartButton();
     }
 
+
     public boolean getGPSstatus()
     {
         return RxGps.isGPSavailable();
+    }
+
+    /**
+     * Method is invoked when currentTrack is changed
+     * @param track
+     */
+    public void onCurrentTrackUpdate(Track track)
+    {
+       if(mapFragment==null) return;
+        mapFragment.set
+    }
+
+    /**
+     * Method is invoked when smoothTrack is ready
+     * @param track
+     */
+    public void onSmoothTrackUpdate(Track track)
+    {
+      if(mapFragment==null) return;
     }
 }

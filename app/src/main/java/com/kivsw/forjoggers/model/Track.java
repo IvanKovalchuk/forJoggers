@@ -14,6 +14,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.SimpleTimeZone;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.subjects.PublishSubject;
+
 /**
  *   This class hold a track as a set of geo points
  */
@@ -30,6 +34,7 @@ public class Track {
     public long timeStart=0, timeStop=0;
     int activityType;
     IOnChange onChange=null;
+    private Observable<Track> observable=null;
     //-----------------------------------------------------
     public Track()
     {
@@ -37,6 +42,48 @@ public class Track {
     };
 
 
+    @Override
+    public Track clone()
+    {
+        Track res=new Track();
+        res.timeStart = timeStart;
+        res.timeStop = timeStop;
+        res.activityType = activityType;
+        res.mGeoPoints = (ArrayList<Location>)mGeoPoints.clone();
+
+        return res;
+
+    }
+
+    public Observable<Track>  getObservable()
+    {
+        if(observable!=null) return observable;
+
+        PublishSubject res = PublishSubject.<Track>create();
+
+        observable.create(new Observable.OnSubscribe<Track>() {
+
+            @Override
+            public void call(final Subscriber<? super Track> subscriber) {
+
+                setOnChange(new IOnChange(){
+                    @Override
+                    public void onAddPoint() {
+                        subscriber.onNext(Track.this);
+                    }
+
+                    @Override
+                    public void onClear() {
+                        subscriber.onNext(Track.this);
+                    }
+                });
+            }
+        }).subscribe(res);
+
+
+        observable = res;
+        return observable;
+    }
     //-----------------------------------------------------
     /**  save points in a file
      * @param fileName file name
@@ -447,7 +494,7 @@ public class Track {
         return r;
     }*/
 
-    public void setOnChange(IOnChange onChange)
+    protected void setOnChange(IOnChange onChange)
     {
         this.onChange = onChange;
     }

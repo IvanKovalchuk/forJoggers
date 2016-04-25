@@ -4,18 +4,17 @@ import android.content.Context;
 import android.location.Location;
 import android.os.SystemClock;
 
-import com.kivsw.dialog.MessageDialog;
-import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.TrackingService;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.rx.RxGps;
+import com.kivsw.forjoggers.ui.MapFragmentPresenter;
 
-import rx.Observer;
 import rx.Subscriber;
-import rx.Subscription;
-import rx.android.plugins.RxAndroidPlugins;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 
 /**
  * Created by ivan on 4/22/16.
@@ -38,6 +37,7 @@ public class DataModel {
     boolean isTracking=false;
 
     private CurrentTrack currentTrack=null;
+    private volatile boolean isTrackSmoothing=false;
     private TrackSmoother trackSmoother=null;
     Subscriber trackingSubscriber=null;
 
@@ -47,8 +47,12 @@ public class DataModel {
         this.context = context;
         settings = SettingsKeeper.getInstance(context);
         currentTrack = CurrentTrack.getInstance(context);
-        trackSmoother = //new TrackSmootherByLine(currentTrack);
-                new TrackSmootherByPolynom(currentTrack);
+        /*trackSmoother = //new TrackSmootherByLine(currentTrack);
+                new TrackSmootherByPolynom(currentTrack);*/
+
+        initSmoothCalculation();
+
+
     };
     public void release()
     {
@@ -70,6 +74,60 @@ public class DataModel {
 
         return  SystemClock.elapsedRealtime() - currentTrack.timeStart;
     }
+    public boolean isTracking()
+    {
+        return isTracking;
+    }
+
+    //------------------------------------------------------------------
+    // initializes smoothen calculation
+    protected void initSmoothCalculation()
+    {
+        Subject<Track,Track> subject=PublishSubject.create();
+        currentTrack.getObservable()
+        .mergeWith(subject) // creates a loop
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .filter(new Func1<Track, Boolean>() { //
+            @Override
+            public Boolean call(Track track) {
+                if(isTrackSmoothing) // if the calculation has been doing
+                    return Boolean.FALSE;
+
+                if(trackSmoother!=null && trackSmoother.needRecalculate(currentTrack))
+                   return Boolean.TRUE;
+
+                return Boolean.FALSE;
+            }
+        })
+        .map(new Func1<Track, TrackSmoother>(){ // creates a smoother
+            @Override
+            public TrackSmoother call(Track track) {
+                TrackSmoother r = new TrackSmootherByPolynom(currentTrack.clone());//new TrackSmootherByLine(currentTrack);
+                isTrackSmoothing=true;
+                return r;
+            }
+        })
+        .subscribeOn(Schedulers.computation()) // change to another thread
+        .map(new Func1<TrackSmoother, TrackSmoother>(){ // calculates a smooth track
+            @Override
+            public TrackSmoother call(TrackSmoother track) {
+                track.doSmooth();
+                return track;
+            }
+        })
+        .subscribeOn(AndroidSchedulers.mainThread())// change to the main thread
+        .map(new Func1<TrackSmoother, TrackSmoother>(){ // calculates a smooth track
+            @Override
+            public TrackSmoother call(TrackSmoother track) {
+                trackSmoother = track;
+                isTrackSmoothing=false;
+                doUpdateCurrentSmoothTrackView();
+                return null;
+            }
+        })
+        .subscribe(subject);
+
+    };
     //------------------------------------------------------------------
     /**
      * starts recording a new track
@@ -93,6 +151,8 @@ public class DataModel {
 
             @Override
             public void onNext(Location location) {
+                currentTrack.addPoint(location);
+                doUpdateCurrentTrackView();
 
             }
         };
@@ -101,7 +161,6 @@ public class DataModel {
                     @Override
                     public Boolean call(Location location) {
                         if(location==null) return false;
-                        currentTrack.addPoint(location);
                         return true;
                     }
                 })
@@ -125,5 +184,13 @@ public class DataModel {
         isTracking = false;
     };
     //--------------------------------------------------------------------
+    protected void doUpdateCurrentTrackView()
+    {
+        MapFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
+    }
+    protected void doUpdateCurrentSmoothTrackView()
+    {
+         MapFragmentPresenter.getInstance(context).onSmoothTrackUpdate(trackSmoother);
+    }
 
 }
