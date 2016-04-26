@@ -18,7 +18,6 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kivsw.dialog.MessageDialog;
-import com.kivsw.forjoggers.model.CurrentTrack;
 import com.kivsw.forjoggers.model.Track;
 
 import java.util.Locale;
@@ -115,7 +114,9 @@ public class AnalysingFragment extends Fragment
     void showGraph(int num)
     {
         needUpdate=false;
-        Track curentTrack= CurrentTrack.getInstance(getActivity());
+        Track curentTrack= null;//CurrentTrack.getInstance(getActivity());
+        if(curentTrack==null)
+            return;
         if(curentTrack.getOnChange() instanceof Track)
         {
             curentTrack = (Track)curentTrack.getOnChange();

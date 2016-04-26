@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.kivsw.forjoggers.helper.SettingsKeeper;
-import com.kivsw.forjoggers.model.CurrentTrack;
 
 
 public class SettingsFragment extends Fragment
@@ -147,7 +146,7 @@ implements CustomPagerView.IonPageAppear
         weightEditText.setText(String.valueOf(settings.getMyWeight()));
         weightUnitsSpinner.setSelection(settings.getMyWeightUnit());
 
-        currentActivitySpinner.setSelection(CurrentTrack.getInstance(getActivity()).activityType);
+       // currentActivitySpinner.setSelection(CurrentTrack.getInstance(getActivity()).activityType);
         defaultActivitySpinner.setSelection(settings.getActivityType());
 
         distanceUnitsSpinner.setSelection(settings.getDistanceUnit());
@@ -163,8 +162,8 @@ implements CustomPagerView.IonPageAppear
         catch(Exception e){i=0;};
         settings.setMyWeight(i, weightUnitsSpinner.getSelectedItemPosition());
 
-        CurrentTrack.getInstance(getActivity()).setActivityType(
-                currentActivitySpinner.getSelectedItemPosition());
+      //  CurrentTrack.getInstance(getActivity()).setActivityType(
+        //        currentActivitySpinner.getSelectedItemPosition());
 
         settings.setActivityType(defaultActivitySpinner.getSelectedItemPosition());
 

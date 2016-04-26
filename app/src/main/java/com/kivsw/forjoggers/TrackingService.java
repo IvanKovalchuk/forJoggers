@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -15,9 +14,7 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
-import com.kivsw.forjoggers.helper.GPSLocationListener;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
-import com.kivsw.forjoggers.model.CurrentTrack;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,7 +27,7 @@ public class TrackingService extends Service {
     //------------------------------------------------
     public static boolean isWorking=false;
 
-    LocationListener mGPSLocationListener=null;
+    //LocationListener mGPSLocationListener=null;
     SettingsKeeper settings=null;
     long startTime=0;
     MyHandler mHandler;
@@ -93,7 +90,7 @@ public class TrackingService extends Service {
 
         };
 
-        if(mGPSLocationListener==null)
+        if(!isWorking)
             stopSelf();
         return START_NOT_STICKY;
     }
@@ -119,18 +116,19 @@ public class TrackingService extends Service {
     private void doStop()
     {
         isWorking=false;
-        if(currentTrack!=null)
+        mHandler.removeUpdateNotification();
+  /*      if(currentTrack!=null)
             currentTrack.timeStop= SystemClock.elapsedRealtime();
         if(mGPSLocationListener!=null)
             mGPSLocationListener.releaseInstance();
         mGPSLocationListener=null;
-        mHandler.removeUpdateNotification();
+
 
         if(currentTrack!=null)
            CurrentTrack.saveTrack();
         currentTrack=null;
 
-        TrackingServiceEventReceiver.sendServiceStatus(this, isWorking);
+        TrackingServiceEventReceiver.sendServiceStatus(this, isWorking);*/
     };
 
 
@@ -184,7 +182,7 @@ public class TrackingService extends Service {
     }
 
     //------------------------------------------------------
-    class LocationListener extends GPSLocationListener
+  /*  class LocationListener extends GPSLocationListener
     {
         LocationListener(Context context)
         {
@@ -200,7 +198,7 @@ public class TrackingService extends Service {
             }
         }
 
-    }
+    }*/
     //------------------------------------------------------
     class MyHandler extends Handler {
         final private int UPDATE_NOTOFICATION = 1;

@@ -65,8 +65,9 @@ public class RxGps {
     {
         if(gpsUiObservable!=null) return gpsUiObservable;
 
+        Observable<Location> o=getGprsObservable(aContext);
         gpsUiObservable = BehaviorSubject.create(gpsListener.getLastknownLocation());
-        getGprsObservable(aContext).subscribe(gpsUiObservable);
+        o.subscribe(gpsUiObservable);
 
         return gpsUiObservable;
     }

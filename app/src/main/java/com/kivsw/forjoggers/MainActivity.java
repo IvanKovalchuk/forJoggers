@@ -1,7 +1,6 @@
 package com.kivsw.forjoggers;
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -15,15 +14,13 @@ import android.view.MenuItem;
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
-import com.kivsw.forjoggers.model.CurrentTrack;
 import com.kivsw.forjoggers.ui.MapFragment;
 
 import java.io.File;
-import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity
-implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingListener,
+implements  FileDialog.OnCloseListener,
             MessageDialog.OnCloseListener,SettingsFragment.onSettingsCloseListener
 {
 
@@ -36,7 +33,7 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
 
     SettingsKeeper settings;
 
-    TrackingServiceEventReceiver trackingServiceEventReceiver=null;
+    //TrackingServiceEventReceiver trackingServiceEventReceiver=null;
 
 
 
@@ -115,7 +112,7 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
          item=menu.findItem(R.id.action_save_track);
          item.setEnabled(!TrackingService.isWorking);
 
-         boolean isTrack = CurrentTrack.getInstance(this).getGeoPoints().size()>1;
+         boolean isTrack = true;//CurrentTrack.getInstance(this).getGeoPoints().size()>1;
          item=menu.findItem(R.id.action_show_my_track);
          item.setEnabled(isTrack);
 
@@ -150,7 +147,7 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
                 return true;
 
             case R.id.action_load_track:
-                if(!TrackingService.isWorking) {
+                /*if(!TrackingService.isWorking) {
                     if (CurrentTrack.getInstance(this).needToBeSaved()) {
                         MessageDialog.newInstance(TRACK_MAY_BE_LOST_LOAD_FILE,
                                 getText(R.string.Warning).toString(),
@@ -160,7 +157,7 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
                     } else {
                         loadCurrentTrack();
                     }
-                }
+                }*/
                 return true;
 
             case R.id.action_show_my_location:
@@ -168,13 +165,13 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
                 return true;
 
             case R.id.action_show_my_track:
-                ArrayList<Location> points=CurrentTrack.getInstance(this).getGeoPoints();
+                /*ArrayList<Location> points=CurrentTrack.getInstance(this).getGeoPoints();
                 if(points!=null && points.size()>0)
                    mapFragment.showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
-                return true;
+                return true;*/
 
             case R.id.action_animate_my_track:
-                mapFragment.animateTrack();
+                //mapFragment.animateTrack();
                 break;
         }
 
@@ -185,14 +182,14 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
     protected void onStart()
     {
         super.onStart();
-        trackingServiceEventReceiver = TrackingServiceEventReceiver.createAndRegister(this, this);
+       // trackingServiceEventReceiver = TrackingServiceEventReceiver.createAndRegister(this, this);
 
     }
     //----------------------------------------------------------
     @Override
     protected void onStop()
     {
-        trackingServiceEventReceiver.unregister();
+       // trackingServiceEventReceiver.unregister();
         super.onStop();
 
     }
@@ -341,7 +338,7 @@ implements  FileDialog.OnCloseListener, TrackingServiceEventReceiver.OnChangingL
     public void onServiceStatusChanged(boolean isRunning)
     {
         supportInvalidateOptionsMenu();
-        mapFragment.onStartStopTrackingService(isRunning);
+        //mapFragment.onStartStopTrackingService(isRunning);
     }
     class MyOnPageChange extends ViewPager.SimpleOnPageChangeListener
     {

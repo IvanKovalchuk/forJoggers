@@ -18,6 +18,16 @@
         android:layout_gravity="left|top"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="15sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text=""
+        android:textColor="#FF000000"
+        android:id="@+id/textCurrentSpeedInfo"
+        android:layout_gravity="right|top"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="45sp"/>
     <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"

@@ -86,14 +86,15 @@ public class DataModel {
         Subject<Track,Track> subject=PublishSubject.create();
         currentTrack.getObservable()
         .mergeWith(subject) // creates a loop
-        .subscribeOn(AndroidSchedulers.mainThread())
+        .observeOn(AndroidSchedulers.mainThread())
         .filter(new Func1<Track, Boolean>() { //
             @Override
             public Boolean call(Track track) {
-                if(isTrackSmoothing) // if the calculation has been doing
+
+                if(isTrackSmoothing) // if the calculation is doing
                     return Boolean.FALSE;
 
-                if(trackSmoother!=null && trackSmoother.needRecalculate(currentTrack))
+                if(trackSmoother==null || trackSmoother.needRecalculate(currentTrack))
                    return Boolean.TRUE;
 
                 return Boolean.FALSE;
@@ -107,7 +108,7 @@ public class DataModel {
                 return r;
             }
         })
-        .subscribeOn(Schedulers.computation()) // change to another thread
+        .observeOn(Schedulers.computation()) // change to another thread
         .map(new Func1<TrackSmoother, TrackSmoother>(){ // calculates a smooth track
             @Override
             public TrackSmoother call(TrackSmoother track) {
@@ -115,7 +116,7 @@ public class DataModel {
                 return track;
             }
         })
-        .subscribeOn(AndroidSchedulers.mainThread())// change to the main thread
+        .observeOn(AndroidSchedulers.mainThread())// change to the main thread
         .map(new Func1<TrackSmoother, TrackSmoother>(){ // calculates a smooth track
             @Override
             public TrackSmoother call(TrackSmoother track) {

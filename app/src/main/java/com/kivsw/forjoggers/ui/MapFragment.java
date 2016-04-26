@@ -19,16 +19,16 @@ import android.widget.TextView;
 
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
-import com.kivsw.forjoggers.model.CurrentTrack;
 import com.kivsw.forjoggers.CustomPagerView;
 import com.kivsw.forjoggers.MainActivity;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.SettingsFragment;
-import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.TrackingService;
 import com.kivsw.forjoggers.UnitUtils;
 import com.kivsw.forjoggers.helper.GPSLocationListener;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.model.Track;
+import com.kivsw.forjoggers.model.TrackSmoother;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -40,11 +40,7 @@ import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
-import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -61,7 +57,7 @@ implements SettingsFragment.onSettingsCloseListener,
 
     private MapView mapView = null;
 
-    private TextView textTrackInfo;
+    private TextView textTrackInfo,textCurrentSpeedInfo;
     ImageView satelliteImageView;
     TextView fileNameTextView;
     Button buttonStart, buttonStop;
@@ -140,6 +136,8 @@ implements SettingsFragment.onSettingsCloseListener,
 
         textTrackInfo = (TextView) rootView.findViewById(R.id.textTrackInfo);
         textTrackInfo.setText("");
+        textCurrentSpeedInfo = (TextView) rootView.findViewById(R.id.textCurrentSpeedInfo);
+        textCurrentSpeedInfo.setText("");
 
         satelliteImageView = (ImageView) rootView.findViewById(R.id.satelliteImageView);
 
@@ -236,8 +234,10 @@ implements SettingsFragment.onSettingsCloseListener,
         showMyLocation();
     }
 
-    ;
 
+    /**
+     * relocates the visible map zone to the current position
+     */
     public void showMyLocation() {
         if (myLocationoverlay.getLastFix() == null) return;
         GeoPoint topLeftGpt = (GeoPoint) mapView.getProjection().fromPixels(0, 0);
@@ -253,6 +253,11 @@ implements SettingsFragment.onSettingsCloseListener,
         }
     }
 
+    /**
+     * relocates the visible map zone to (lat,lon) position
+     * @param lat
+     * @param lon
+     */
     public void showLocation(double lat, double lon) {
         IMapController mapController = mapView.getController();
         GeoPoint cl = new GeoPoint(lat, lon);
@@ -288,7 +293,12 @@ implements SettingsFragment.onSettingsCloseListener,
         }
         updateTrackInfo();
     }*/
-    public void updateTrackInfo(Track currentTrack, Track trackSmoother) {
+    public void updateTrackInfo(TrackSmoother trackSmoother, Track currentTrack ) {
+        if(trackSmoother==null)
+        {
+            textTrackInfo.setText("");
+            return;
+        }
         StringBuilder str = new StringBuilder();
         ArrayList<Location> points = trackSmoother.getGeoPoints();
 
@@ -320,23 +330,6 @@ implements SettingsFragment.onSettingsCloseListener,
             str.append(unitUtils.speedToStr(distance / time));
             str.append("\n");
 
-            if (TrackingService.isWorking) {
-                str.append(getText(R.string.current_speed));
-
-                Location lastLoc = null;
-                if (!currentTrack.getGeoPoints().isEmpty()) {
-                    lastLoc = currentTrack.getGeoPoints().get(currentTrack.getGeoPoints().size() - 1);
-                    if (!lastLoc.hasSpeed()) lastLoc = null;
-                }
-                ;
-                if (lastLoc == null) {
-                    lastLoc = points.get(points.size() - 1);
-                }
-
-                str.append(unitUtils.speedToStr(lastLoc.getSpeed()));
-                str.append("\n");
-
-            }
         }
 
         textTrackInfo.setText(str);
@@ -378,9 +371,11 @@ implements SettingsFragment.onSettingsCloseListener,
         mapView.postInvalidate();
     }
 
-    public void putSmoothTrackOnMao(Track trackSmoother)
+    public void putSmoothTrackOnMap(Track trackSmoother)
     {
-        ArrayList<GeoPoint> points = new ArrayList<GeoPoint>(trackSmoother.getGeoPoints().size());
+        int size = trackSmoother!=null?trackSmoother.getGeoPoints().size():0;
+        ArrayList<GeoPoint> points = new ArrayList<GeoPoint>(size);
+        if(trackSmoother!=null)
         for(Location l:trackSmoother.getGeoPoints()) {
             points.add(new GeoPoint(l));
         }
@@ -400,6 +395,7 @@ implements SettingsFragment.onSettingsCloseListener,
             showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
 
         return r;*/
+        return false;
     }
 
     public boolean saveTrackToFile(String fileName)
@@ -408,6 +404,7 @@ implements SettingsFragment.onSettingsCloseListener,
         if(r)
             updateFileName();
         return r;*/
+        return false;
     }
 
     /** is invoked when it's necessary to update the tracking service status
@@ -450,12 +447,33 @@ implements SettingsFragment.onSettingsCloseListener,
     public void setCurrentLocation(Location location)
     {
         myLocationoverlay.setLocation(location);//onLocationChanged(location,null);
+
+        if(location.hasSpeed()) {
+            StringBuilder str=new StringBuilder();
+                str.append(getText(R.string.current_speed));
+
+              /*  Location lastLoc = null;
+                if (!currentTrack.getGeoPoints().isEmpty()) {
+                    lastLoc = currentTrack.getGeoPoints().get(currentTrack.getGeoPoints().size() - 1);
+                    if (!lastLoc.hasSpeed()) lastLoc = null;
+                }
+                ;
+                if (lastLoc == null) {
+                    lastLoc = points.get(points.size() - 1);
+                }
+
+                str.append(unitUtils.speedToStr(lastLoc.getSpeed()));*/
+            str.append(unitUtils.speedToStr(location.getSpeed()));
+            textCurrentSpeedInfo.setText(str);
+        }
+        else
+            textCurrentSpeedInfo.setText("");
     };
     //----------------------------------------------
     // SettingsFragment.onSettingsCloseListener
     @Override
     public void onSettingsChanged() {
-        updateTrackInfo();
+        //updateTrackInfo();
     }
     //----------------------------------------------
     // CustomPagerView.IonPageAppear

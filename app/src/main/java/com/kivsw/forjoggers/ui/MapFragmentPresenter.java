@@ -143,8 +143,9 @@ public class MapFragmentPresenter {
      */
     public void onCurrentTrackUpdate(Track track)
     {
-       if(mapFragment==null) return;
-        mapFragment.set
+         if(mapFragment==null) return;
+          mapFragment.putCurrentTrackOnMap(track);
+          //mapFragment.updateTrackInfo(DataModel.getInstance(context).getCurrentTrack(), DataModel.getInstance(context).getTrackSmoother());
     }
 
     /**
@@ -153,6 +154,8 @@ public class MapFragmentPresenter {
      */
     public void onSmoothTrackUpdate(Track track)
     {
-      if(mapFragment==null) return;
+        if(mapFragment==null) return;
+        mapFragment.putSmoothTrackOnMap(track);
+        mapFragment.updateTrackInfo(DataModel.getInstance(context).getTrackSmoother(),DataModel.getInstance(context).getCurrentTrack());
     }
 }
