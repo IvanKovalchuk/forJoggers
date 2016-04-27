@@ -19,6 +19,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.model.Track;
+import com.kivsw.forjoggers.ui.MainActivity;
 
 import java.util.Locale;
 

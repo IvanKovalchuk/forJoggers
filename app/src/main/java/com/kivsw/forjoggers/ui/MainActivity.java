@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +13,11 @@ import android.view.MenuItem;
 
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
+import com.kivsw.forjoggers.AnalysingFragment;
+import com.kivsw.forjoggers.CustomPagerView;
+import com.kivsw.forjoggers.R;
+import com.kivsw.forjoggers.SettingsFragment;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
-import com.kivsw.forjoggers.ui.MapFragment;
 
 import java.io.File;
 
@@ -27,9 +30,10 @@ implements  FileDialog.OnCloseListener,
     final static String ACTION_RECEIVE_TRACK="com.kivsw.forjoggers.ACTION_RECIEVE_TRACK";
 
     private ViewPager pager;
-    SettingsFragment settingsFragment=null;
+    public SettingsFragment settingsFragment=null;
     public MapFragment mapFragment=null;
-    AnalysingFragment analysingFragment=null;
+    public AnalysingFragment analysingFragment=null;
+    MainActivityPresenter presenter = null;
 
     SettingsKeeper settings;
 
@@ -70,6 +74,9 @@ implements  FileDialog.OnCloseListener,
        }
 
         processIntent(getIntent());
+
+        presenter=MainActivityPresenter.getInstance(this);
+        presenter.onCreateActivity(this);
     }
 //----------------------------------------------------------
     @Override
@@ -82,6 +89,7 @@ implements  FileDialog.OnCloseListener,
     @Override
     protected void onDestroy()
     {
+        presenter.onDestroyActivity();
         super.onDestroy();
 
     }
@@ -104,20 +112,22 @@ implements  FileDialog.OnCloseListener,
      @Override
     public boolean onPrepareOptionsMenu(Menu menu)
      {
+
+         boolean isTracking = presenter.isTracking();
          MenuItem item=menu.findItem(R.id.action_show_my_location);
 
          item=menu.findItem(R.id.action_load_track);
-         item.setEnabled(!TrackingService.isWorking);
+         item.setEnabled(!isTracking);
 
          item=menu.findItem(R.id.action_save_track);
-         item.setEnabled(!TrackingService.isWorking);
+         item.setEnabled(!isTracking);
 
-         boolean isTrack = true;//CurrentTrack.getInstance(this).getGeoPoints().size()>1;
+         boolean hasTrackData = presenter.hasTrackData();
          item=menu.findItem(R.id.action_show_my_track);
-         item.setEnabled(isTrack);
+         item.setEnabled(hasTrackData);
 
          item=menu.findItem(R.id.action_animate_my_track);
-         item.setEnabled(isTrack && !TrackingService.isWorking);
+         item.setEnabled(hasTrackData && !isTracking);
 
          return super.onPrepareOptionsMenu(menu);
      }
@@ -131,24 +141,15 @@ implements  FileDialog.OnCloseListener,
 
         //noinspection SimplifiableIfStatement
         switch(id) {
-           /* case R.id.action_settings:
-                SettingsFragment.newInstance(new SettingsFragment.onSettingsCloseListener(){
-                    @Override
-                    public void onSettingsChanged() {
-                        analysingFragment.onSettingsChanged();
-                        mapFragment.onSettingsChanged();
-                    }
-                }).show(getSupportFragmentManager(),"");
-                return true;*/
 
             case R.id.action_save_track:
-                if(!TrackingService.isWorking)
+                if(!presenter.isTracking())
                    saveCurrentTrack();
                 return true;
 
             case R.id.action_load_track:
-                /*if(!TrackingService.isWorking) {
-                    if (CurrentTrack.getInstance(this).needToBeSaved()) {
+                if(!presenter.isTracking() ) {
+                    if (presenter.trackNeedToBeSaved()) {
                         MessageDialog.newInstance(TRACK_MAY_BE_LOST_LOAD_FILE,
                                 getText(R.string.Warning).toString(),
                                 getText(R.string.track_may_be_lost).toString(),
@@ -157,7 +158,7 @@ implements  FileDialog.OnCloseListener,
                     } else {
                         loadCurrentTrack();
                     }
-                }*/
+                }
                 return true;
 
             case R.id.action_show_my_location:
@@ -165,12 +166,15 @@ implements  FileDialog.OnCloseListener,
                 return true;
 
             case R.id.action_show_my_track:
+                 presenter.actionShowCurrentTrack();
+                return true;
                 /*ArrayList<Location> points=CurrentTrack.getInstance(this).getGeoPoints();
                 if(points!=null && points.size()>0)
                    mapFragment.showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
                 return true;*/
 
             case R.id.action_animate_my_track:
+                presenter.actionAnimateTrack();
                 //mapFragment.animateTrack();
                 break;
         }
@@ -210,10 +214,6 @@ implements  FileDialog.OnCloseListener,
 
 
 
-
-
-
-
     private void saveCurrentTrack()
     {
         String dir=settings.getLastPath();
@@ -245,7 +245,7 @@ implements  FileDialog.OnCloseListener,
             case 1:
                 if(!fileName.matches(".*\\.gpx$"))
                     fileName=fileName+".gpx";
-                success=mapFragment.saveTrackToFile(fileName);
+                success=presenter.actionSaveTrack(fileName);//mapFragment.saveTrackToFile(fileName);
                 if(!success)
                 {
                     String msg=String.format(getText(R.string.cannot_save_file).toString(),fileName);
@@ -254,7 +254,7 @@ implements  FileDialog.OnCloseListener,
                 }
                 break;
             case 2:
-                success=mapFragment.loadTrackFromFile(fileName);
+                success=presenter.actionLoadTrack(fileName);//mapFragment.loadTrackFromFile(fileName);
                 if(!success)
                 {
                     String msg=String.format(getText(R.string.cannot_load_file).toString(),fileName);

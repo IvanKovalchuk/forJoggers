@@ -78,6 +78,10 @@ public class DataModel {
     {
         return isTracking;
     }
+    public boolean hasTrackData()
+    {
+        return getCurrentTrack().getGeoPoints().size()>1;
+    }
 
     //------------------------------------------------------------------
     // initializes smoothen calculation

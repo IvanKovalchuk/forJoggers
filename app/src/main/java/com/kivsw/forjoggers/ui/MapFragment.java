@@ -20,10 +20,8 @@ import android.widget.TextView;
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.CustomPagerView;
-import com.kivsw.forjoggers.MainActivity;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.SettingsFragment;
-import com.kivsw.forjoggers.TrackingService;
 import com.kivsw.forjoggers.UnitUtils;
 import com.kivsw.forjoggers.helper.GPSLocationListener;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
@@ -71,6 +69,7 @@ implements SettingsFragment.onSettingsCloseListener,
 
     private CurrentLocationOverlay myLocationoverlay;
     private MyHandler mHandler;
+    MapFragmentPresenter presenter;
 
 
     public MapFragment() {
@@ -146,22 +145,26 @@ implements SettingsFragment.onSettingsCloseListener,
 
         buttonStart = (Button) rootView.findViewById(R.id.buttonStart);
         buttonStart.setOnClickListener(this);
+        buttonStart.setVisibility(View.GONE);
 
         buttonStop = (Button) rootView.findViewById(R.id.buttonStop);
         buttonStop.setOnClickListener(this);
-        if (TrackingService.isWorking) {
+        buttonStop.setVisibility(View.GONE);
+
+        /*if (TrackingService.isWorking) {
             buttonStop.setVisibility(View.VISIBLE);
             buttonStart.setVisibility(View.GONE);
         } else {
             buttonStop.setVisibility(View.GONE);
             buttonStart.setVisibility(View.VISIBLE);
-        }
+        }*/
 
 
         if (savedInstanceState != null) {
 
         }
 
+        presenter = MapFragmentPresenter.getInstance(getActivity());
         return rootView;
     }
 
@@ -182,7 +185,7 @@ implements SettingsFragment.onSettingsCloseListener,
     public void onResume() {
         super.onResume();
 
-        MapFragmentPresenter.getInstance(getActivity()).setTrackingStatus();
+        presenter.setTrackingStatus();
 
     }
 
@@ -194,13 +197,13 @@ implements SettingsFragment.onSettingsCloseListener,
     @Override
     public void onStart() {
         super.onStart();
-        MapFragmentPresenter.getInstance(getActivity()).setUI(this);
+        presenter.setUI(this);
 
     }
 
     @Override
     public void onStop() {
-        MapFragmentPresenter.getInstance(getActivity()).setUI(null);
+        presenter.setUI(null);
         super.onStop();
         mHandler.deleteAllMessages();
     }
@@ -494,12 +497,12 @@ implements SettingsFragment.onSettingsCloseListener,
         switch(v.getId())
         {
             case R.id.buttonStart: {
-                  MapFragmentPresenter.getInstance(getActivity()).onStartClick();
+                presenter.onStartClick();
             }
             break;
             case R.id.buttonStop:
                 //stopTrackService();
-                MapFragmentPresenter.getInstance(getActivity()).onStopClick();
+                presenter.onStopClick();
                 break;
         }
     }
@@ -533,16 +536,16 @@ public void showMessageDialog(int id, String caption, String message)
 
     @Override
     public void onClickOk(MessageDialog msg) {
-        MapFragmentPresenter.getInstance(getActivity()).onMessageBoxClose(msg.getDlgId(), true);
+        presenter.onMessageBoxClose(msg.getDlgId(), true);
     }
 
     @Override
     public void onClickCancel(MessageDialog msg)
-    { MapFragmentPresenter.getInstance(getActivity()).onMessageBoxClose(msg.getDlgId(), false); }
+    { presenter.onMessageBoxClose(msg.getDlgId(), false); }
 
     @Override
     public void onClickExtra(MessageDialog msg)
-    { MapFragmentPresenter.getInstance(getActivity()).onMessageBoxClose(msg.getDlgId(), false); }
+    { presenter.onMessageBoxClose(msg.getDlgId(), false); }
     //-----------------------------------------------------------
 
 

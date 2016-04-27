@@ -167,6 +167,8 @@ public class Track {
         Reader rd= new StringReader(str);
         try {
             gpx.fromGPX(rd);
+            if(onChange!=null)
+                onChange.onAddPoint();
             return true;
         }catch(Exception e)
         {

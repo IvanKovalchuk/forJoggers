@@ -3,7 +3,6 @@ package com.kivsw.forjoggers.model;
 import android.location.Location;
 
 import com.kivsw.forjoggers.BuildConfig;
-import com.kivsw.forjoggers.model.Track;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlSerializer;
@@ -265,7 +264,8 @@ public class GpxConvertor {
 
                     if(xpp.getName().equals("trkpt"))
                     {
-                        track.addPoint(loc);
+                        //track.addPoint(loc);
+                        track.mGeoPoints.add(loc);
                         loc=null;
                     };
                     break;

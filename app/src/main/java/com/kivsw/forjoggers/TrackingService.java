@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.ui.MainActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,7 +26,7 @@ public class TrackingService extends Service {
                         ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP";
 
     //------------------------------------------------
-    public static boolean isWorking=false;
+    private static boolean isWorking=false;
 
     //LocationListener mGPSLocationListener=null;
     SettingsKeeper settings=null;

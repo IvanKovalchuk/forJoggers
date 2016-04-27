@@ -15,7 +15,7 @@ import rx.functions.Action1;
  * Created by ivan on 4/22/16.
  */
 
-public class MapFragmentPresenter {
+public class MapFragmentPresenter  extends BasePresenter {
 
     static private MapFragmentPresenter singletone=null;
     static public MapFragmentPresenter getInstance(Context context)
@@ -25,14 +25,13 @@ public class MapFragmentPresenter {
         return singletone;
     };
 
-    Context context=null;
     MapFragment mapFragment=null;
     Subscription rxGps=null;
 
     final static int  WARNINGS_AND_START_SERVICE_MESSAGE_ID=0;
 
     private MapFragmentPresenter(Context context) {
-        this.context=context;
+        super(context);
     }
 
     void setUI(MapFragment mapFragment)
@@ -65,6 +64,16 @@ public class MapFragmentPresenter {
         }
 
     }
+
+    public void actionShowCurrentTrack()
+    {
+        if(!hasTrackData()) return;
+        if(mapFragment==null) return;
+        Location loc= DataModel.getInstance(context).getCurrentTrack().getGeoPoints().get(0);
+        mapFragment.showLocation(loc.getLatitude(), loc.getLongitude());
+    }
+    void actionAnimateTrack()
+    {}
     //----------------------------------------------------------
 
     /**
@@ -80,6 +89,7 @@ public class MapFragmentPresenter {
             mapFragment.showStartButton();
 
     }
+
     /**
      * starts recording a new track
      */

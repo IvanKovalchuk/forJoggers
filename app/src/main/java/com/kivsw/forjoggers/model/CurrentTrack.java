@@ -29,6 +29,9 @@ public class CurrentTrack extends Track {
         return track;
     }
 
+    /**
+     * Save the track into sharedPreferences
+     */
     static synchronized public void saveTrack()
     {
         if(track==null) return;
