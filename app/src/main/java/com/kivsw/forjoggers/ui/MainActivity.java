@@ -1,5 +1,6 @@
 package com.kivsw.forjoggers.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,7 +28,7 @@ implements  FileDialog.OnCloseListener,
             MessageDialog.OnCloseListener,SettingsFragment.onSettingsCloseListener
 {
 
-    final static String ACTION_RECEIVE_TRACK="com.kivsw.forjoggers.ACTION_RECIEVE_TRACK";
+    final static String ACTION_SHOW_MSG="com.kivsw.forjoggers.ACTION_SHOW_MSG";
 
     private ViewPager pager;
     public SettingsFragment settingsFragment=null;
@@ -41,6 +42,16 @@ implements  FileDialog.OnCloseListener,
 
 
 
+    static public void showMessage(Context cnt, int msgId, String title, String msg)
+    {
+        Intent i=new Intent(ACTION_SHOW_MSG);
+        i.setClass(cnt, MainActivity.class);
+        i.putExtra("msgId",msgId);
+        i.putExtra("title",title);
+        i.putExtra("message",msg);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        cnt.startActivity(i);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,17 +84,25 @@ implements  FileDialog.OnCloseListener,
            pager.setCurrentItem(1);
        }
 
-        processIntent(getIntent());
-
         presenter=MainActivityPresenter.getInstance(this);
         presenter.onCreateActivity(this);
+
+        onNewIntent(getIntent());
     }
 //----------------------------------------------------------
     @Override
     protected void onNewIntent(Intent i)
     {
         super.onNewIntent(i);
-        processIntent(i);
+
+        if(i.getAction().equals(ACTION_SHOW_MSG))
+        {
+            String title = i.getExtras().getString("title");
+            String message = i.getExtras().getString("message");
+            int msgId=i.getExtras().getInt("msgId");
+            MessageDialog.newInstance(msgId,title, message, this)
+                    .show(getSupportFragmentManager(), "");
+        }
     }
     //----------------------------------------------------------
     @Override
@@ -206,11 +225,6 @@ implements  FileDialog.OnCloseListener,
         else
             pager.setCurrentItem(1,true);
     }
-    //----------------------------------------------------------
-    private void processIntent(Intent i)
-    {
-
-    };
 
 
 

@@ -14,10 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.SimpleTimeZone;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.subjects.PublishSubject;
-
 /**
  *   This class hold a track as a set of geo points
  */
@@ -27,6 +23,7 @@ public class Track {
     {
         void onAddPoint();
         void onClear();
+        void onError(Throwable msg);
 
     }
     //-----------------------------------------------------
@@ -34,7 +31,7 @@ public class Track {
     public long timeStart=0, timeStop=0;
     int activityType;
     IOnChange onChange=null;
-    private Observable<Track> observable=null;
+
     //-----------------------------------------------------
     public Track()
     {
@@ -55,35 +52,14 @@ public class Track {
 
     }
 
-    public Observable<Track>  getObservable()
+    public void assign(Track track)
     {
-        if(observable!=null) return observable;
-
-        PublishSubject res = PublishSubject.<Track>create();
-
-        observable.create(new Observable.OnSubscribe<Track>() {
-
-            @Override
-            public void call(final Subscriber<? super Track> subscriber) {
-
-                setOnChange(new IOnChange(){
-                    @Override
-                    public void onAddPoint() {
-                        subscriber.onNext(Track.this);
-                    }
-
-                    @Override
-                    public void onClear() {
-                        subscriber.onNext(Track.this);
-                    }
-                });
-            }
-        }).subscribe(res);
-
-
-        observable = res;
-        return observable;
+        timeStart = track.timeStart;
+        timeStop = track.timeStop;
+        activityType = track.activityType;
+        mGeoPoints = (ArrayList<Location>)track.mGeoPoints.clone();
     }
+
     //-----------------------------------------------------
     /**  save points in a file
      * @param fileName file name
@@ -121,6 +97,8 @@ public class Track {
 
         GpxConvertor gpx=new GpxConvertor(this);
         boolean r= gpx.loadFromFile(fileName);
+        if(onChange!=null)
+                onChange.onAddPoint();
         return r;
 
         /*try {

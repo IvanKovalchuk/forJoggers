@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +22,6 @@ import com.kivsw.forjoggers.CustomPagerView;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.SettingsFragment;
 import com.kivsw.forjoggers.UnitUtils;
-import com.kivsw.forjoggers.helper.GPSLocationListener;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.model.TrackSmoother;
@@ -39,6 +37,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -57,6 +56,8 @@ implements SettingsFragment.onSettingsCloseListener,
 
     private TextView textTrackInfo,textCurrentSpeedInfo;
     ImageView satelliteImageView;
+    Boolean isGpsAvailable=null;
+
     TextView fileNameTextView;
     Button buttonStart, buttonStop;
 
@@ -139,9 +140,9 @@ implements SettingsFragment.onSettingsCloseListener,
         textCurrentSpeedInfo.setText("");
 
         satelliteImageView = (ImageView) rootView.findViewById(R.id.satelliteImageView);
+        satelliteImageView.setVisibility(View.INVISIBLE);
 
         fileNameTextView = (TextView) rootView.findViewById(R.id.fileNameTextView);
-        updateFileName();
 
         buttonStart = (Button) rootView.findViewById(R.id.buttonStart);
         buttonStart.setOnClickListener(this);
@@ -165,6 +166,7 @@ implements SettingsFragment.onSettingsCloseListener,
         }
 
         presenter = MapFragmentPresenter.getInstance(getActivity());
+//        updateFileName();
         return rootView;
     }
 
@@ -233,8 +235,8 @@ implements SettingsFragment.onSettingsCloseListener,
      * check if mylocation is on the screen and correct visible bounds
      */
     void checkMyLocationVisibility() {
-        if (!settings.getReturnToMyLocation()) return;
-        showMyLocation();
+        if (settings.getReturnToMyLocation() || presenter.isTracking())
+            showMyLocation();
     }
 
 
@@ -250,7 +252,7 @@ implements SettingsFragment.onSettingsCloseListener,
         BoundingBoxE6 bounding = mapView.getBoundingBox();
 
         GeoPoint cl = new GeoPoint(myLocationoverlay.getLastFix());
-        boolean r = bounding.contains(cl);
+        boolean r = bounding.contains(cl); // whether the current location is visible
         if (!r) {
             showLocation(cl.getLatitude(), cl.getLongitude());
         }
@@ -267,23 +269,6 @@ implements SettingsFragment.onSettingsCloseListener,
         mapController.animateTo(cl);
         settings.setZoomLevel(settings.getZoomLevel(), cl.getLatitude(), cl.getLongitude());
     }
-    /*public void animateTrack()
-    {
-        ArrayList<Location> points=currentTrack.getGeoPoints();
-        if(points!=null && points.size()>0) {
-            showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
-            mHandler.startPointAnimation();
-        }
-    }*/
-
-    /**
-     *
-     *
-     void setTrack(String gpx)
-     {
-     currentTrack.fromGPX(gpx);
-     updateTrack(true);
-     }*/
 
 
     /**
@@ -297,11 +282,13 @@ implements SettingsFragment.onSettingsCloseListener,
         updateTrackInfo();
     }*/
     public void updateTrackInfo(TrackSmoother trackSmoother, Track currentTrack ) {
-        if(trackSmoother==null)
+        if((trackSmoother==null) ||
+           (!presenter.isTracking() && trackSmoother.getGeoPoints().size()<2)    )
         {
             textTrackInfo.setText("");
             return;
         }
+
         StringBuilder str = new StringBuilder();
         ArrayList<Location> points = trackSmoother.getGeoPoints();
 
@@ -355,17 +342,29 @@ implements SettingsFragment.onSettingsCloseListener,
      * @param available
      */
     public void setGPSstatus(boolean available) {
+        if((isGpsAvailable!=null) && (available == isGpsAvailable.booleanValue()))
+            return;
+
+        satelliteImageView.setVisibility(View.VISIBLE);
+
         if (available) {
             satelliteImageView.setImageResource(R.drawable.satellite_en);
-            mHandler.scheduleLastPositionFix(GPSLocationListener.UPDATE_INTERVAL * 5);
-        } else satelliteImageView.setImageResource(R.drawable.satellite_dis);
+            isGpsAvailable = Boolean.TRUE;
+            //mHandler.scheduleLastPositionFix(GPSLocationListener.UPDATE_INTERVAL * 5);
+        } else{
+            satelliteImageView.setImageResource(R.drawable.satellite_dis);
+            isGpsAvailable = Boolean.FALSE;
+        }
+
+
     }
 
     public void putCurrentTrackOnMap(Track currentTrack) {
+        int size = currentTrack!=null?currentTrack.getGeoPoints().size():0;
 
-        //OverlayManager om=mapView.getOverlayManager();
-        ArrayList<GeoPoint> points = new ArrayList<GeoPoint>(currentTrack.getGeoPoints().size());
+        ArrayList<GeoPoint> points = new ArrayList<GeoPoint>(size);
 
+        if(currentTrack!=null)
         for (Location l : currentTrack.getGeoPoints()) {
             points.add(new GeoPoint(l));
         }
@@ -387,58 +386,22 @@ implements SettingsFragment.onSettingsCloseListener,
         mapView.postInvalidate();
     }
 
-    public boolean loadTrackFromFile(String fileName)
-    {
-      /*  boolean r=currentTrack.loadGeoPoint(fileName);
-        updateTrack(true);
-        updateFileName();
-
-        ArrayList<Location> points=currentTrack.getGeoPoints();
-        if(points!=null && points.size()>0)
-            showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
-
-        return r;*/
-        return false;
-    }
-
-    public boolean saveTrackToFile(String fileName)
-    {
-       /* boolean r= currentTrack.saveGeoPoint(fileName);
-        if(r)
-            updateFileName();
-        return r;*/
-        return false;
-    }
 
     /** is invoked when it's necessary to update the tracking service status
      *
      */
-   /* public void onStartStopTrackingService(boolean isRunning) {
-        if (isRunning) {
-            updateTrack(true);
-            mHandler.startTrackUpdate(true);
-            buttonStart.setVisibility(View.GONE);
-            buttonStop.setVisibility(View.VISIBLE);
-            updateFileName();
-        }
-        else
-        {
-            buttonStop.setVisibility(View.GONE);
-            buttonStart.setVisibility(View.VISIBLE);
-        }
-        getActivity().supportInvalidateOptionsMenu();
-    }*/
-    private void updateFileName()
+
+    public void updateFileName()
     {
 
-       /* String fn= currentTrack.getFileName();
+        String fn= presenter.getCurrentTrack().getFileName();
         if(fn!=null && !fn.isEmpty()) {
             File file = new File(fn);
             fn=file.getName();
         }
         if(fn==null || fn.isEmpty())
             fn="*";
-        fileNameTextView.setText(fn);*/
+        fileNameTextView.setText(fn);
     };
     public static Bitmap RotateBitmap(Bitmap source, float angle)
     {
@@ -450,10 +413,11 @@ implements SettingsFragment.onSettingsCloseListener,
     public void setCurrentLocation(Location location)
     {
         myLocationoverlay.setLocation(location);//onLocationChanged(location,null);
+        mHandler.scheduleIfNecessaryRestoringPosition();
 
         if(location.hasSpeed()) {
             StringBuilder str=new StringBuilder();
-                str.append(getText(R.string.current_speed));
+                //str.append(getText(R.string.current_speed));
 
               /*  Location lastLoc = null;
                 if (!currentTrack.getGeoPoints().isEmpty()) {
@@ -520,6 +484,7 @@ public void showStopButton()
     buttonStop.setVisibility(View.VISIBLE);
     buttonStart.setVisibility(View.GONE);
 }
+
 /** shows a message Dialog
  *
  * @param id
@@ -651,7 +616,7 @@ public void showMessageDialog(int id, String caption, String message)
 
     class MyHandler extends Handler
     {
-        final private int RESTORE_POSITION=1, POINT_ANIMATION=2, UPDATE_TRACK=3, LAST_LOCATION_FIX_TIMEOUT =4;
+        final private int RESTORE_POSITION=1;
         MyHandler()
         {
             super();
@@ -660,78 +625,18 @@ public void showMessageDialog(int id, String caption, String message)
         public void deleteAllMessages()
         {
             removeMessages(RESTORE_POSITION);
-            removeMessages(POINT_ANIMATION);
-            //removeAnimation();
-            removeMessages(UPDATE_TRACK);
-            removeMessages(LAST_LOCATION_FIX_TIMEOUT);
-
-          /*  if(marker!=null)
-               mapView.getOverlays().remove(marker);
-            marker=null;*/
-
         }
 
         public void scheduleIfNecessaryRestoringPosition()
         {
             if(!hasMessages(RESTORE_POSITION))
-                sendEmptyMessageDelayed(RESTORE_POSITION, 5000);
+                sendEmptyMessageDelayed(RESTORE_POSITION, 1000);
         }
         public void scheduleRestoringPosition()
         {
             removeMessages(RESTORE_POSITION);
             sendEmptyMessageDelayed(RESTORE_POSITION, 5000);
         }
-        public void scheduleLastPositionFix(int timeout)
-        {
-            removeMessages(LAST_LOCATION_FIX_TIMEOUT);
-            sendEmptyMessageDelayed(LAST_LOCATION_FIX_TIMEOUT, timeout);
-        }
-
-      /*  private int pointIndex=0;
-        MyLocationNewOverlay marker=null;
-        IMyLocationProvider fakeProvider=new IMyLocationProvider(){
-            Location loc=new Location("fake");
-            public boolean startLocationProvider(IMyLocationConsumer myLocationConsumer) {return true;};
-            public void stopLocationProvider() {}
-            public Location getLastKnownLocation() { return loc; }
-        };
-        public void startPointAnimation()
-        {
-            pointIndex=0;
-            if(marker==null) {
-                marker = new MyLocationNewOverlay(getActivity(), mapView);//new Marker(mapView);
-                marker.disableFollowLocation();
-                marker.setDrawAccuracyEnabled(true);
-                marker.enableMyLocation(fakeProvider);
-                mapView.getOverlayManager().add(marker);
-            }
-            removeMessages(POINT_ANIMATION);
-            sendEmptyMessageDelayed(POINT_ANIMATION, 500);
-        }
-        private void nextPointAnimation()
-        {
-            Track track = trackSmoother; // currenttrack
-            if(pointIndex<track.getGeoPoints().size()) {
-                Location loc=track.getGeoPoints().get(pointIndex);
-                pointIndex++;
-
-                marker.onLocationChanged(loc,null);
-                sendEmptyMessageDelayed(POINT_ANIMATION, 300);
-            }
-            else
-            {
-                //marker.remove(mapView);
-               removeAnimation();
-            }
-        }
-        void removeAnimation()
-        {
-            if(marker==null) return;
-            mapView.getOverlays().remove(marker);
-            marker=null;
-            mapView.invalidate();
-            pointIndex=0;
-        }*/
 
         public Bitmap rotateBitmap(Bitmap source, float angle)
         {
@@ -742,20 +647,6 @@ public void showMessageDialog(int id, String caption, String message)
             return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
         }
 
-        long stopTrackUpdatingTime=0;
-        public void startTrackUpdate(boolean doProlongWorking)
-        {
-            long t= SystemClock.elapsedRealtime();
-            if(doProlongWorking)
-            {
-                stopTrackUpdatingTime = t+1000;
-            };
-
-            if(t<=stopTrackUpdatingTime) {
-                removeMessages(UPDATE_TRACK);
-                sendEmptyMessageDelayed(UPDATE_TRACK, 300);
-            }
-        };
 
         public void handleMessage (Message msg)
         {
@@ -763,16 +654,6 @@ public void showMessageDialog(int id, String caption, String message)
             {
                 case RESTORE_POSITION:
                     checkMyLocationVisibility();
-                    break;
-               /* case POINT_ANIMATION:
-                     //nextPointAnimation();
-                     break;*/
-               /* case UPDATE_TRACK:
-                    updateTrack(false);
-                    startTrackUpdate(TrackingService.isWorking);
-                    break;*/
-                case LAST_LOCATION_FIX_TIMEOUT:
-                    setGPSstatus(false);
                     break;
             }
 

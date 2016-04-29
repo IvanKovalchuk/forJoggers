@@ -10,17 +10,21 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.model.DataModel;
 import com.kivsw.forjoggers.ui.MainActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.SimpleTimeZone;
 
+/**
+ * This service works when the application is tracking.
+ * it does not have presenter because it's too simple
+ */
 public class TrackingService extends Service {
     public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
                         ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP";
@@ -107,11 +111,9 @@ public class TrackingService extends Service {
     //-----------------------------------------
     private void doStart()
     {
-
-
         isWorking=true;
+        mHandler.scheduleUpdateNotification();
         turnIntoForeground();
-
     };
 
     private void doStop()
@@ -159,7 +161,7 @@ public class TrackingService extends Service {
         mBuilder.setSmallIcon(R.drawable.tortoise_ltl);
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         mBuilder.setContentTitle(this.getText(R.string.app_name));
-        long workingTime=SystemClock.elapsedRealtime()-startTime;
+        long workingTime= DataModel.getInstance(this).getTrackingTime();//SystemClock.elapsedRealtime()-startTime;
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         sdf.setTimeZone(new SimpleTimeZone(0, ""));
         sdf.format(new Date(workingTime));
@@ -210,10 +212,10 @@ public class TrackingService extends Service {
 
         public void scheduleUpdateNotification() {
             removeMessages(UPDATE_NOTOFICATION);
-            sendEmptyMessageDelayed(UPDATE_NOTOFICATION, 1000);
-        }
-
-        ;
+            long workingTime= DataModel.getInstance(TrackingService.this).getTrackingTime();
+            long t=1000-workingTime%1000;
+            sendEmptyMessageDelayed(UPDATE_NOTOFICATION, t);
+        };
 
         public void removeUpdateNotification() {
             removeMessages(UPDATE_NOTOFICATION);

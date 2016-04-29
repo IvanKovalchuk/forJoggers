@@ -2,6 +2,7 @@ package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
 
+import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.model.DataModel;
 
 /**
@@ -38,11 +39,12 @@ public class MainActivityPresenter extends BasePresenter {
     ///---------------------------------------------------
     boolean actionSaveTrack(String fileName)
     {
-        return DataModel.getInstance(context).getCurrentTrack().saveGeoPoint(fileName);
+        return DataModel.getInstance(context).saveTrack(fileName);
+
     };
     boolean actionLoadTrack(String fileName)
     {
-        return DataModel.getInstance(context).getCurrentTrack().loadGeoPoint(fileName);
+        return DataModel.getInstance(context).loadTrack(fileName);
     };
 
     void actionShowCurrentTrack()
@@ -57,4 +59,13 @@ public class MainActivityPresenter extends BasePresenter {
         MapFragmentPresenter.getInstance(context).actionAnimateTrack();
     };
     ///---------------------------------------------------
+
+    public void showError(String msg)
+    {
+        showMessage(-1, context.getText(R.string.Error).toString(), msg);
+    }
+    public void showMessage(int msgId, String title, String msg)
+    {
+         MainActivity.showMessage(context, msgId, title, msg);
+    }
 }

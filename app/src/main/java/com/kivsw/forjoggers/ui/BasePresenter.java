@@ -2,7 +2,9 @@ package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
 
+import com.kivsw.forjoggers.model.CurrentTrack;
 import com.kivsw.forjoggers.model.DataModel;
+import com.kivsw.forjoggers.model.TrackSmoother;
 
 /**
  * Created by ivan on 4/27/16.
@@ -14,16 +16,28 @@ public class BasePresenter {
         this.context = context.getApplicationContext();
     }
 
-    boolean isTracking()
+    public boolean isTracking()
     {
         return DataModel.getInstance(context).isTracking();
     }
-    boolean hasTrackData()
+    public long getTrackingTime()
+    {
+        return DataModel.getInstance(context).getTrackingTime();
+    }
+    public boolean hasTrackData()
     {
         return DataModel.getInstance(context).hasTrackData();
     }
-    boolean trackNeedToBeSaved()
+    public boolean trackNeedToBeSaved()
     {
         return DataModel.getInstance(context).getCurrentTrack().needToBeSaved();
+    }
+    public CurrentTrack getCurrentTrack()
+    {
+        return DataModel.getInstance(context).getCurrentTrack();
+    }
+    public TrackSmoother getTrackSmoother()
+    {
+        return DataModel.getInstance(context).getTrackSmoother();
     }
 }

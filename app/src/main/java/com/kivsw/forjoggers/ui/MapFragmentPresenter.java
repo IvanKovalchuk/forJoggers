@@ -8,7 +8,12 @@ import com.kivsw.forjoggers.model.DataModel;
 import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.rx.RxGps;
 
+import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 /**
@@ -18,6 +23,7 @@ import rx.functions.Action1;
 public class MapFragmentPresenter  extends BasePresenter {
 
     static private MapFragmentPresenter singletone=null;
+
     static public MapFragmentPresenter getInstance(Context context)
     {
         if(singletone==null)
@@ -26,7 +32,8 @@ public class MapFragmentPresenter  extends BasePresenter {
     };
 
     MapFragment mapFragment=null;
-    Subscription rxGps=null;
+    Subscription rxGps=null, rxGpsStateUpdate=null, rxTrackInfoUpdate=null;
+
 
     final static int  WARNINGS_AND_START_SERVICE_MESSAGE_ID=0;
 
@@ -34,17 +41,34 @@ public class MapFragmentPresenter  extends BasePresenter {
         super(context);
     }
 
+
     void setUI(MapFragment mapFragment)
     {
-        this.mapFragment = mapFragment;
         if(mapFragment==null)
         {
             if(rxGps!=null)
                rxGps.unsubscribe();
+            rxGps=null;
+
+            if(rxGpsStateUpdate!=null) rxGpsStateUpdate.unsubscribe();
+            rxGpsStateUpdate=null;
+
+            if(rxTrackInfoUpdate!=null) rxTrackInfoUpdate.unsubscribe();
+            rxTrackInfoUpdate=null;
+
+            stopTrackingUpdating();
+
+            this.mapFragment = null;
         }
         else
         {
-            final MapFragment fragment=mapFragment;
+            if(this.mapFragment!=null)
+                setUI(null);
+            this.mapFragment = mapFragment;
+
+            final WeakReference<MapFragment> fragment=new WeakReference<MapFragment>(mapFragment);
+
+            // emits GPS locations
             rxGps= RxGps.getGprsUiObservable(context).subscribe(new Action1<Location>() {
                 @Override
                 public void call(Location location) {
@@ -53,11 +77,28 @@ public class MapFragmentPresenter  extends BasePresenter {
                     long ct= System.currentTimeMillis();
                     Long.valueOf(t-ct);
 
-                    fragment.setCurrentLocation(location);
+                    if( fragment.get()!=null)
+                         fragment.get().setCurrentLocation(location);
                 }
             });
 
+            // emits events to update GPS status
+            rxGpsStateUpdate = Observable.interval(300,1000, TimeUnit.MILLISECONDS,AndroidSchedulers.mainThread())
+                     .subscribe(new Action1<Long>(){
+                         @Override
+                         public void call(Long i) {
+                             if( fragment.get()!=null)
+                             fragment.get().setGPSstatus(getGPSstatus());
+                         }
+                     });
+
+            // emits events to update track information
+            if(isTracking())
+                startTrackingUpdating();
+
+
             mapFragment.setGPSstatus(RxGps.isGPSavailable());
+            updateFileName();
             onCurrentTrackUpdate(DataModel.getInstance(context).getCurrentTrack());
             onSmoothTrackUpdate(DataModel.getInstance(context).getTrackSmoother());
 
@@ -65,6 +106,34 @@ public class MapFragmentPresenter  extends BasePresenter {
 
     }
 
+    private void startTrackingUpdating()// emits events to update track information
+    {
+        if(! isTracking()) return;
+
+        final WeakReference<MapFragment> fragment=new WeakReference<MapFragment>(mapFragment);
+
+        rxTrackInfoUpdate= Observable.interval(500, TimeUnit.MILLISECONDS,AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Long>(){
+                    @Override
+                    public void call(Long i) {
+                        if(!isTracking())
+                        {
+                            stopTrackingUpdating();
+                            return;
+                        };
+                        if( fragment.get()!=null)
+                        {
+                             fragment.get().updateTrackInfo(getTrackSmoother() ,getCurrentTrack());
+                        }
+
+                    }
+                });
+    }
+    private void stopTrackingUpdating()
+    {
+        if(rxTrackInfoUpdate!=null)   rxTrackInfoUpdate.unsubscribe();
+        rxTrackInfoUpdate=null;
+    }
     public void actionShowCurrentTrack()
     {
         if(!hasTrackData()) return;
@@ -134,10 +203,14 @@ public class MapFragmentPresenter  extends BasePresenter {
     {
         mapFragment.showStopButton();
         DataModel.getInstance(context).startTracking();
+        startTrackingUpdating();
+
     }
     protected void doStop()
     {
+
         DataModel.getInstance(context).stopTracking();
+        stopTrackingUpdating();
         mapFragment.showStartButton();
     }
 
@@ -157,6 +230,12 @@ public class MapFragmentPresenter  extends BasePresenter {
           mapFragment.putCurrentTrackOnMap(track);
           //mapFragment.updateTrackInfo(DataModel.getInstance(context).getCurrentTrack(), DataModel.getInstance(context).getTrackSmoother());
     }
+
+    public void updateFileName()
+    {
+        if(mapFragment==null) return;
+          mapFragment.updateFileName();
+    };
 
     /**
      * Method is invoked when smoothTrack is ready

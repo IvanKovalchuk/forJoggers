@@ -7,8 +7,10 @@ import android.os.SystemClock;
 import com.kivsw.forjoggers.TrackingService;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.rx.RxGps;
+import com.kivsw.forjoggers.ui.MainActivityPresenter;
 import com.kivsw.forjoggers.ui.MapFragmentPresenter;
 
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -46,7 +48,22 @@ public class DataModel {
     {
         this.context = context;
         settings = SettingsKeeper.getInstance(context);
-        currentTrack = CurrentTrack.getInstance(context);
+        currentTrack = CurrentTrack.getInstance(context, new Observer() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                MapFragmentPresenter.getInstance(DataModel.this.context).updateFileName();
+                MainActivityPresenter.getInstance(DataModel.this.context).showError(e.getMessage());
+            }
+
+            @Override
+            public void onNext(Object o) {
+                doUpdateCurrentTrackView();
+            }
+        });
+
         /*trackSmoother = //new TrackSmootherByLine(currentTrack);
                 new TrackSmootherByPolynom(currentTrack);*/
 
@@ -141,13 +158,14 @@ public class DataModel {
     {
         TrackingService.start(context);
 
+        trackSmoother=null;
         currentTrack.clear();
         currentTrack.setActivityType(settings.getActivityType());
         currentTrack.timeStart= SystemClock.elapsedRealtime();
         isTracking=true;
 
 
-        trackingSubscriber = new Subscriber<Location>() {
+        trackingSubscriber = new Subscriber<Location>() { // this entity adds new data from GPS to the track
             @Override
             public void onCompleted() {  }
 
@@ -157,11 +175,10 @@ public class DataModel {
             @Override
             public void onNext(Location location) {
                 currentTrack.addPoint(location);
-                doUpdateCurrentTrackView();
 
             }
         };
-        RxGps.getGprsObservable(context)
+        RxGps.getGprsObservable(context) // starts forming a new current track
                 .filter(new Func1<Location, Boolean>() {
                     @Override
                     public Boolean call(Location location) {
@@ -173,6 +190,8 @@ public class DataModel {
                 .subscribe(trackingSubscriber);
 
 
+        doUpdateCurrentTrackView();
+        doUpdateCurrentSmoothTrackView();
 
     }
 
@@ -188,6 +207,30 @@ public class DataModel {
         currentTrack.saveTrack();
         isTracking = false;
     };
+
+    /**
+     * Load track from file
+     */
+    public boolean saveTrack(String fileName)
+    {
+        boolean r=getCurrentTrack().saveGeoPoint(fileName);
+        MapFragmentPresenter.getInstance(context).updateFileName();
+        return r;
+    }
+
+    /**
+     * Save track to file
+     */
+    public boolean loadTrack(String fileName)
+    {
+        trackSmoother=null;
+        doUpdateCurrentSmoothTrackView();
+        boolean r= getCurrentTrack().loadGeoPoint(fileName);
+        MapFragmentPresenter.getInstance(context).updateFileName();
+        //doUpdateCurrentTrackView();
+        //doUpdateCurrentSmoothTrackView();
+        return r;
+    }
     //--------------------------------------------------------------------
     protected void doUpdateCurrentTrackView()
     {
