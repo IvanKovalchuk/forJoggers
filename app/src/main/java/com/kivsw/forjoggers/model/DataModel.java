@@ -192,6 +192,7 @@ public class DataModel {
 
         doUpdateCurrentTrackView();
         doUpdateCurrentSmoothTrackView();
+        doUpdateFileNameView();
 
     }
 
@@ -214,7 +215,7 @@ public class DataModel {
     public boolean saveTrack(String fileName)
     {
         boolean r=getCurrentTrack().saveGeoPoint(fileName);
-        MapFragmentPresenter.getInstance(context).updateFileName();
+        doUpdateFileNameView();
         return r;
     }
 
@@ -226,7 +227,7 @@ public class DataModel {
         trackSmoother=null;
         doUpdateCurrentSmoothTrackView();
         boolean r= getCurrentTrack().loadGeoPoint(fileName);
-        MapFragmentPresenter.getInstance(context).updateFileName();
+        doUpdateFileNameView();
         //doUpdateCurrentTrackView();
         //doUpdateCurrentSmoothTrackView();
         return r;
@@ -240,5 +241,8 @@ public class DataModel {
     {
          MapFragmentPresenter.getInstance(context).onSmoothTrackUpdate(trackSmoother);
     }
-
+    protected void doUpdateFileNameView()
+    {
+        MapFragmentPresenter.getInstance(context).updateFileName();
+    }
 }
