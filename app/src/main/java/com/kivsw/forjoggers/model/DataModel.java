@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.os.SystemClock;
 
+import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.TrackingService;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
@@ -11,9 +12,13 @@ import com.kivsw.forjoggers.rx.RxGps;
 import com.kivsw.forjoggers.ui.MainActivityPresenter;
 import com.kivsw.forjoggers.ui.MapFragmentPresenter;
 
+import java.io.File;
+
 import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Action2;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -53,29 +58,13 @@ public class DataModel implements UsingCounter.IUsingChanged{
         usingCounter = new UsingCounter(this);
 
         settings = SettingsKeeper.getInstance(context);
-        currentTrack = CurrentTrack.getInstance(context, new Observer() {
-            @Override
-            public void onCompleted() {}
-
-            @Override
-            public void onError(Throwable e) {
-                MapFragmentPresenter.getInstance(DataModel.this.context).updateFileName();
-                MainActivityPresenter.getInstance(DataModel.this.context).showError(e.getMessage());
-            }
-
-            @Override
-            public void onNext(Object o) {
-                doUpdateCurrentTrackView();
-            }
-        });
-
-        /*trackSmoother = //new TrackSmootherByLine(currentTrack);
-                new TrackSmootherByPolynom(currentTrack);*/
+        currentTrack = new CurrentTrack();
 
         initSmoothCalculation();
+        initCurrentTrackUpdating();
 
-        currentTrack.loadTrack(); // loads the last track
-
+        // load the last track
+        loadLastData();
 
     };
     public void release()
@@ -106,6 +95,20 @@ public class DataModel implements UsingCounter.IUsingChanged{
     public CurrentTrack getCurrentTrack() {
         return currentTrack;
     };
+
+    /**
+     * loads the last track
+     */
+    private void loadLastData()
+    {
+        String fn=settings.getCurrentFileName();
+        if(fn==null || fn.isEmpty())
+            fn = getTempFileName();
+        File file = new File(fn);
+        if(file.exists())
+             loadTrack(fn);
+
+    }
     public long getTrackingTime()
     {
         if(!isTracking) return 0;
@@ -171,7 +174,32 @@ public class DataModel implements UsingCounter.IUsingChanged{
         .subscribe(subject);
 
     };
+    private void initCurrentTrackUpdating()
+    {
+        currentTrack.getObservable()
+                .subscribe(
+                    new Observer() {
+                        @Override
+                        public void onCompleted() {}
+
+                        @Override
+                        public void onError(Throwable e) {
+                            MapFragmentPresenter.getInstance(DataModel.this.context).updateFileName();
+                            MainActivityPresenter.getInstance(DataModel.this.context).showError(e.getMessage());
+                        }
+
+                        @Override
+                        public void onNext(Object o) {
+                            doUpdateCurrentTrackView();
+                        }
+                    });
+    }
     //------------------------------------------------------------------
+    private String getTempFileName()
+    {
+        String s=context.getCacheDir().getAbsolutePath() + "/lasttrack.gpx";
+        return s;
+    }
     /**
      * starts recording a new track
      */
@@ -226,7 +254,10 @@ public class DataModel implements UsingCounter.IUsingChanged{
         trackingSubscriber.unsubscribe();
         trackingSubscriber=null;
         currentTrack.timeStop= SystemClock.elapsedRealtime();
-        currentTrack.saveTrack();
+
+        saveTrack(getTempFileName());
+        /*currentTrack.saveGeoPoint(getTempFileName()); // save file synchronously
+        settings.setCurrentFileName("");*/
         isTracking = false;
     };
 
@@ -235,8 +266,25 @@ public class DataModel implements UsingCounter.IUsingChanged{
      */
     public boolean saveTrack(String fileName)
     {
-        boolean r=getCurrentTrack().saveGeoPoint(fileName);
-        doUpdateFileNameView();
+        boolean r=getCurrentTrack().saveGeoPoint(fileName, new Action2<Boolean,String>() {
+            @Override
+            public void call(Boolean aBoolean, String aFileName) {
+                if(aBoolean.booleanValue())
+                {
+                    if(currentTrack.getFileName().equals(getTempFileName()))
+                        currentTrack.fileName="";
+
+                    doUpdateFileNameView();
+                    settings.setCurrentFileName(currentTrack.getFileName());
+                }
+                else
+                {
+                    MainActivityPresenter.getInstance(context)
+                            .showError(String.format(context.getText(R.string.cannot_save_file).toString(),aFileName));
+                }
+            }
+        });
+
         return r;
     }
 
@@ -247,10 +295,27 @@ public class DataModel implements UsingCounter.IUsingChanged{
     {
         trackSmoother=null;
         doUpdateCurrentSmoothTrackView();
-        boolean r= getCurrentTrack().loadGeoPoint(fileName);
+        boolean r= getCurrentTrack().loadGeoPoint(fileName,new Action2<Boolean,String>() {
+            @Override
+            public void call(Boolean aBoolean, String aFileName) {
+                if(aBoolean.booleanValue())
+                {
+                    if(aFileName.equals(getTempFileName()))
+                        currentTrack.fileName="";
+                    doUpdateFileNameView();
+                    settings.setCurrentFileName(currentTrack.getFileName());
+                }
+                else
+                {
+                    MapFragmentPresenter.getInstance(context).updateFileName();
+                    MainActivityPresenter.getInstance(context)
+                            .showError(String.format(context.getText(R.string.cannot_load_file).toString(),aFileName));
+                    doUpdateFileNameView();
+                }
+            }
+        });
         doUpdateFileNameView();
-        //doUpdateCurrentTrackView();
-        //doUpdateCurrentSmoothTrackView();
+
         return r;
     }
     //--------------------------------------------------------------------

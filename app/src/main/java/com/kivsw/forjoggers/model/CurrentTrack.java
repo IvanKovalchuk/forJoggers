@@ -10,43 +10,30 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Action2;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 /**
- * Created by ivan on 20.11.15.
+ *  This class holds the current track data.
+ *  This class adds rx-features.
+ *  The class may load and save its data asynchronously
  */
 public class CurrentTrack extends Track {
-    static private CurrentTrack track=null;
-    SettingsKeeper settings=null;
-    Context context;
+
     String fileName;
 
-    static synchronized  CurrentTrack getInstance(Context context, Observer observer)
-    {
-        if(track==null)
-        {
-            track = new CurrentTrack(context.getApplicationContext());
-            //track.settings = SettingsKeeper.getInstance(context);
-            if(observer!=null)
-                track.getObservable().subscribe(observer);
-
-
-        }
-        return track;
-    }
-
-    private CurrentTrack(Context context)
+    public CurrentTrack()
     {
         super();
-        this.context = context;
         fileName="";
-        settings = SettingsKeeper.getInstance(context);
     }
 
     /**
      * gets observable for this class
+     * this observable emits an event when the track data has been changed
      */
     private Observable<Track> observable=null;
     public Observable<Track>  getObservable()
@@ -84,32 +71,6 @@ public class CurrentTrack extends Track {
         return observable;
     }
 
-    /**
-     * Save the track into sharedPreferences
-     */
-    synchronized public void saveTrack()
-    {
-        if(track==null) return;
-        track.settings.setCurrentTrack( track.toGPX());
-    }
-
-    /**
-     * Load last track from sharedPreferences
-     * @return
-     */
-    synchronized public void loadTrack()
-    {
-        if(track==null) return;
-
-        String fn=track.settings.getCurrentFileName();
-        if(fn!=null && !fn.isEmpty())
-            track.loadGeoPoint(fn);
-        else
-            track.fromGPX(track.settings.getCurrentTrack());
-    }
-
-
-
     public String getFileName() {
         return fileName;
     }
@@ -120,28 +81,15 @@ public class CurrentTrack extends Track {
         fileName="";
         super.clear();
 
-        settings.setCurrentFileName("");
     }
 
     //----------------------------------------------------
     /**  save points in a file asynchronously
-     * @param fileName file name
+     * @param aFileName file name
      * @return true if the saving was successful
      */
-    public boolean saveGeoPoint(String fileName)
+    public boolean saveGeoPoint(final String aFileName, final Action2<Boolean,String> onCompletedListener)
     {
-      /*  if(!fileName.matches(".*\\.gpx$"))
-            fileName = fileName+".gpx";*/
-
-            /*if(super.saveGeoPoint(fileName)) {
-            this.fileName = fileName;
-            settings.setCurrentFileName(fileName);
-
-            return true;
-        }
-        return false;*/
-        this.fileName = fileName;
-        final String fn=fileName;
         Observable.just(this)
                 .map(new Func1 < CurrentTrack, Track > () {
                     @Override
@@ -153,9 +101,9 @@ public class CurrentTrack extends Track {
                 .map(new Func1 < Track, Boolean > (){
                     @Override
                     public Boolean call(Track track) {
-                        if(!track.saveGeoPoint(fn))
-                            throw new RuntimeException(String.format(context.getText(R.string.cannot_save_file).toString(),fn));
-                        return Boolean.TRUE;
+                        if(track.saveGeoPoint(aFileName))
+                             return Boolean.TRUE;
+                        else return Boolean.FALSE;
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -167,14 +115,19 @@ public class CurrentTrack extends Track {
 
                     @Override
                     public void onError(Throwable e) {
-                        onChange.onError(e);
+                        if(onCompletedListener!=null)
+                            onCompletedListener.call(Boolean.FALSE, aFileName);
                     }
 
                     @Override
                     public void onNext(Boolean r) {
-                        CurrentTrack.this.fileName = fn;
-                        settings.setCurrentFileName(CurrentTrack.this.fileName);
-                        onChange.onAddPoint();
+                        if(r.booleanValue()) {
+                            CurrentTrack.this.fileName = aFileName;
+                            //settings.setCurrentFileName(aFileName);
+                            //onChange.onAddPoint();
+                        }
+                        if(onCompletedListener!=null)
+                            onCompletedListener.call(r,aFileName);
                     }
                 });
 
@@ -184,16 +137,16 @@ public class CurrentTrack extends Track {
 
     /**
      * load points from file asynchronously
-     * @param fileName file name
+     * @param aFileName file name
      * @return true if the loading was successful
      */
-    public boolean loadGeoPoint(String fileName) {
+    public boolean loadGeoPoint(final String aFileName, final Action2<Boolean, String> onCompletedListener) {
         boolean r=false;
 
         super.clear();
-        this.fileName = fileName;
+        this.fileName = "";
 
-        Observable.just(fileName)
+        Observable.just(aFileName)
                 .observeOn(Schedulers.io())
                 .map(new Func1<String, Track>() {
                     @Override
@@ -202,7 +155,8 @@ public class CurrentTrack extends Track {
                         if(r.loadGeoPoint(fileName))
                             return r;
                         else {
-                            throw new RuntimeException(String.format(context.getText(R.string.cannot_load_file).toString(),fileName));
+                            return null;
+                            //throw new RuntimeException(String.format(context.getText(R.string.cannot_load_file).toString(),fileName));
                         }
                     };
                 })
@@ -215,17 +169,30 @@ public class CurrentTrack extends Track {
 
                     @Override
                     public void onError(Throwable e) {
-                        CurrentTrack.this.fileName = "";
+
                         clear();
-                        onChange.onError(e);
+                        if(onCompletedListener!=null)
+                             onCompletedListener.call(Boolean.FALSE,aFileName);
+                       // onChange.onError(e);
                     }
 
                     @Override
                     public void onNext(Track track) {
 
-                        assign(track);
-                        settings.setCurrentFileName(CurrentTrack.this.fileName);
-                        onChange.onAddPoint();
+                        if(track!=null) {
+                            CurrentTrack.this.fileName = aFileName;
+                            assign(track);
+                           // settings.setCurrentFileName(CurrentTrack.this.fileName);
+                            onChange.onAddPoint();
+                            if(onCompletedListener!=null)
+                                onCompletedListener.call(Boolean.TRUE,aFileName);
+                        }
+                        else
+                        {
+                            if(onCompletedListener!=null)
+                                onCompletedListener.call(Boolean.FALSE,aFileName);
+                           // CurrentTrack.this.fileName = "";
+                        }
                     }
                 });
 
