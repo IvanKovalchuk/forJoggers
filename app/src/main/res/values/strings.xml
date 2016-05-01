@@ -81,6 +81,6 @@
     <string name="action_save_track">Save current track</string>
     <string name="action_show_my_location">Show my location</string>
     <string name="action_show_track">Show track</string>
-    <string name="action_animate_track">Animate track</string>
+    <string name="action_emulate_track">Emulate track</string>
 
 </resources>

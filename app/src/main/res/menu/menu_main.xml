@@ -34,8 +34,8 @@
           android:orderInCategory="100"
           app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/action_animate_my_track"
-          android:title="@string/action_animate_track"
+    <item android:id="@+id/action_emulate_my_track"
+          android:title="@string/action_emulate_track"
           android:icon="@drawable/ic_action_play_over_video"
           android:orderInCategory="100"
           app:showAsAction="ifRoom"/>

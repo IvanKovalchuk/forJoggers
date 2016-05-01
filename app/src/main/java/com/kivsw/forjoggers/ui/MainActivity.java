@@ -14,6 +14,7 @@ import android.view.MenuItem;
 
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
+import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.CustomPagerView;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.SettingsFragment;
@@ -145,8 +146,8 @@ implements  FileDialog.OnCloseListener,
          item=menu.findItem(R.id.action_show_my_track);
          item.setEnabled(hasTrackData);
 
-         item=menu.findItem(R.id.action_animate_my_track);
-         item.setVisible(hasTrackData && !isTracking /*&& BuildConfig.BUILD_TYPE.equals("debug")*/);//FIXME BuildConfig
+         item=menu.findItem(R.id.action_emulate_my_track);
+         item.setVisible(hasTrackData && !isTracking && BuildConfig.DEBUG);
 
          return super.onPrepareOptionsMenu(menu);
      }
@@ -192,7 +193,7 @@ implements  FileDialog.OnCloseListener,
                    mapFragment.showLocation(points.get(0).getLatitude(), points.get(0).getLongitude());
                 return true;*/
 
-            case R.id.action_animate_my_track:
+            case R.id.action_emulate_my_track:
                 presenter.actionAnimateTrack();
                 //mapFragment.animateTrack();
                 break;

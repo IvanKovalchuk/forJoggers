@@ -79,6 +79,6 @@
     <string name="action_save_track">Сохранить трек</string>
     <string name="action_show_my_location">Моё положение</string>
     <string name="action_show_track">Мой трек</string>
-    <string name="action_animate_track">Анимировать трек</string>
+    <string name="action_emulate_track">Эмулировать трек</string>
 
 </resources>
