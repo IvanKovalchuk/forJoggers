@@ -74,6 +74,8 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
         initSmoothCalculation();
 
+        currentTrack.loadTrack(); // loads the last track
+
 
     };
     public void release()

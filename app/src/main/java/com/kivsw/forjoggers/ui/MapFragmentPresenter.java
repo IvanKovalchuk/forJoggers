@@ -29,7 +29,7 @@ public class MapFragmentPresenter  extends BasePresenter {
     static public MapFragmentPresenter getInstance(Context context)
     {
         if(singletone==null)
-            singletone = new MapFragmentPresenter(context);
+            singletone = new MapFragmentPresenter(context.getApplicationContext());
         return singletone;
     };
 
@@ -65,7 +65,7 @@ public class MapFragmentPresenter  extends BasePresenter {
         else
         {
             if(this.mapFragment!=null)
-                setUI(null);
+                setUI(null); // unsubscribes old rx-subscriptions
             this.mapFragment = mapFragment;
 
             final WeakReference<MapFragment> fragment=new WeakReference<MapFragment>(mapFragment);
@@ -152,7 +152,7 @@ public class MapFragmentPresenter  extends BasePresenter {
     /**
      *  shows the stop button or the start button
      */
-    public void setTrackingStatus()
+    public void updateTrackingStatus()
     {
         if(mapFragment==null) return;
 

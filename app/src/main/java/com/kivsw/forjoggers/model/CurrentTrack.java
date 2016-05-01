@@ -32,11 +32,7 @@ public class CurrentTrack extends Track {
             if(observer!=null)
                 track.getObservable().subscribe(observer);
 
-            String fn=track.settings.getCurrentFileName();
-            if(fn!=null && !fn.isEmpty())
-               track.loadGeoPoint(fn);
-            else
-                track.fromGPX(track.settings.getCurrentTrack());
+
         }
         return track;
     }
@@ -91,11 +87,27 @@ public class CurrentTrack extends Track {
     /**
      * Save the track into sharedPreferences
      */
-    static synchronized public void saveTrack()
+    synchronized public void saveTrack()
     {
         if(track==null) return;
         track.settings.setCurrentTrack( track.toGPX());
     }
+
+    /**
+     * Load last track from sharedPreferences
+     * @return
+     */
+    synchronized public void loadTrack()
+    {
+        if(track==null) return;
+
+        String fn=track.settings.getCurrentFileName();
+        if(fn!=null && !fn.isEmpty())
+            track.loadGeoPoint(fn);
+        else
+            track.fromGPX(track.settings.getCurrentTrack());
+    }
+
 
 
     public String getFileName() {

@@ -187,7 +187,7 @@ implements SettingsFragment.onSettingsCloseListener,
     public void onResume() {
         super.onResume();
 
-        presenter.setTrackingStatus();
+        presenter.updateTrackingStatus();
 
     }
 

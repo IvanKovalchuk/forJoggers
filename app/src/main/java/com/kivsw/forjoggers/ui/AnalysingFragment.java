@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.ui;
 
 
 import android.app.Activity;
@@ -18,6 +18,10 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kivsw.dialog.MessageDialog;
+import com.kivsw.forjoggers.CustomPagerView;
+import com.kivsw.forjoggers.R;
+import com.kivsw.forjoggers.SettingsFragment;
+import com.kivsw.forjoggers.UnitUtils;
 import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.ui.MainActivity;
 
@@ -29,7 +33,7 @@ import java.util.Locale;
 public class AnalysingFragment extends Fragment
         implements AdapterView.OnItemSelectedListener,
         SettingsFragment.onSettingsCloseListener,
-         CustomPagerView.IonPageAppear
+        CustomPagerView.IonPageAppear
 {
 
     GraphView graph;
@@ -38,6 +42,7 @@ public class AnalysingFragment extends Fragment
     LineGraphSeries<DataPoint> series;
     Spinner graphSpiner;
     ArrayAdapter<CharSequence> spinnerAdpter;
+    AnalysingFragmentPresenter presenter;
     boolean isVisible=false;
     boolean needUpdate=true;
 
@@ -74,10 +79,23 @@ public class AnalysingFragment extends Fragment
         graphSpiner.setOnItemSelectedListener(this);
         graphSpiner.setSelection(2);
 
+        presenter = AnalysingFragmentPresenter.getInstance(getActivity());
 
         return rootView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        presenter.setUI(this);
+
+    }
+
+    @Override
+    public void onStop() {
+        presenter.setUI(null);
+        super.onStop();
+    }
 
     //-----------------------------------------------------------------------
     /**
@@ -115,7 +133,7 @@ public class AnalysingFragment extends Fragment
     void showGraph(int num)
     {
         needUpdate=false;
-        Track curentTrack= null;//CurrentTrack.getInstance(getActivity());
+        Track curentTrack= presenter.getTrackSmoother();//CurrentTrack.getInstance(getActivity());
         if(curentTrack==null)
             return;
         if(curentTrack.getOnChange() instanceof Track)

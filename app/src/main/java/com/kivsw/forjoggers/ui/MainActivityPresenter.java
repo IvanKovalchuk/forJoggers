@@ -36,8 +36,6 @@ public class MainActivityPresenter extends BasePresenter {
         this.activity=null;
     }
 
-
-
     ///---------------------------------------------------
     boolean actionSaveTrack(String fileName)
     {
