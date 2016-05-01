@@ -6,6 +6,7 @@ import android.os.SystemClock;
 
 import com.kivsw.forjoggers.TrackingService;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.helper.UsingCounter;
 import com.kivsw.forjoggers.rx.RxGps;
 import com.kivsw.forjoggers.ui.MainActivityPresenter;
 import com.kivsw.forjoggers.ui.MapFragmentPresenter;
@@ -19,9 +20,10 @@ import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
 /**
- * Created by ivan on 4/22/16.
+ * This is the main module of the data model.
+ * it controls all the data
  */
-public class DataModel {
+public class DataModel implements UsingCounter.IUsingChanged{
 
     static DataModel dataModel=null;
     static public  DataModel getInstance(Context context)
@@ -35,6 +37,7 @@ public class DataModel {
     //-------------------------------------------------------------------
     Context context;
     SettingsKeeper settings;
+    UsingCounter<String> usingCounter;
 
     boolean isTracking=false;
 
@@ -47,6 +50,8 @@ public class DataModel {
     private DataModel(Context context)
     {
         this.context = context;
+        usingCounter = new UsingCounter(this);
+
         settings = SettingsKeeper.getInstance(context);
         currentTrack = CurrentTrack.getInstance(context, new Observer() {
             @Override
@@ -74,9 +79,23 @@ public class DataModel {
     public void release()
     {
         RxGps.release();
-        trackSmoother.release();
-        context = null;
+    }
+    //----------------------------------------------------------
 
+    /**
+     * Watches whether other entities use this class.
+     * Release all the resources if no one uses this class.
+     * @param usingCount
+     */
+    @Override
+    public void onUsingCountChanged(int usingCount) {
+          if(usingCount==0)
+              release();
+    }
+    //------------------------------------------------------------------
+    public UsingCounter getUsingCounter()
+    {
+        return usingCounter;
     }
     //------------------------------------------------------------------
     public TrackSmoother getTrackSmoother() {
@@ -245,4 +264,6 @@ public class DataModel {
     {
         MapFragmentPresenter.getInstance(context).updateFileName();
     }
+
+
 }

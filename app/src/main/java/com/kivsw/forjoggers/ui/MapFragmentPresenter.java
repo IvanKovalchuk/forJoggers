@@ -9,10 +9,12 @@ import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.rx.RxGps;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
+import rx.android.plugins.RxAndroidPlugins;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
@@ -142,7 +144,9 @@ public class MapFragmentPresenter  extends BasePresenter {
         mapFragment.showLocation(loc.getLatitude(), loc.getLongitude());
     }
     void actionAnimateTrack()
-    {}
+    {
+        RxGps.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
+    }
     //----------------------------------------------------------
 
     /**

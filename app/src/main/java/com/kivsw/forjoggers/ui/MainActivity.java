@@ -2,6 +2,7 @@ package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.AnalysingFragment;
+import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.CustomPagerView;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.SettingsFragment;
@@ -28,6 +30,7 @@ implements  FileDialog.OnCloseListener,
             MessageDialog.OnCloseListener,SettingsFragment.onSettingsCloseListener
 {
 
+    final public static String TAG="MainActivity";
     final static String ACTION_SHOW_MSG="com.kivsw.forjoggers.ACTION_SHOW_MSG";
 
     private ViewPager pager;
@@ -146,7 +149,7 @@ implements  FileDialog.OnCloseListener,
          item.setEnabled(hasTrackData);
 
          item=menu.findItem(R.id.action_animate_my_track);
-         item.setEnabled(hasTrackData && !isTracking);
+         item.setVisible(hasTrackData && !isTracking /*&& BuildConfig.BUILD_TYPE.equals("debug")*/);
 
          return super.onPrepareOptionsMenu(menu);
      }

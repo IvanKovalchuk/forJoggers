@@ -4,12 +4,17 @@ import android.content.Context;
 import android.location.Location;
 import android.os.SystemClock;
 
-import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.helper.GPSLocationListener;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -20,38 +25,54 @@ import rx.subjects.PublishSubject;
  */
 public class RxGps {
 
+    static Observable<Location> coreGpsObservable =null;
     static RxGPSLocationListener gpsListener=null;
     static BehaviorSubject gpsUiObservable=null;
     static PublishSubject gpsObservable=null;
+    static Subscription gpsObservableSubscription, gpsUiObservableSubscription;
+
     static long lastLocationTime=0; // when the last location was received
 
+    private static Observable<Location> getCoreObservable(Context aContext)
+    {
+        if(coreGpsObservable ==null)
+        {
+            final Context context = aContext.getApplicationContext();
+
+            if(gpsListener==null)
+                gpsListener = new RxGPSLocationListener(context);
+
+            coreGpsObservable = Observable.create(new Observable.OnSubscribe<Location>() {
+                @Override
+                public void call(Subscriber<? super Location> subscriber) {
+
+                    gpsListener.setSubscriber(subscriber);
+                }
+            })
+            .filter(new Func1<Location, Boolean>() {  // remembers the time when the last location was received
+                @Override
+                public Boolean call(Location location) {
+                    lastLocationTime = SystemClock.elapsedRealtime();
+                    return true;// really I don't filter
+                }
+            });
+        }
+        return coreGpsObservable;
+
+    }
     /**
      * return the observable that emits the current location
      * @param aContext
      * @return
      */
+
     public static Observable<Location> getGprsObservable(Context aContext)
     {
         if(gpsObservable!=null) return gpsObservable;
 
-        final Context context = aContext.getApplicationContext();
-        gpsListener = new RxGPSLocationListener(context);
         gpsObservable= PublishSubject.create();
 
-        Observable.create(new Observable.OnSubscribe<Location>() {
-            @Override
-            public void call(Subscriber<? super Location> subscriber) {
-              gpsListener.setSubscriber(subscriber);
-            }
-        })
-                .filter(new Func1<Location, Boolean>() {  // remembers the time when the last location was received
-                    @Override
-                    public Boolean call(Location location) {
-                        lastLocationTime = SystemClock.elapsedRealtime();
-                        return true;// really I don't filter
-                    }
-                })
-                .subscribe(gpsObservable);
+        gpsObservableSubscription=  getCoreObservable(aContext).subscribe(gpsObservable);
 
         return gpsObservable;
     }
@@ -67,9 +88,43 @@ public class RxGps {
 
         Observable<Location> o=getGprsObservable(aContext);
         gpsUiObservable = BehaviorSubject.create(gpsListener.getLastknownLocation());
-        o.subscribe(gpsUiObservable);
+        gpsUiObservableSubscription= o.subscribe(gpsUiObservable);
 
         return gpsUiObservable;
+    }
+
+    /**
+     * Substitute coreGpsObservable with a new one.
+     * This new observable sends data from 'list'.
+     * then it puts coreGpsObservable on its place
+     * @param list
+     */
+    public static void setEmulationData(final List<Location> list)
+    {
+
+        if(gpsObservableSubscription!=null) gpsObservableSubscription.unsubscribe();
+
+        Observable o=Observable.interval(300, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .map(new Func1<Long,Location>() {
+                    @Override
+                    public Location call(Long i) {
+                        if(list.size()>i)
+                             return list.get(i.intValue());
+
+                        gpsObservableSubscription.unsubscribe(); // subscribe normal GPS again
+                        gpsObservableSubscription=  getCoreObservable(null).subscribe(gpsObservable);
+                        return null;
+                    }
+                })
+                .filter(new Func1<Location, Boolean>() {  // remembers the time when the last location was received
+                    @Override
+                    public Boolean call(Location location) {
+                        lastLocationTime = SystemClock.elapsedRealtime();
+                        return true;// really I don't filter
+                    }
+                });
+        gpsObservableSubscription = o.subscribe(gpsObservable);
+
     }
 
     /**
@@ -82,6 +137,7 @@ public class RxGps {
             gpsListener.subscriber.onCompleted();
             gpsListener = null;
         }
+        coreGpsObservable =null;
         gpsObservable=null;
         gpsUiObservable=null;
     }
@@ -91,7 +147,8 @@ public class RxGps {
      */
     public static boolean isGPSavailable()
     {
-        return (lastLocationTime+GPSLocationListener.UPDATE_INTERVAL*5) < SystemClock.elapsedRealtime();
+        long t=SystemClock.elapsedRealtime();
+        return (lastLocationTime+GPSLocationListener.UPDATE_INTERVAL*5) > t;
     }
     /**
      *  a listener for Android GPS system
@@ -101,7 +158,7 @@ public class RxGps {
         Subscriber<? super Location> subscriber=null;
         public RxGPSLocationListener(Context context)
         {
-            super(context,  true && BuildConfig.DEBUG);
+            super(context,  false);//true && BuildConfig.DEBUG);
 
         }
         void setSubscriber(Subscriber<? super Location> subscriber)
@@ -111,7 +168,8 @@ public class RxGps {
         @Override
         public void onLocationChanged(Location loc)
         {
-            subscriber.onNext(loc);
+            if(subscriber!=null && !subscriber.isUnsubscribed())
+                subscriber.onNext(loc);
         }
     }
 

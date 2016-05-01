@@ -46,7 +46,7 @@ public class Track {
         res.timeStart = timeStart;
         res.timeStop = timeStop;
         res.activityType = activityType;
-        res.mGeoPoints = (ArrayList<Location>)mGeoPoints.clone();
+        res.mGeoPoints = new ArrayList<Location>(mGeoPoints);
 
         return res;
 

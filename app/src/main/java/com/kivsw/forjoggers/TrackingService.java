@@ -26,6 +26,7 @@ import java.util.SimpleTimeZone;
  * it does not have presenter because it's too simple
  */
 public class TrackingService extends Service {
+    public static final String TAG="TrackingService";
     public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
                         ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP";
 
@@ -76,8 +77,14 @@ public class TrackingService extends Service {
 
     @Override
     public void onCreate() {
-
+         DataModel.getInstance(this).getUsingCounter().startUsingBy(TAG);
     }
+    @Override
+    public void onDestroy() {
+        doStop();
+        DataModel.getInstance(this).getUsingCounter().stopUsingBy(TAG);
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -101,10 +108,7 @@ public class TrackingService extends Service {
     }
 
 
-    @Override
-    public void onDestroy() {
-        doStop();
-    }
+
 
 
 
