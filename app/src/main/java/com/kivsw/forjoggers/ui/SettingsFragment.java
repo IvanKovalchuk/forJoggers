@@ -29,7 +29,7 @@ implements CustomPagerView.IonPageAppear
     {
         void onSettingsChanged();
     }*/
-    CheckBox returnToMyLocationCheckBox, keepInBackgroundCheckBox;
+    CheckBox keepInBackgroundCheckBox;
     EditText weightEditText;
     Spinner weightUnitsSpinner,
             currentActivitySpinner,
@@ -65,7 +65,6 @@ implements CustomPagerView.IonPageAppear
         // Inflate the layout for this fragment
         View rootView= inflater.inflate(R.layout.fragment_settings, container, false);
 
-        returnToMyLocationCheckBox = (CheckBox)rootView.findViewById(R.id.returnToMyLocationCheckBox);
         keepInBackgroundCheckBox = (CheckBox)rootView.findViewById(R.id.keepInBackgroundCheckBox);
         weightEditText = (EditText)rootView.findViewById(R.id.weightEditText);
         weightEditText.addTextChangedListener(new WeightWatcher());
@@ -149,7 +148,6 @@ implements CustomPagerView.IonPageAppear
 
     private void loadData()
     {
-        returnToMyLocationCheckBox.setChecked(settings.getReturnToMyLocation());
         keepInBackgroundCheckBox.setChecked(settings.getKeepBackGround());
         weightEditText.setText(String.valueOf(settings.getMyWeight()));
         weightUnitsSpinner.setSelection(settings.getMyWeightUnit());
@@ -164,7 +162,6 @@ implements CustomPagerView.IonPageAppear
     private void saveData()
     {
         int i;
-        settings.setReturnToMyLocation(returnToMyLocationCheckBox.isChecked());
         settings.setKeepBackGround(keepInBackgroundCheckBox.isChecked());
         try{i=Integer.parseInt(weightEditText.getText().toString());}
         catch(Exception e){i=0;};
@@ -192,7 +189,8 @@ implements CustomPagerView.IonPageAppear
 
     @Override
     public void onPageDisappear() {
-        getView().findFocus().clearFocus(); // clear focus to hide the virtual keyboard
+        View focus= getView().findFocus();
+        if(focus!=null) focus.clearFocus(); // clear focus to hide the virtual keyboard
         saveData();
     }
     ////--------------------------------------------

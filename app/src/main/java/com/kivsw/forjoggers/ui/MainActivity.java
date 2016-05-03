@@ -179,9 +179,6 @@ implements  FileDialog.OnCloseListener,
                 }
                 return true;
 
-            case R.id.action_show_my_location:
-                mapFragment.showMyLocation();
-                return true;
 
             case R.id.action_show_my_track:
                  presenter.actionShowCurrentTrack();

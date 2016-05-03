@@ -1,8 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context=".ui.MapFragment">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.MapFragment">
 
     <org.osmdroid.views.MapView android:id="@+id/map"
                                 android:layout_width="fill_parent"
@@ -27,13 +28,15 @@
         android:id="@+id/textCurrentSpeedInfo"
         android:layout_gravity="right|top"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="45sp"/>
+        android:layout_marginTop="50dp"/>
     <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/satelliteImageView"
         android:layout_gravity="right|top"
-        android:src="@drawable/satellite_dis"/>
+        android:src="@drawable/gps_disconnected"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -44,7 +47,7 @@
         android:id="@+id/buttonStart"
         android:layout_gravity="center_horizontal|bottom"
         android:background="@drawable/start_btn"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="15dp"
         android:alpha="0.6" />
     <Button
         android:layout_width="wrap_content"
@@ -55,8 +58,21 @@
         android:id="@+id/buttonStop"
         android:layout_gravity="center_horizontal|bottom"
         android:background="@drawable/stop_btn"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="15dp"
         android:alpha="0.6" />
+
+    <android.support.design.widget.FloatingActionButton
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/myLocationButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="right|bottom"
+        app:borderWidth="1dp"
+        app:elevation="0dp"
+        android:src="@drawable/center_direction_colour"
+        android.support.design:backgroundTint="#90FFFFFF"
+        android:layout_marginBottom="10dp" />
 
     <TextView
         android:layout_width="wrap_content"

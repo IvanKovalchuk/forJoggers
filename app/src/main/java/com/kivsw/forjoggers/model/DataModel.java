@@ -310,6 +310,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
                     if(aFileName.equals(getTempFileName()))
                         currentTrack.fileName="";
                     doUpdateFileNameView();
+                    MapFragmentPresenter.getInstance(context).actionShowCurrentTrack();
                     settings.setCurrentFileName(currentTrack.getFileName());
                 }
                 else

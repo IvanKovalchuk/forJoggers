@@ -140,6 +140,7 @@ public class MapFragmentPresenter  extends BasePresenter {
         if(!hasTrackData()) return;
         if(mapFragment==null) return;
         Location loc= DataModel.getInstance(context).getCurrentTrack().getGeoPoints().get(0);
+        mapFragment.stopFollowingMyLocation();
         mapFragment.showLocation(loc.getLatitude(), loc.getLongitude());
     }
     void actionAnimateTrack()

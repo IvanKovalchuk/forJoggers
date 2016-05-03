@@ -4,10 +4,11 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,9 +48,6 @@ implements
         CustomPagerView.IonPageAppear, View.OnClickListener,
         MessageDialog.OnCloseListener {
 
-    private OnFragmentInteractionListener mListener;
-    private static long savingTime = 0, savedPointIndex = 0;
-
     private MapView mapView = null;
 
     private TextView textTrackInfo,textCurrentSpeedInfo;
@@ -59,11 +57,15 @@ implements
     TextView fileNameTextView;
     Button buttonStart, buttonStop;
 
+    long timeOfStartFollowingMyLocation=0git; // time when myLocationButton was pressed
+    FloatingActionButton myLocationButton;
+
     Polyline originalPath = null, smoothyPath = null;
 
     private View rootView;
 
     private SettingsKeeper settings = null;
+
     UnitUtils unitUtils = null;
 
     private CurrentLocationOverlay myLocationoverlay;
@@ -84,7 +86,6 @@ implements
         settings = SettingsKeeper.getInstance(getActivity());
         unitUtils = new UnitUtils(getActivity());
 
-        // mGPSLocationListener = new MyGPSLocationListener(getActivity());
         mHandler = new MyHandler();
 
 
@@ -150,6 +151,9 @@ implements
         buttonStop.setOnClickListener(this);
         buttonStop.setVisibility(View.GONE);
 
+        myLocationButton = (FloatingActionButton) rootView.findViewById(R.id.myLocationButton);
+        myLocationButton.setOnClickListener(this);
+
         /*if (TrackingService.isWorking) {
             buttonStop.setVisibility(View.VISIBLE);
             buttonStart.setVisibility(View.GONE);
@@ -164,6 +168,7 @@ implements
         }
 
         presenter = MapFragmentPresenter.getInstance(getActivity());
+
 //        updateFileName();
         return rootView;
     }
@@ -212,20 +217,12 @@ implements
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        try {
-            ((MainActivity) getActivity()).mapFragment = this;
-            if (activity instanceof OnFragmentInteractionListener)
-                mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+
     }
 
 
@@ -239,10 +236,38 @@ implements
 
 
     /**
+     * start mode following
+     */
+    void startFollowingMyLocation()
+    {
+        timeOfStartFollowingMyLocation = SystemClock.elapsedRealtime();
+        settings.setReturnToMyLocation(true);
+        myLocationButton.setImageResource(R.drawable.center_direction_colour);
+        showMyLocation();
+
+    }
+    void stopFollowingMyLocation()
+    {
+        settings.setReturnToMyLocation(false);
+        myLocationButton.setImageResource(R.drawable.center_direction_black);
+    }
+    /**
      * relocates the visible map zone to the current position
      */
     public void showMyLocation() {
         if (myLocationoverlay.getLastFix() == null) return;
+
+        boolean r = isMyLocationVisible(); // whether the current location is visible
+        if (!r) {
+            GeoPoint cl = new GeoPoint(myLocationoverlay.getLastFix());
+            showLocation(cl.getLatitude(), cl.getLongitude());
+        }
+    }
+
+    boolean isMyLocationVisible()
+    {
+        if (myLocationoverlay.getLastFix() == null) return false;
+
         GeoPoint topLeftGpt = (GeoPoint) mapView.getProjection().fromPixels(0, 0);
         GeoPoint bottomRightGpt = (GeoPoint) mapView.getProjection().fromPixels(
                 mapView.getWidth(), mapView.getHeight());
@@ -251,9 +276,7 @@ implements
 
         GeoPoint cl = new GeoPoint(myLocationoverlay.getLastFix());
         boolean r = bounding.contains(cl); // whether the current location is visible
-        if (!r) {
-            showLocation(cl.getLatitude(), cl.getLongitude());
-        }
+        return r;
     }
 
     /**
@@ -346,11 +369,11 @@ implements
         satelliteImageView.setVisibility(View.VISIBLE);
 
         if (available) {
-            satelliteImageView.setImageResource(R.drawable.satellite_en);
+            satelliteImageView.setImageResource(R.drawable.gps_receiving);
             isGpsAvailable = Boolean.TRUE;
             //mHandler.scheduleLastPositionFix(GPSLocationListener.UPDATE_INTERVAL * 5);
         } else{
-            satelliteImageView.setImageResource(R.drawable.satellite_dis);
+            satelliteImageView.setImageResource(R.drawable.gps_disconnected);
             isGpsAvailable = Boolean.FALSE;
         }
 
@@ -411,7 +434,9 @@ implements
     public void setCurrentLocation(Location location)
     {
         myLocationoverlay.setLocation(location);//onLocationChanged(location,null);
-        mHandler.scheduleIfNecessaryRestoringPosition();
+
+        if(settings.getReturnToMyLocation())
+             mHandler.scheduleIfNecessaryRestoringPosition();
 
         if(location.hasSpeed()) {
             StringBuilder str=new StringBuilder();
@@ -465,6 +490,10 @@ implements
                 //stopTrackService();
                 presenter.onStopClick();
                 break;
+
+            case R.id.myLocationButton:
+                startFollowingMyLocation();
+                break;
         }
     }
 
@@ -512,31 +541,18 @@ public void showMessageDialog(int id, String caption, String message)
 
 
 
-
-    //----------------------------------------------------------
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-    }
-
-
     //------------------------------------------
     class MapListener implements org.osmdroid.events.MapListener
     {
 
         @Override
         public boolean onScroll(ScrollEvent event) {
-            mHandler.scheduleRestoringPosition();
+
+            long T=SystemClock.elapsedRealtime();
+            if(!isMyLocationVisible()
+                    && (T>(timeOfStartFollowingMyLocation+1500)))// if startFollowingMyLocation() has been invoked recently
+                 stopFollowingMyLocation();
+           // mHandler.scheduleRestoringPosition();
             GeoPoint c=mapView.getBoundingBox().getCenter();
             settings.setZoomLevel(settings.getZoomLevel(), c.getLatitude(), c.getLongitude());
             return false;
