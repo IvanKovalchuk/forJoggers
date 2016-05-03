@@ -9,7 +9,7 @@ import com.kivsw.forjoggers.model.TrackSmoother;
 /**
  * Created by ivan on 4/27/16.
  */
-public class BasePresenter {
+public abstract class BasePresenter {
     protected Context context;
     BasePresenter(Context context)
     {
@@ -40,4 +40,6 @@ public class BasePresenter {
     {
         return DataModel.getInstance(context).getTrackSmoother();
     }
+
+    abstract public void onSettingsChanged();
 }

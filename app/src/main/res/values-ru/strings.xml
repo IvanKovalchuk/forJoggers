@@ -31,6 +31,7 @@
     <!-- settings fragment -->
     <string name="Settings">Настройки</string>
     <string name="return_to_my_location">возвращать в мое положение</string>
+    <string name="keep_in_backgroung">работать в фоне</string>
     <string name="my_weight">Мой вес:</string>
 
     <string name="current_activity">Деятельность текущго трека:</string>
@@ -80,5 +81,9 @@
     <string name="action_show_my_location">Моё положение</string>
     <string name="action_show_track">Мой трек</string>
     <string name="action_emulate_track">Эмулировать трек</string>
+
+    <!-- TrackingService -->
+    <string name="file_saving">Сохранение...</string>
+    <string name="background">Фоновая работа</string>
 
 </resources>

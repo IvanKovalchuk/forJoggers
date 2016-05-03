@@ -24,6 +24,7 @@ public class MainActivityPresenter extends BasePresenter {
         super(context);
     }
 
+
     public void onCreateActivity(MainActivity activity)
     {
         this.activity=activity;
@@ -36,6 +37,10 @@ public class MainActivityPresenter extends BasePresenter {
         this.activity=null;
     }
 
+    @Override
+    public void onSettingsChanged() {
+
+    }
     ///---------------------------------------------------
     boolean actionSaveTrack(String fileName)
     {

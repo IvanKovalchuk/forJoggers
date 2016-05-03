@@ -18,12 +18,9 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kivsw.dialog.MessageDialog;
-import com.kivsw.forjoggers.CustomPagerView;
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.SettingsFragment;
-import com.kivsw.forjoggers.UnitUtils;
+import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.model.Track;
-import com.kivsw.forjoggers.ui.MainActivity;
 
 import java.util.Locale;
 
@@ -32,7 +29,6 @@ import java.util.Locale;
  */
 public class AnalysingFragment extends Fragment
         implements AdapterView.OnItemSelectedListener,
-        SettingsFragment.onSettingsCloseListener,
         CustomPagerView.IonPageAppear
 {
 
@@ -216,8 +212,7 @@ public class AnalysingFragment extends Fragment
 
     }
     //----------------------------------------------
-    // SettingsFragment.onSettingsCloseListener
-    @Override
+
     public void onSettingsChanged() {
         needUpdate=true;
         if(isVisible)

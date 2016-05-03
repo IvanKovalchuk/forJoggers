@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -32,6 +32,11 @@ public class CustomPagerView extends android.support.v4.view.ViewPager {
         return false;
     }
 
+    /**
+     * Allows to swipe page only when the user touches near the screen edge
+     * @param event
+     * @return
+     */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         switch(event.getAction())
@@ -40,7 +45,7 @@ public class CustomPagerView extends android.support.v4.view.ViewPager {
                 if(event.getPointerCount()==1)
                 {
                     int w=getWidth();
-                    int min=20,max=w-20;
+                    int min=w*15/100,max=w*85/100; // select 15% from the screen width
                     int x=(int)event.getX();
                     enabled= x<min || x>max;
                 }

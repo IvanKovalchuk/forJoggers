@@ -2,7 +2,7 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="com.kivsw.forjoggers.SettingsFragment"
+            tools:context=".ui.SettingsFragment"
     >
 
 <LinearLayout
@@ -17,6 +17,14 @@
         android:layout_height="wrap_content"
         android:text="@string/return_to_my_location"
         android:id="@+id/returnToMyLocationCheckBox"
+        android:layout_gravity="center_horizontal|left"
+        android:layout_marginLeft="10dp"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/keep_in_backgroung"
+        android:id="@+id/keepInBackgroundCheckBox"
         android:layout_gravity="center_horizontal|left"
         android:layout_marginLeft="10dp"/>
 

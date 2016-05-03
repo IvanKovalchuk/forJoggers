@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.rx;
+package com.kivsw.forjoggers.helper;
 
 import android.content.Context;
 import android.location.Location;

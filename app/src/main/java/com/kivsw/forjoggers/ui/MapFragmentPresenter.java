@@ -6,7 +6,7 @@ import android.location.Location;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.model.DataModel;
 import com.kivsw.forjoggers.model.Track;
-import com.kivsw.forjoggers.rx.RxGps;
+import com.kivsw.forjoggers.helper.RxGps;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
-import rx.android.plugins.RxAndroidPlugins;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
@@ -230,6 +229,10 @@ public class MapFragmentPresenter  extends BasePresenter {
      */
     public void onCurrentTrackUpdate(Track track)
     {
+        if(Thread.currentThread().getId()!=1)
+        {
+            int xxx=0;
+        }
          if(mapFragment==null) return;
           mapFragment.putCurrentTrackOnMap(track);
           //mapFragment.updateTrackInfo(DataModel.getInstance(context).getCurrentTrack(), DataModel.getInstance(context).getTrackSmoother());
@@ -247,8 +250,18 @@ public class MapFragmentPresenter  extends BasePresenter {
      */
     public void onSmoothTrackUpdate(Track track)
     {
+        if(Thread.currentThread().getId()!=1)
+        {
+            int xxx=0;
+        }
         if(mapFragment==null) return;
         mapFragment.putSmoothTrackOnMap(track);
         mapFragment.updateTrackInfo(DataModel.getInstance(context).getTrackSmoother(),DataModel.getInstance(context).getCurrentTrack());
+    }
+
+    @Override
+    public void onSettingsChanged() {
+        if(mapFragment==null) return;
+        mapFragment.onSettingsChanged();
     }
 }

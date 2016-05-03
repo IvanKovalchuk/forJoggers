@@ -25,18 +25,35 @@ public class UsingCounter<T> {
     {
         if(listener!=null) listener.onUsingCountChanged(userSet.size());
     }
-    public void startUsingBy(T anInstance)
+
+    public boolean startUsingBy(T anInstance)
     {
         if(userSet.contains(anInstance))
-            return;//throw new Exception("UsingCounter has already contained "+anInstance.toString());
+            return false;//throw new Exception("UsingCounter has already contained "+anInstance.toString());
         userSet.add(anInstance);
         doOnUsingCountChanged();
+        return true;
     }
-    public void stopUsingBy(T anInstance)
+    public boolean stopUsingBy(T anInstance)
     {
         if(!userSet.contains(anInstance))
-            return;//throw new Exception("UsingCounter has not contained "+anInstance.toString());
+            return false;//throw new Exception("UsingCounter has not contained "+anInstance.toString());
         userSet.remove(anInstance);
         doOnUsingCountChanged();
+        return true;
+    }
+
+    public boolean contains(T anInstance )
+    {
+        return userSet.contains(anInstance);
+    }
+    public int count()
+    {
+        return userSet.size();
+    }
+
+    public Object[] array()
+    {
+       return  userSet.toArray();
     }
 }

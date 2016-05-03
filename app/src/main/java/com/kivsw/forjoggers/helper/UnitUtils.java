@@ -1,7 +1,8 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.helper;
 
 import android.content.Context;
 
+import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 
 import java.util.Locale;

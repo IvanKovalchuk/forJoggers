@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers;
+package com.kivsw.forjoggers.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -13,22 +13,23 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
-import com.kivsw.forjoggers.ui.MainActivity;
 
-
+/**
+ *  This class is the UI for settings
+ */
 public class SettingsFragment extends Fragment
 implements CustomPagerView.IonPageAppear
 {
 
     SettingsKeeper settings;
 
-
-    public interface onSettingsCloseListener
+    /*public interface onSettingsCloseListener
     {
         void onSettingsChanged();
-    }
-    CheckBox returnToMyLocationCheckBox;
+    }*/
+    CheckBox returnToMyLocationCheckBox, keepInBackgroundCheckBox;
     EditText weightEditText;
     Spinner weightUnitsSpinner,
             currentActivitySpinner,
@@ -39,16 +40,12 @@ implements CustomPagerView.IonPageAppear
             speedTUnitsSpinner;
 
 
+    SettingsFragmentPresenter presenter;
+
     public SettingsFragment() {
         super();
     }
 
-
-    /*public static SettingsFragment newInstance(onSettingsCloseListener listener) {
-        SettingsFragment fragment = new SettingsFragment();
-        fragment.setOnCloseLister(listener);
-        return fragment;
-    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +54,8 @@ implements CustomPagerView.IonPageAppear
         if (getArguments() != null) {
 
         }
+
+        presenter = SettingsFragmentPresenter.getInstance(getActivity());
     }
 
     @Override
@@ -67,6 +66,7 @@ implements CustomPagerView.IonPageAppear
         View rootView= inflater.inflate(R.layout.fragment_settings, container, false);
 
         returnToMyLocationCheckBox = (CheckBox)rootView.findViewById(R.id.returnToMyLocationCheckBox);
+        keepInBackgroundCheckBox = (CheckBox)rootView.findViewById(R.id.keepInBackgroundCheckBox);
         weightEditText = (EditText)rootView.findViewById(R.id.weightEditText);
         weightEditText.addTextChangedListener(new WeightWatcher());
 
@@ -109,6 +109,17 @@ implements CustomPagerView.IonPageAppear
         return rootView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
     //-------------------------------------------------------
 
     @Override
@@ -118,12 +129,7 @@ implements CustomPagerView.IonPageAppear
         super.onPause();
 
     }
-    @Override
-    public void onStop()
-    {
-        super.onStop();
 
-    }
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -144,6 +150,7 @@ implements CustomPagerView.IonPageAppear
     private void loadData()
     {
         returnToMyLocationCheckBox.setChecked(settings.getReturnToMyLocation());
+        keepInBackgroundCheckBox.setChecked(settings.getKeepBackGround());
         weightEditText.setText(String.valueOf(settings.getMyWeight()));
         weightUnitsSpinner.setSelection(settings.getMyWeightUnit());
 
@@ -158,7 +165,7 @@ implements CustomPagerView.IonPageAppear
     {
         int i;
         settings.setReturnToMyLocation(returnToMyLocationCheckBox.isChecked());
-
+        settings.setKeepBackGround(keepInBackgroundCheckBox.isChecked());
         try{i=Integer.parseInt(weightEditText.getText().toString());}
         catch(Exception e){i=0;};
         settings.setMyWeight(i, weightUnitsSpinner.getSelectedItemPosition());
@@ -172,10 +179,8 @@ implements CustomPagerView.IonPageAppear
 
         settings.setSpeedUnit(speedDUnitsSpinner.getSelectedItemPosition(), speedTUnitsSpinner.getSelectedItemPosition());
 
-        if(getActivity()!=null && (getActivity() instanceof onSettingsCloseListener) ) {
-            onSettingsCloseListener l = (onSettingsCloseListener) getActivity();
-            l.onSettingsChanged();
-        }
+        // informs the others that we have new settings
+        presenter.onSettingsChanged();
 
     }
     //----------------------------------------------
@@ -187,6 +192,7 @@ implements CustomPagerView.IonPageAppear
 
     @Override
     public void onPageDisappear() {
+        getView().findFocus().clearFocus(); // clear focus to hide the virtual keyboard
         saveData();
     }
     ////--------------------------------------------

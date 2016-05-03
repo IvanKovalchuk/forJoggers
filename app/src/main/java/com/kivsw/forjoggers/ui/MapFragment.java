@@ -18,10 +18,8 @@ import android.widget.TextView;
 
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
-import com.kivsw.forjoggers.CustomPagerView;
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.SettingsFragment;
-import com.kivsw.forjoggers.UnitUtils;
+import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.model.TrackSmoother;
@@ -45,7 +43,7 @@ import java.util.Locale;
 
 
 public class MapFragment extends Fragment
-implements SettingsFragment.onSettingsCloseListener,
+implements
         CustomPagerView.IonPageAppear, View.OnClickListener,
         MessageDialog.OnCloseListener {
 
@@ -437,10 +435,9 @@ implements SettingsFragment.onSettingsCloseListener,
             textCurrentSpeedInfo.setText("");
     };
     //----------------------------------------------
-    // SettingsFragment.onSettingsCloseListener
-    @Override
+
     public void onSettingsChanged() {
-        //updateTrackInfo();
+        updateTrackInfo(presenter.getTrackSmoother(), presenter.getCurrentTrack());
     }
     //----------------------------------------------
     // CustomPagerView.IonPageAppear

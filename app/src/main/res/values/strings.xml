@@ -32,6 +32,7 @@
     <!-- settings fragment -->
     <string name="Settings">Settings</string>
     <string name="return_to_my_location">return to my location</string>
+    <string name="keep_in_backgroung">keep in background</string>
     <string name="my_weight">My weight:</string>
 
     <string name="current_activity">Current track activity:</string>
@@ -82,5 +83,10 @@
     <string name="action_show_my_location">Show my location</string>
     <string name="action_show_track">Show track</string>
     <string name="action_emulate_track">Emulate track</string>
+
+
+    <!-- TrackingService -->
+    <string name="file_saving">Saving...</string>
+    <string name="background">Background</string>
 
 </resources>

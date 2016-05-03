@@ -15,9 +15,7 @@ import android.view.MenuItem;
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
-import com.kivsw.forjoggers.CustomPagerView;
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.SettingsFragment;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 
 import java.io.File;
@@ -25,7 +23,7 @@ import java.io.File;
 
 public class MainActivity extends ActionBarActivity
 implements  FileDialog.OnCloseListener,
-            MessageDialog.OnCloseListener,SettingsFragment.onSettingsCloseListener
+            MessageDialog.OnCloseListener
 {
 
     final public static String TAG="MainActivity";
@@ -147,7 +145,7 @@ implements  FileDialog.OnCloseListener,
          item.setEnabled(hasTrackData);
 
          item=menu.findItem(R.id.action_emulate_my_track);
-         item.setVisible(hasTrackData && !isTracking && BuildConfig.DEBUG);
+         item.setVisible(/*hasTrackData &&*/ !isTracking && BuildConfig.DEBUG);
 
          return super.onPrepareOptionsMenu(menu);
      }
@@ -311,12 +309,6 @@ implements  FileDialog.OnCloseListener,
     public void onClickExtra(MessageDialog msg) { }
 
     //--------------------------------------------------------------------------
-    // SettingsFragment.onSettingsCloseListener
-    @Override
-    public void onSettingsChanged() {
-        analysingFragment.onSettingsChanged();
-        mapFragment.onSettingsChanged();
-    }
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
         public MyPagerAdapter(FragmentManager fm) {

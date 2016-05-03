@@ -64,7 +64,7 @@ public class SettingsKeeper {
     }
 
     //-----------------------------------------------------
-    public  String getCurrentTrack()
+  /*  public  String getCurrentTrack()
     {
         return sharedPreferences.getString("currentTrack", "");
     };
@@ -73,7 +73,7 @@ public class SettingsKeeper {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putString("currentTrack", t);
         e.commit();
-    }
+    }*/
     //-----------------------------------------------------
     public  String getCurrentFileName()
     {
@@ -186,4 +186,15 @@ public class SettingsKeeper {
     }
     //-------------------------------------------------------------
 
+    public  boolean getKeepBackGround()
+    {
+        return sharedPreferences.getBoolean("keepBackground", false);
+    };
+    public void setKeepBackGround(boolean v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putBoolean("keepBackground", v);
+        e.commit();
+    }
+    //-----------------------------------------------------
 }

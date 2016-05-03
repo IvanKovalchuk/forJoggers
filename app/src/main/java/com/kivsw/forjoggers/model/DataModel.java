@@ -5,19 +5,19 @@ import android.location.Location;
 import android.os.SystemClock;
 
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.TrackingService;
+import com.kivsw.forjoggers.ui.TrackingService;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
-import com.kivsw.forjoggers.rx.RxGps;
+import com.kivsw.forjoggers.helper.RxGps;
 import com.kivsw.forjoggers.ui.MainActivityPresenter;
 import com.kivsw.forjoggers.ui.MapFragmentPresenter;
+import com.kivsw.forjoggers.ui.TrackingServicePresenter;
 
 import java.io.File;
 
 import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Action2;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -65,6 +65,10 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
         // load the last track
         loadLastData();
+
+        // starts background working
+        if(settings.getKeepBackGround())
+            TrackingServicePresenter.getInstance(context).startBackground();
 
     };
     public void release()
@@ -205,7 +209,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
      */
     public void startTracking()
     {
-        TrackingService.start(context);
+        TrackingServicePresenter.getInstance(context).startTracking();
 
         trackSmoother=null;
         currentTrack.clear();
@@ -250,7 +254,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
      */
     public void stopTracking()
     {
-        TrackingService.stop(context);
+        TrackingServicePresenter.getInstance(context).endTracking();
         trackingSubscriber.unsubscribe();
         trackingSubscriber=null;
         currentTrack.timeStop= SystemClock.elapsedRealtime();
@@ -266,12 +270,15 @@ public class DataModel implements UsingCounter.IUsingChanged{
      */
     public boolean saveTrack(String fileName)
     {
+        TrackingServicePresenter.getInstance(context).startSaving(); // starts service
+
         boolean r=getCurrentTrack().saveGeoPoint(fileName, new Action2<Boolean,String>() {
             @Override
             public void call(Boolean aBoolean, String aFileName) {
+                TrackingServicePresenter.getInstance(context).endSaving(); // stops service
                 if(aBoolean.booleanValue())
                 {
-                    if(currentTrack.getFileName().equals(getTempFileName()))
+                    if(currentTrack.getFileName().equals(getTempFileName())) // don't keep the temporary file's name
                         currentTrack.fileName="";
 
                     doUpdateFileNameView();
@@ -332,5 +339,17 @@ public class DataModel implements UsingCounter.IUsingChanged{
         MapFragmentPresenter.getInstance(context).updateFileName();
     }
 
+    /**
+     * is invoked when the user has changes the settings
+     */
+    public void onSettingsChanged() {
+
+        // starts or stop background working
+        if(settings.getKeepBackGround())
+            TrackingServicePresenter.getInstance(context).startBackground();
+        else
+            TrackingServicePresenter.getInstance(context).endBackground();
+
+    }
 
 }
