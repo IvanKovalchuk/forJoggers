@@ -147,6 +147,9 @@ implements  FileDialog.OnCloseListener,
          item=menu.findItem(R.id.action_emulate_my_track);
          item.setVisible(/*hasTrackData &&*/ !isTracking && BuildConfig.DEBUG);
 
+         item=menu.findItem(R.id.action_quit);
+         item.setVisible(settings.getKeepBackGround());
+
          return super.onPrepareOptionsMenu(menu);
      }
     //----------------------------------------------------------
@@ -191,6 +194,10 @@ implements  FileDialog.OnCloseListener,
             case R.id.action_emulate_my_track:
                 presenter.actionAnimateTrack();
                 //mapFragment.animateTrack();
+                break;
+
+            case R.id.action_quit:
+                presenter.actionQuit();
                 break;
         }
 

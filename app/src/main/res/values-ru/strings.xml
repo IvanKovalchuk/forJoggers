@@ -81,6 +81,7 @@
     <string name="action_show_my_location">Моё положение</string>
     <string name="action_show_track">Мой трек</string>
     <string name="action_emulate_track">Эмулировать трек</string>
+    <string name="action_quit">Выход</string>
 
     <!-- TrackingService -->
     <string name="file_saving">Сохранение...</string>

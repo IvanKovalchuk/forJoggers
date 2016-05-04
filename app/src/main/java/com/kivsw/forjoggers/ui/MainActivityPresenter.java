@@ -63,6 +63,12 @@ public class MainActivityPresenter extends BasePresenter {
         if(!hasTrackData()) return;
         MapFragmentPresenter.getInstance(context).actionAnimateTrack();
     };
+    void actionQuit()
+    {
+         if(this.activity!=null)
+             this.activity.finish();
+        TrackingServicePresenter.getInstance(context).endBackground();
+    }
     ///---------------------------------------------------
 
     public void showError(String msg)

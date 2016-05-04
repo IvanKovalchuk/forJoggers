@@ -5,10 +5,9 @@ import android.location.Location;
 import android.os.SystemClock;
 
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.ui.TrackingService;
+import com.kivsw.forjoggers.helper.RxGps;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
-import com.kivsw.forjoggers.helper.RxGps;
 import com.kivsw.forjoggers.ui.MainActivityPresenter;
 import com.kivsw.forjoggers.ui.MapFragmentPresenter;
 import com.kivsw.forjoggers.ui.TrackingServicePresenter;

@@ -20,8 +20,8 @@ import android.widget.TextView;
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.model.Track;
 import com.kivsw.forjoggers.model.TrackSmoother;
 
@@ -33,7 +33,6 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 
 import java.io.File;
@@ -48,7 +47,7 @@ implements
         CustomPagerView.IonPageAppear, View.OnClickListener,
         MessageDialog.OnCloseListener {
 
-    private MapView mapView = null;
+    private MapViewEnvelope mapView = null;
 
     private TextView textTrackInfo,textCurrentSpeedInfo;
     ImageView satelliteImageView;
@@ -57,7 +56,7 @@ implements
     TextView fileNameTextView;
     Button buttonStart, buttonStop;
 
-    long timeOfStartFollowingMyLocation=0git; // time when myLocationButton was pressed
+   // long timeOfStartFollowingMyLocation=0; // time when myLocationButton was pressed
     FloatingActionButton myLocationButton;
 
     Polyline originalPath = null, smoothyPath = null;
@@ -97,7 +96,7 @@ implements
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
-        mapView = (MapView) rootView.findViewById(R.id.map);
+        mapView = (MapViewEnvelope) rootView.findViewById(R.id.map);
         //mapView.setTileSource(TileSourceFactory.MAPNIK);
         //mapView.setTileSource(TileSourceFactory.CYCLEMAP);
         OnlineTileSourceBase tileSource = null;
@@ -240,7 +239,7 @@ implements
      */
     void startFollowingMyLocation()
     {
-        timeOfStartFollowingMyLocation = SystemClock.elapsedRealtime();
+        //timeOfStartFollowingMyLocation = SystemClock.elapsedRealtime();
         settings.setReturnToMyLocation(true);
         myLocationButton.setImageResource(R.drawable.center_direction_colour);
         showMyLocation();
@@ -549,8 +548,7 @@ public void showMessageDialog(int id, String caption, String message)
         public boolean onScroll(ScrollEvent event) {
 
             long T=SystemClock.elapsedRealtime();
-            if(!isMyLocationVisible()
-                    && (T>(timeOfStartFollowingMyLocation+1500)))// if startFollowingMyLocation() has been invoked recently
+            if(mapView.isTouching() &&  !isMyLocationVisible())// if startFollowingMyLocation() has been invoked recently
                  stopFollowingMyLocation();
            // mHandler.scheduleRestoringPosition();
             GeoPoint c=mapView.getBoundingBox().getCenter();

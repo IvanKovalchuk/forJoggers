@@ -83,7 +83,7 @@
     <string name="action_show_my_location">Show my location</string>
     <string name="action_show_track">Show track</string>
     <string name="action_emulate_track">Emulate track</string>
-
+    <string name="action_quit">Quit</string>
 
     <!-- TrackingService -->
     <string name="file_saving">Saving...</string>
