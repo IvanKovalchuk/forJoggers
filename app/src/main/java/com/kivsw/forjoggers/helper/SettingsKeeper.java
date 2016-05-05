@@ -197,4 +197,106 @@ public class SettingsKeeper {
         e.commit();
     }
     //-----------------------------------------------------
+    // sets autostop for distance
+    public  boolean getAutoStopDistance()
+    {
+        return sharedPreferences.getBoolean("autoStopDistance", false);
+    };
+    public void setAutoStopDistance(boolean v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putBoolean("autoStopDistance", v);
+        e.commit();
+    }
+
+    public  int getAutoStopDistanceUnit()
+    {
+        return sharedPreferences.getInt("autoStopDistanceUnit", 0);
+    };
+    public void setAutoStopDistanceUnit(int v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putInt("autoStopDistanceUnit", v);
+        e.commit();
+    }
+
+    public  double getAutoStopDistanceValue()
+    {
+        long v=sharedPreferences.getLong("autoStopDistanceValue", 0);
+        return Double.longBitsToDouble(v);
+    };
+    double getAutoStopDistanceMeters()
+    {
+        double v=getAutoStopDistanceValue();
+        switch(getAutoStopDistanceUnit())
+        {
+            case METERS:
+                break;
+            case KILOMETERS:
+                v*=1000;
+                break;
+            case MILES:
+                v*=1609;
+                break;
+        }
+        return v;
+    }
+    public void setAutoStopDistanceValue(double v, int type)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        long vl= Double.doubleToLongBits(v);
+        e.putLong("autoStopDistanceValue", vl);
+        e.commit();
+    }
+    //-----------------------------------------------------
+    // sets autostop for time
+    public  boolean getAutoStopTime()
+    {
+        return sharedPreferences.getBoolean("autoStopTime", false);
+    };
+    public void setAutoStopTime(boolean v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putBoolean("autoStopTime", v);
+        e.commit();
+    }
+
+    public  int getAutoStopTimeUnit()
+    {
+        return sharedPreferences.getInt("autoStopTimeUnit", 0);
+    };
+    public void setAutoStopTimeUnit(int v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putInt("autoStopTimeUnit", v);
+        e.commit();
+    }
+
+    public void setAutoStopTimeValue(long v, int type)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putLong("autoStopDistanceValue", v);
+        e.commit();
+    }
+    public  long getAutoStopTimeValue()
+    {
+        long v=sharedPreferences.getLong("autoStopTimeValue", 0);
+        return v;
+    };
+    public  long getAutoStopTimeSeconds()
+    {
+        long v=getAutoStopTimeValue();
+        switch(getAutoStopTimeUnit())
+        {
+            case SECOND:
+                break;
+            case MINUTE:
+                v*=60;
+                break;
+            case HOUR:
+                v*=60*60;
+                break;
+        }
+        return v;
+    };
 }

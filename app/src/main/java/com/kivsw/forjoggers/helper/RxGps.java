@@ -110,7 +110,7 @@ public class RxGps {
 
                         gpsObservableSubscription.unsubscribe(); // subscribe normal GPS again
                         gpsObservableSubscription=  getCoreObservable(null).subscribe(gpsObservable);
-                        return null;
+                        return list.get(list.size()-1);
                     }
                 })
                 .filter(new Func1<Location, Boolean>() {  // remembers the time when the last location was received
