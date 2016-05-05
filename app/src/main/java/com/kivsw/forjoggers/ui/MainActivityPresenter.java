@@ -79,4 +79,10 @@ public class MainActivityPresenter extends BasePresenter {
     {
          MainActivity.showMessage(context, msgId, title, msg);
     }
+
+    public void menuUpdate()
+    {
+        if(this.activity!=null)
+            activity.supportInvalidateOptionsMenu();
+    }
 }

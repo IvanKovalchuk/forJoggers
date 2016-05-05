@@ -167,7 +167,11 @@ implements
 
         presenter = MapFragmentPresenter.getInstance(getActivity());
 
-//        updateFileName();
+        if(settings.getReturnToMyLocation())
+            startFollowingMyLocation();
+        else
+            stopFollowingMyLocation();
+
         return rootView;
     }
 

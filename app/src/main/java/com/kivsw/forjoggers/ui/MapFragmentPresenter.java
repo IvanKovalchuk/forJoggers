@@ -209,13 +209,15 @@ public class MapFragmentPresenter  extends BasePresenter {
         DataModel.getInstance(context).startTracking();
         startTrackingUpdating();
 
+        MainActivityPresenter.getInstance(context).menuUpdate();
+
     }
     protected void doStop()
     {
-
         DataModel.getInstance(context).stopTracking();
         stopTrackingUpdating();
         mapFragment.showStartButton();
+        MainActivityPresenter.getInstance(context).menuUpdate();
     }
 
 
