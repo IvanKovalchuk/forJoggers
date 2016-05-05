@@ -41,7 +41,7 @@ public class GPSLocationListener implements android.location.LocationListener{
                 if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                     locationManager.requestLocationUpdates(
                             LocationManager.GPS_PROVIDER, UPDATE_INTERVAL, 2f, listener);
-            }catch(Exception e)
+            }catch(SecurityException e)
             {
                 e.getMessage();
             }
@@ -51,7 +51,7 @@ public class GPSLocationListener implements android.location.LocationListener{
                 if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
                     locationManager.requestLocationUpdates(
                             LocationManager.NETWORK_PROVIDER, UPDATE_INTERVAL, 2f, listener);
-            }catch(Exception e)
+            }catch(SecurityException e)
             {
                 e.getMessage();
             }
@@ -63,8 +63,13 @@ public class GPSLocationListener implements android.location.LocationListener{
     {
 
         if(locationManager!=null) {
-            locationManager.removeUpdates(this);
-            locationManager=null;
+            try {
+                locationManager.removeUpdates(this);
+                locationManager=null;
+            }catch(SecurityException e)
+            {
+                e.getMessage();
+            }
         }
 
     }
@@ -122,9 +127,14 @@ public class GPSLocationListener implements android.location.LocationListener{
     public Location getLastknownLocation()
     {
         if(locationManager==null) return null;
-        Location loc=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(loc==null && useNetWorkProvider)
-            loc=locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location loc=null;
+
+        try {
+            loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (loc == null && useNetWorkProvider)
+                loc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }catch (SecurityException e)
+        {e.toString();}
 
         return loc;
     }

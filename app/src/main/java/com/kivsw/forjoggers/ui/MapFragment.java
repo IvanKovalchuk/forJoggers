@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -55,7 +53,6 @@ implements
     TextView fileNameTextView;
     Button buttonStart, buttonStop;
 
-   // long timeOfStartFollowingMyLocation=0; // time when myLocationButton was pressed
     FloatingActionButton myLocationButton;
 
     Polyline originalPath = null, smoothyPath = null;
@@ -67,7 +64,6 @@ implements
     UnitUtils unitUtils = null;
 
     private CurrentLocationOverlay myLocationoverlay;
-    private MyHandler mHandler;
     MapFragmentPresenter presenter;
 
 
@@ -83,10 +79,6 @@ implements
 
         settings = SettingsKeeper.getInstance(getActivity());
         unitUtils = new UnitUtils(getActivity());
-
-        mHandler = new MyHandler();
-
-
     }
 
     @Override
@@ -126,9 +118,7 @@ implements
         mapController.setZoom(settings.getZoomLevel());
         GeoPoint c = new GeoPoint(settings.getLastLatitude(), settings.getLastLongitude());
         mapController.setCenter(c);
-        mHandler.scheduleRestoringPosition();
-        /*if(mGPSLocationListener.getLastKnownLocation()!=null)
-           mapController.animateTo(new GeoPoint(mGPSLocationListener.getLastKnownLocation()));*/
+
         mapView.setMapListener(new MapListener());
 
         textTrackInfo = (TextView) rootView.findViewById(R.id.textTrackInfo);
@@ -151,15 +141,6 @@ implements
 
         myLocationButton = (FloatingActionButton) rootView.findViewById(R.id.myLocationButton);
         myLocationButton.setOnClickListener(this);
-
-        /*if (TrackingService.isWorking) {
-            buttonStop.setVisibility(View.VISIBLE);
-            buttonStart.setVisibility(View.GONE);
-        } else {
-            buttonStop.setVisibility(View.GONE);
-            buttonStart.setVisibility(View.VISIBLE);
-        }*/
-
 
         if (savedInstanceState != null) {
 
@@ -212,7 +193,7 @@ implements
     public void onStop() {
         presenter.setUI(null);
         super.onStop();
-        mHandler.deleteAllMessages();
+        //mHandler.deleteAllMessages();
     }
 
     @Override
@@ -373,7 +354,6 @@ implements
         if (available) {
             satelliteImageView.setImageResource(R.drawable.gps_receiving);
             isGpsAvailable = Boolean.TRUE;
-            //mHandler.scheduleLastPositionFix(GPSLocationListener.UPDATE_INTERVAL * 5);
         } else{
             satelliteImageView.setImageResource(R.drawable.gps_disconnected);
             isGpsAvailable = Boolean.FALSE;
@@ -438,23 +418,10 @@ implements
         myLocationoverlay.setLocation(location);//onLocationChanged(location,null);
 
         if(settings.getReturnToMyLocation())
-             mHandler.scheduleIfNecessaryRestoringPosition();
+            checkMyLocationVisibility();
 
         if(location.hasSpeed()) {
             StringBuilder str=new StringBuilder();
-                //str.append(getText(R.string.current_speed));
-
-              /*  Location lastLoc = null;
-                if (!currentTrack.getGeoPoints().isEmpty()) {
-                    lastLoc = currentTrack.getGeoPoints().get(currentTrack.getGeoPoints().size() - 1);
-                    if (!lastLoc.hasSpeed()) lastLoc = null;
-                }
-                ;
-                if (lastLoc == null) {
-                    lastLoc = points.get(points.size() - 1);
-                }
-
-                str.append(unitUtils.speedToStr(lastLoc.getSpeed()));*/
             str.append(unitUtils.speedToStr(location.getSpeed()));
             textCurrentSpeedInfo.setText(str);
         }
@@ -489,7 +456,6 @@ implements
             }
             break;
             case R.id.buttonStop:
-                //stopTrackService();
                 presenter.onStopClick();
                 break;
 
@@ -567,113 +533,5 @@ public void showMessageDialog(int id, String caption, String message)
             return false;
         }
     }
-/*    //----------------------------------------
-    class MyGPSLocationListener extends GPSLocationListener
-            implements IMyLocationProvider
-    {
-
-        MyGPSLocationListener(Context context)
-        {super(context,false&&BuildConfig.DEBUG);}
-
-        //----------------------------------------
-        @Override
-        public void onLocationChanged(Location loc)
-        {
-            super.onLocationChanged(loc);
-            if(consumer!=null) {
-                consumer.onLocationChanged(loc, this);
-
-                mHandler.scheduleIfNecessaryRestoringPosition();
-                if(loc.getProvider().equals(LocationManager.GPS_PROVIDER)) {
-                    setGPSstatus(true);
-
-                }
-            }
-        }
-        @Override
-        public void onStatusChanged(String provider,int status, Bundle extras) {
-            super.onStatusChanged(provider, status, extras);
-
-            if(!provider.equals(LocationManager.GPS_PROVIDER)) return;
-
-            switch(status) {
-                case     LocationProvider.TEMPORARILY_UNAVAILABLE:
-                case     LocationProvider.OUT_OF_SERVICE:
-                    setGPSstatus(false);
-                    break;
-                case   LocationProvider.AVAILABLE:
-                    //setGPSstatus(1);
-                    break;
-            }
-
-        }
-
-        //------------------------------
-        IMyLocationConsumer consumer=null;
-        @Override
-        public boolean startLocationProvider(IMyLocationConsumer myLocationConsumer) {
-            consumer = myLocationConsumer;
-            return true;
-        }
-
-        @Override
-        public void stopLocationProvider() {
-            consumer=null;
-        }
-
-        @Override
-        public Location getLastKnownLocation() {
-            return super.getLastknownLocation();
-        }
-    }
-    //----------------------------------------*/
-
-    class MyHandler extends Handler
-    {
-        final private int RESTORE_POSITION=1;
-        MyHandler()
-        {
-            super();
-        }
-
-        public void deleteAllMessages()
-        {
-            removeMessages(RESTORE_POSITION);
-        }
-
-        public void scheduleIfNecessaryRestoringPosition()
-        {
-            if(!hasMessages(RESTORE_POSITION))
-                sendEmptyMessageDelayed(RESTORE_POSITION, 1000);
-        }
-        public void scheduleRestoringPosition()
-        {
-            removeMessages(RESTORE_POSITION);
-            sendEmptyMessageDelayed(RESTORE_POSITION, 5000);
-        }
-
-        public Bitmap rotateBitmap(Bitmap source, float angle)
-        {
-            Matrix matrix = new Matrix();
-            matrix.postScale(0.2f,0.2f);
-            matrix.postRotate(angle);
-
-            return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-        }
-
-
-        public void handleMessage (Message msg)
-        {
-            switch(msg.what)
-            {
-                case RESTORE_POSITION:
-                    checkMyLocationVisibility();
-                    break;
-            }
-
-        }
-
-    }
-
 
 }
