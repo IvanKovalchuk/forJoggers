@@ -1,13 +1,6 @@
 package org.osmdroid.bonuspack.routing;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Locale;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import android.util.Log;
 
 import org.osmdroid.bonuspack.utils.BonusPackHelper;
 import org.osmdroid.bonuspack.utils.HttpConnection;
@@ -18,18 +11,29 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.util.Log;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Locale;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 /** class to get a route between a start and a destination point, going through a list of waypoints. <br>
- * Note that displaying a route provided by Google on a non-Google map (like OSM) is not allowed by Google T&C. 
+ * Note that displaying a route provided by Google on a non-Google map (like OSM) is not allowed by Google T&C.
  * @see <a href="https://developers.google.com/maps/documentation/directions">Google Maps Directions API</a>
  * @author M.Kergall
  */
 public class GoogleRoadManager extends RoadManager {
-	
+
 	static final String GOOGLE_DIRECTIONS_SERVICE = "http://maps.googleapis.com/maps/api/directions/xml?";
-	
-	/**
+
+	public GoogleRoadManager() {
+		super();
+  }
+
+  /**
 	 * Build the URL to Google Directions service returning a route in XML format
 	 */
 	protected String getUrl(ArrayList<GeoPoint> waypoints, boolean getAlternates) {
@@ -122,7 +126,7 @@ public class GoogleRoadManager extends RoadManager {
 }
 
 class GoogleDirectionsHandler extends DefaultHandler {
-	ArrayList<Road> mRoads;
+  ArrayList<Road> mRoads;
 	Road mCurrentRoad;
 	RoadLeg mLeg;
 	RoadNode mNode;
@@ -131,10 +135,10 @@ class GoogleDirectionsHandler extends DefaultHandler {
 	double mLat, mLng;
 	double mNorth, mWest, mSouth, mEast;
 	private StringBuilder mStringBuilder = new StringBuilder(1024);
-	
+
 	public GoogleDirectionsHandler() {
 		isOverviewPolyline = isBB = isPolyline = isLeg = isStep = isDuration = isDistance = false;
-		mRoads = new ArrayList<Road>();
+		mRoads = new ArrayList<>();
 	}
 
 	public void startElement(String uri, String localName, String name,
@@ -169,7 +173,7 @@ class GoogleDirectionsHandler extends DefaultHandler {
 			throws SAXException {
 		mStringBuilder.append(ch, start, length);
 	}
-	
+
 	public void endElement(String uri, String localName, String name)
 			throws SAXException {
 		if (localName.equals("points")) {

@@ -1,15 +1,17 @@
 package org.osmdroid.bonuspack.routing;
 
-import java.util.ArrayList;
+import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
 
+import org.osmdroid.bonuspack.R;
 import org.osmdroid.bonuspack.utils.BonusPackHelper;
 import org.osmdroid.bonuspack.utils.DouglasPeuckerReducer;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
+import java.util.ArrayList;
 
 
 /** describes the way to go from a position to an other. 
@@ -21,11 +23,11 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class Road  implements Parcelable {
-	/** 
-	 * STATUS_OK = road properly retrieved and built. 
-	 * STATUS_INVALID = road has not been built yet. 
-	 * STATUS_TECHNICAL_ISSUE = technical issue, no answer from the service provider. 
-	 * All other values: functional errors/issues, depending on the service provider. 
+  /**
+	 * STATUS_OK = road properly retrieved and built.
+	 * STATUS_INVALID = road has not been built yet.
+	 * STATUS_TECHNICAL_ISSUE = technical issue, no answer from the service provider.
+	 * All other values: functional errors/issues, depending on the service provider.
 	 * */
 	public int mStatus;
 
@@ -52,14 +54,14 @@ public class Road  implements Parcelable {
 		mStatus = STATUS_INVALID;
 		mLength = 0.0;
 		mDuration = 0.0;
-		mNodes = new ArrayList<RoadNode>();
-		mRouteHigh = new ArrayList<GeoPoint>();
+		mNodes = new ArrayList<>();
+		mRouteHigh = new ArrayList<>();
 		mRouteLow = null;
-		mLegs = new ArrayList<RoadLeg>();
+		mLegs = new ArrayList<>();
 		mBoundingBox = null;
 	}
-	
-	public Road(){
+
+	public Road() {
 		init();
 	}
 	
@@ -104,27 +106,27 @@ public class Road  implements Parcelable {
 	 * @param duration in sec
 	 * @return a human-readable length&duration text. 
 	 */
-	public static String getLengthDurationText(double length, double duration){
+	public static String getLengthDurationText(Context context, double length, double duration) {
 		String result;
-		if (length >= 100.0){
-			result = (int)(length) + "km, ";
-		} else if (length >= 1.0){
-			result = Math.round(length*10)/10.0 + "km, ";
+		if (length >= 100.0) {
+			result = context.getString(R.string.osmbonuspack_format_distance_kilometers, (int) (length)) + ", ";
+		} else if (length >= 1.0) {
+			result = context.getString(R.string.osmbonuspack_format_distance_kilometers, Math.round(length * 10) / 10.0) + ", ";
 		} else {
-			result = (int)(length*1000) + "m, ";
+			result = context.getString(R.string.osmbonuspack_format_distance_meters, (int) (length * 1000)) + ", ";
 		}
 		int totalSeconds = (int)duration;
 		int hours = totalSeconds / 3600;
 		int minutes = (totalSeconds / 60) - (hours*60);
 		int seconds = (totalSeconds % 60);
-		if (hours != 0){
-			result += hours + "h ";
+		if (hours != 0) {
+			result += context.getString(R.string.osmbonuspack_format_hours, hours) + " ";
 		}
-		if (minutes != 0){
-			result += minutes + "min ";
+		if (minutes != 0) {
+			result += context.getString(R.string.osmbonuspack_format_minutes, minutes) + " ";
 		}
 		if (hours == 0 && minutes == 0){
-			result += seconds + "sec";
+			result += context.getString(R.string.osmbonuspack_format_seconds, seconds);
 		}
 		return result;
 	}
@@ -134,10 +136,10 @@ public class Road  implements Parcelable {
 	 * as a String, in a readable format. 
 	 * @param leg leg index, starting from 0. -1 for the whole road
 	 */
-	public String getLengthDurationText(int leg){
+	public String getLengthDurationText(Context context, int leg) {
 		double length = (leg == -1 ? mLength : mLegs.get(leg).mLength);
 		double duration = (leg == -1 ? mDuration : mLegs.get(leg).mDuration);
-		return getLengthDurationText(length, duration);
+		return getLengthDurationText(context, length, duration);
 	}
 	
 	protected double distanceLLSquared(GeoPoint p1, GeoPoint p2){

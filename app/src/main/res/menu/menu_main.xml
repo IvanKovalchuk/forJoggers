@@ -22,12 +22,6 @@
             app:showAsAction="ifRoom"/>
 
 
-    <item android:id="@+id/action_show_my_location"
-          android:title="@string/action_show_my_location"
-          android:icon="@drawable/ic_action_location_found"
-          android:orderInCategory="100"
-          app:showAsAction="ifRoom"/>
-
     <item android:id="@+id/action_show_my_track"
           android:title="@string/action_show_track"
           android:icon="@drawable/ic_action_place"

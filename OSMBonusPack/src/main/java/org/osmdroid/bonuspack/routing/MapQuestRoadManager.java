@@ -1,9 +1,7 @@
 package org.osmdroid.bonuspack.routing;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import android.util.Log;
+
 import org.osmdroid.bonuspack.utils.BonusPackHelper;
 import org.osmdroid.bonuspack.utils.HttpConnection;
 import org.osmdroid.bonuspack.utils.PolylineEncoder;
@@ -12,10 +10,15 @@ import org.osmdroid.util.GeoPoint;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import android.util.Log;
 
-/** class to get a route between a start and a destination point, going through a list of waypoints. 
- * 
+import java.io.InputStream;
+import java.util.ArrayList;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+/** class to get a route between a start and a destination point, going through a list of waypoints.
+ *
  * It uses MapQuest open, public and free API, based on OpenStreetMap data. <br>
  * Return a "Road" object. 
  * @see Road
@@ -31,7 +34,7 @@ public class MapQuestRoadManager extends RoadManager {
 	 * @param apiKey MapQuest API key, mandatory to use the MapQuest Open service. 
 	 * @see <a href="http://developer.mapquest.com">MapQuest API</a> for registration. 
 	 */
-	public MapQuestRoadManager(String apiKey){
+	public MapQuestRoadManager(String apiKey) {
 		super();
 		mApiKey = apiKey;
 	}
@@ -196,15 +199,15 @@ class MapQuestGuidanceHandler extends DefaultHandler {
 	double mNorth, mWest, mSouth, mEast;
 	RoadLink mLink;
 	RoadNode mNode;
-	
+
 	public MapQuestGuidanceHandler() {
 		isBB = isGuidanceNodeCollection = false;
 		mRoad = new Road();
-		mLinks = new ArrayList<RoadLink>();
+		mLinks = new ArrayList<>();
 	}
 
 	@Override public void startElement(String uri, String localName, String name,
-			Attributes attributes) throws SAXException {		
+			Attributes attributes) throws SAXException {
 		if (localName.equals("boundingBox"))
 			isBB = true;
 		else if (localName.equals("link"))

@@ -39,7 +39,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
-//import org.osmdroid.bonuspack.overlays.Polyline;
 
 
 public class MapFragment extends Fragment

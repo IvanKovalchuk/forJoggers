@@ -1,1 +1,1 @@
-include ':app', ':dialogLib', ':OSMBonusPack', ':GraphView'
+include ':app', ':dialogLib', ':GraphView', ':OSMBonusPack'

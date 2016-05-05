@@ -4,8 +4,6 @@ import android.content.Context;
 import android.location.Location;
 import android.os.SystemClock;
 
-import com.kivsw.forjoggers.helper.GPSLocationListener;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +12,6 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -104,7 +101,7 @@ public class RxGps {
 
         if(gpsObservableSubscription!=null) gpsObservableSubscription.unsubscribe();
 
-        Observable o=Observable.interval(300, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+        Observable o=Observable.interval(250, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .map(new Func1<Long,Location>() {
                     @Override
                     public Location call(Long i) {

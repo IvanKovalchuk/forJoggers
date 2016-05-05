@@ -2,6 +2,7 @@ package org.osmdroid.bonuspack.kml;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import java.io.IOException;
 import java.io.Writer;
 
@@ -90,6 +91,18 @@ public class HotSpot implements Parcelable {
         out.writeInt(mXUnits.ordinal());
         out.writeInt(mYUnits.ordinal());
     }
+
+    public static final Creator<HotSpot> CREATOR = new Creator<HotSpot>() {
+        @Override
+        public HotSpot createFromParcel(Parcel in) {
+            return new HotSpot(in);
+        }
+
+        @Override
+        public HotSpot[] newArray(int size) {
+            return new HotSpot[size];
+        }
+    };
 
     public HotSpot(Parcel in){
         mx = in.readFloat();

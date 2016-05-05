@@ -1,12 +1,9 @@
 package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import org.osmdroid.ResourceProxy;
-import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.views.MapView;
 
 /**
@@ -14,7 +11,7 @@ import org.osmdroid.views.MapView;
  */
 public class MapViewEnvelope extends MapView {
 
-    protected MapViewEnvelope(final Context context, final int tileSizePixels,
+    /*protected MapViewEnvelope(final Context context, final int tileSizePixels,
                       final ResourceProxy resourceProxy, MapTileProviderBase tileProvider,
                       final Handler tileRequestCompleteHandler, final AttributeSet attrs) {
         super (context, tileSizePixels,
@@ -45,7 +42,11 @@ public class MapViewEnvelope extends MapView {
                    final Handler tileRequestCompleteHandler)
     {
         super(context,tileSizePixels,resourceProxy, aTileProvider, tileRequestCompleteHandler);
-    };
+    };*/
+
+    public MapViewEnvelope(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
+    }
 
 
     int touchCount=0;

@@ -177,6 +177,10 @@ public class DataModel implements UsingCounter.IUsingChanged{
         .subscribe(subject);
 
     };
+
+    /**
+     * informs the View about new data in the current track
+     */
     private void initCurrentTrackUpdating()
     {
         currentTrack.getObservable()
@@ -226,6 +230,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
             @Override
             public void onNext(Location location) {
+
                 currentTrack.addPoint(location);
 
             }
@@ -238,7 +243,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
                         return true;
                     }
                 })
-                .observeOn(Schedulers.computation())
+                //.observeOn(Schedulers.computation())
                 .subscribe(trackingSubscriber);
 
 

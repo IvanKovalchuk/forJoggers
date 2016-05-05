@@ -132,7 +132,7 @@ implements  FileDialog.OnCloseListener,
      {
 
          boolean isTracking = presenter.isTracking();
-         MenuItem item=menu.findItem(R.id.action_show_my_location);
+         MenuItem item;//=menu.findItem(R.id.action_show_my_location);
 
          item=menu.findItem(R.id.action_load_track);
          item.setEnabled(!isTracking);

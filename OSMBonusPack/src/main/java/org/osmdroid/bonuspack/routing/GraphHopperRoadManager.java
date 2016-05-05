@@ -1,7 +1,7 @@
 package org.osmdroid.bonuspack.routing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,7 +9,9 @@ import org.osmdroid.bonuspack.utils.BonusPackHelper;
 import org.osmdroid.bonuspack.utils.PolylineEncoder;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
-import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /** get a route between a start and a destination point, going through a list of waypoints.
  * It uses GraphHopper, an open source routing service based on OpenSteetMap data. <br>
@@ -45,10 +47,10 @@ public class GraphHopperRoadManager extends RoadManager {
 	}
 	
 	/**
-	 * @param apiKey GraphHopper API key, mandatory to use the public GraphHopper service. 
-	 * @see <a href="http://graphhopper.com/#enterprise">GraphHopper</a> to obtain an API key. 
+	 * @param apiKey GraphHopper API key, mandatory to use the public GraphHopper service.
+	 * @see <a href="http://graphhopper.com/#enterprise">GraphHopper</a> to obtain an API key.
 	 */
-	public GraphHopperRoadManager(String apiKey){
+	public GraphHopperRoadManager(String apiKey) {
 		super();
 		mServiceUrl = SERVICE;
 		mKey = apiKey;
