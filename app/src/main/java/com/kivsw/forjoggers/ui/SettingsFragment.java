@@ -16,6 +16,9 @@ import android.widget.Spinner;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  *  This class is the UI for settings
  */
@@ -29,15 +32,16 @@ implements CustomPagerView.IonPageAppear
     {
         void onSettingsChanged();
     }*/
-    CheckBox keepInBackgroundCheckBox;
-    EditText weightEditText;
+    CheckBox keepInBackgroundCheckBox,autoStopCheckBox;
+    EditText weightEditText, autoStopValueEditText;
     Spinner weightUnitsSpinner,
             currentActivitySpinner,
             defaultActivitySpinner,
 
             distanceUnitsSpinner,
             speedDUnitsSpinner,
-            speedTUnitsSpinner;
+            speedTUnitsSpinner,
+                    autoStopUnitSpinner;
 
 
     SettingsFragmentPresenter presenter;
@@ -102,6 +106,19 @@ implements CustomPagerView.IonPageAppear
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         speedTUnitsSpinner.setAdapter(adapter);
 
+
+        autoStopCheckBox = (CheckBox)rootView.findViewById(R.id.autoStopCheckBox);
+        autoStopValueEditText = (EditText)rootView.findViewById(R.id.autoStopValueEditText);
+        autoStopValueEditText.addTextChangedListener(new AutoStopValueWatcher());
+
+        autoStopUnitSpinner=(Spinner)rootView.findViewById(R.id.autoStopUnitSpinner);
+        ArrayList<String> autostopUnits=new ArrayList(6);
+        autostopUnits.addAll(Arrays.asList(getResources().getStringArray(R.array.time_unit_plural)));
+        autostopUnits.addAll(Arrays.asList(getResources().getStringArray(R.array.distance_unit)));
+        adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item,autostopUnits);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        autoStopUnitSpinner.setAdapter(adapter);
+
        // getDialog().setTitle(getText(R.string.Settings));
 
         loadData();
@@ -158,6 +175,26 @@ implements CustomPagerView.IonPageAppear
         distanceUnitsSpinner.setSelection(settings.getDistanceUnit());
         speedDUnitsSpinner.setSelection(settings.getSpeedUnitDistance());
         speedTUnitsSpinner.setSelection(settings.getSpeedUnitTime());
+
+
+        if(settings.getAutoStopDistance())
+        {
+            autoStopCheckBox.setChecked(true);
+            autoStopValueEditText.setText(String.valueOf(settings.getAutoStopDistanceValue()));
+            autoStopUnitSpinner.setSelection(3+settings.getAutoStopTimeUnit());
+        }
+        else
+        if(settings.getAutoStopTime())
+        {
+            autoStopCheckBox.setChecked(true);
+            autoStopValueEditText.setText(String.valueOf(settings.getAutoStopTimeValue()));
+            autoStopUnitSpinner.setSelection(settings.getAutoStopDistanceUnit());
+        }
+        else {
+            autoStopCheckBox.setChecked(false);
+            autoStopValueEditText.setText("");
+            autoStopUnitSpinner.setSelection(-1);
+        }
     }
     private void saveData()
     {
@@ -214,6 +251,29 @@ implements CustomPagerView.IonPageAppear
                 weightEditText.setError(getText(R.string.Incorrect_value));
             } else
                 weightEditText.setError(null);
+
+        }
+    }
+    class AutoStopValueWatcher implements TextWatcher {
+        //TextWatcher
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            long v = -1;
+            try {
+                v = Long.parseLong(s.toString());
+            } catch (Exception e) {
+            }
+            ;
+            if ((v < 0 || v > 99999) && autoStopCheckBox.isChecked()) {
+                autoStopValueEditText.setError(getText(R.string.Incorrect_value));
+            } else
+                autoStopValueEditText.setError(null);
 
         }
     }

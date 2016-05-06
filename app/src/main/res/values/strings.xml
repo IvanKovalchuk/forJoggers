@@ -68,6 +68,11 @@
         <item>min</item>
         <item>h</item>
     </string-array>
+    <string-array name="time_unit_plural">
+        <item>seconds</item>
+        <item>minutes</item>
+        <item>hours</item>
+    </string-array>
 
     <string-array name="weight_unit">
         <item>kg</item>
@@ -75,6 +80,8 @@
     </string-array>
 
     <string name="Incorrect_value">Incorrect value!</string>
+
+    <string name="auto_stop">Auto stop</string>
 
     <!-- MENU -->
     <string name="action_settings">Settings</string>

@@ -66,6 +66,11 @@
         <item>мин</item>
         <item>ч</item>
     </string-array>
+    <string-array name="time_unit_plural">
+        <item>секунды</item>
+        <item>минуты</item>
+        <item>часы</item>
+    </string-array>
 
     <string-array name="weight_unit">
         <item>кг</item>
@@ -73,6 +78,8 @@
     </string-array>
 
     <string name="Incorrect_value">Некорректное значение!</string>
+
+    <string name="auto_stop">Автоматически останавливать</string>
 
     <!-- MENU -->
     <string name="action_settings">Настройки</string>
