@@ -18,6 +18,7 @@ import com.kivsw.forjoggers.helper.SettingsKeeper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  *  This class is the UI for settings
@@ -183,7 +184,8 @@ implements CustomPagerView.IonPageAppear
 
         // auto stop
         autoStopDistanceCheckBox.setChecked(settings.getAutoStopDistance());
-        autoStopDistanceValueEditText.setText(String.format("%.1f",settings.getAutoStopDistanceValue()));
+        //autoStopDistanceValueEditText.setText(String.format("%.1f",settings.getAutoStopDistanceValue()));
+        autoStopDistanceValueEditText.setText(  String.format(Locale.US,"%.1f",settings.getAutoStopDistanceValue()));
         autoStopDistanceUnitSpinner.setSelection(settings.getAutoStopTimeUnit());
 
         // auto stop
@@ -273,9 +275,8 @@ implements CustomPagerView.IonPageAppear
             try {
                 v = Double.parseDouble(s.toString());
             } catch (Exception e) {
-            }
-            ;
-            if ((v < 0 || v > 99999) && autoStopDistanceCheckBox.isChecked()) {
+            } ;
+            if ((v < 0 || v > 99999) ) {
                 autoStopDistanceValueEditText.setError(getText(R.string.Incorrect_value));
             } else
                 autoStopDistanceValueEditText.setError(null);
@@ -297,9 +298,8 @@ implements CustomPagerView.IonPageAppear
             try {
                 v = Long.parseLong(s.toString());
             } catch (Exception e) {
-            }
-            ;
-            if ((v < 0 || v > 99999) && autoStopTimeCheckBox.isChecked()) {
+            } ;
+            if ((v < 0 || v > 99999)) {
                 autoStopTimeValueEditText.setError(getText(R.string.Incorrect_value));
             } else
                 autoStopTimeValueEditText.setError(null);
