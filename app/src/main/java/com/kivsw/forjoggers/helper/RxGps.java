@@ -42,7 +42,6 @@ public class RxGps {
             coreGpsObservable = Observable.create(new Observable.OnSubscribe<Location>() {
                 @Override
                 public void call(Subscriber<? super Location> subscriber) {
-
                     gpsListener.setSubscriber(subscriber);
                 }
             })

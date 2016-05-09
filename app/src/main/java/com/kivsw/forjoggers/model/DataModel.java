@@ -13,10 +13,14 @@ import com.kivsw.forjoggers.ui.MapFragmentPresenter;
 import com.kivsw.forjoggers.ui.TrackingServicePresenter;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
+import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Action2;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -49,6 +53,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
     private volatile boolean isTrackSmoothing=false;
     private TrackSmoother trackSmoother=null;
     Subscriber trackingSubscriber=null;
+    Subscription autostopSubscription=null;
 
 
     private DataModel(Context context)
@@ -212,6 +217,8 @@ public class DataModel implements UsingCounter.IUsingChanged{
      */
     public void startTracking()
     {
+        if(isTracking) return;
+
         TrackingServicePresenter.getInstance(context).startTracking();
 
         trackSmoother=null;
@@ -247,6 +254,16 @@ public class DataModel implements UsingCounter.IUsingChanged{
                 .subscribe(trackingSubscriber);
 
 
+        // for autostop option
+        autostopSubscription= Observable.interval(1000, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        checkAutoStop();
+                    }
+                });
+
+        // updates all the views
         doUpdateCurrentTrackView();
         doUpdateCurrentSmoothTrackView();
         doUpdateFileNameView();
@@ -258,19 +275,26 @@ public class DataModel implements UsingCounter.IUsingChanged{
      */
     public void stopTracking()
     {
+        if(!isTracking) return;
+
         TrackingServicePresenter.getInstance(context).endTracking();
         trackingSubscriber.unsubscribe();
         trackingSubscriber=null;
+
+        autostopSubscription.unsubscribe();
+        autostopSubscription=null;
+
         currentTrack.timeStop= SystemClock.elapsedRealtime();
 
         saveTrack(getTempFileName());
-        /*currentTrack.saveGeoPoint(getTempFileName()); // save file synchronously
-        settings.setCurrentFileName("");*/
         isTracking = false;
+
+        MapFragmentPresenter.getInstance(context).onAfterStopTracking();
+
     };
 
     /**
-     * Load track from file
+     * Save track to a file
      */
     public boolean saveTrack(String fileName)
     {
@@ -344,6 +368,26 @@ public class DataModel implements UsingCounter.IUsingChanged{
         MapFragmentPresenter.getInstance(context).updateFileName();
     }
 
+    /**
+     * check whether we should stop tracking right now
+     *  and stop it if it's necessary
+     */
+    private void checkAutoStop()
+    {
+        Track track=trackSmoother;
+
+        if(track!=null && settings.getAutoStopDistance())
+        {
+            if(track.getTrackDistance() > settings.getAutoStopDistanceMeters())
+                stopTracking();
+        }
+
+        if(settings.getAutoStopTime())
+        {
+            if(currentTrack.getTrackTime()>(settings.getAutoStopTimeSeconds()*1000))
+                stopTracking();
+        }
+    }
     /**
      * is invoked when the user has changes the settings
      */

@@ -297,7 +297,7 @@ implements
         ArrayList<Location> points = trackSmoother.getGeoPoints();
 
         double distance = trackSmoother.getTrackDistance();
-        double time = trackSmoother.getTrackTime(false) / 1000.0;
+        double time = trackSmoother.getTrackPointsTime() / 1000.0;
 
         str.append(getText(R.string.distance));
         str.append(unitUtils.distanceToStr(distance));
@@ -309,7 +309,7 @@ implements
         str.append("\n");
 
         str.append(getText(R.string.time));
-        str.append(trackSmoother.getTrackTimeStr(true));
+        str.append(trackSmoother.getTrackTimeStr());
         str.append("\n");
 
         String energy = getCalloriesStr(trackSmoother);

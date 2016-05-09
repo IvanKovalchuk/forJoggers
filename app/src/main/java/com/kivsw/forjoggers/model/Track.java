@@ -287,34 +287,48 @@ public class Track {
         return false;
     }*/
 
-    public long getTrackTime(boolean totalTime)
+    /**
+     * get the track's duration out of its points
+     * @return
+     */
+    public long getTrackPointsTime()
     {
         long t;
-        if(((timeStart==0) && (timeStop==0)) || !totalTime) {
-            int s = mGeoPoints.size();
-            if (s < 2) return 0;
-            Location firstLoc = mGeoPoints.get(0),
-                    lastLoc = mGeoPoints.get(s - 1);
+        int s = mGeoPoints.size(); // get track duration out of its points
+        if (s < 2) return 0;
+        Location firstLoc = mGeoPoints.get(0),
+                lastLoc = mGeoPoints.get(s - 1);
 
-            t = lastLoc.getTime() - firstLoc.getTime();
+        t = lastLoc.getTime() - firstLoc.getTime();
 
+        return t;
+    };
+    public long getTrackTime()
+    {
+        long t;
+        if( ((timeStart==0) && (timeStop==0))) {
+            t = getTrackPointsTime();
         }
         else if((timeStart!=0) &&(timeStop==0))
-           t= SystemClock.elapsedRealtime()-timeStart;
+           t= SystemClock.elapsedRealtime()-timeStart; // when the track is still being recorded
         else
-           t=timeStop-timeStart;
+           t=timeStop-timeStart;  // when the track is finished
         return t;
 
     };
 
-    public String getTrackTimeStr(boolean totalTime)
+    public String getTrackTimeStr()
     {
-        long t=getTrackTime(totalTime);
+        long t=getTrackTime();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         sdf.setTimeZone(new SimpleTimeZone(0, ""));
         return sdf.format(new Date(t));
     }
 
+    /**
+     *
+     * @return the track length in meters
+     */
     public double getTrackDistance()
     {
         Location prevLoc=null;

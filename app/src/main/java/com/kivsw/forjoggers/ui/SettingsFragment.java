@@ -32,8 +32,8 @@ implements CustomPagerView.IonPageAppear
     {
         void onSettingsChanged();
     }*/
-    CheckBox keepInBackgroundCheckBox,autoStopCheckBox;
-    EditText weightEditText, autoStopValueEditText;
+    CheckBox keepInBackgroundCheckBox,autoStopDistanceCheckBox,autoStopTimeCheckBox;
+    EditText weightEditText, autoStopDistanceValueEditText,autoStopTimeValueEditText;
     Spinner weightUnitsSpinner,
             currentActivitySpinner,
             defaultActivitySpinner,
@@ -41,7 +41,7 @@ implements CustomPagerView.IonPageAppear
             distanceUnitsSpinner,
             speedDUnitsSpinner,
             speedTUnitsSpinner,
-                    autoStopUnitSpinner;
+                    autoStopDistanceUnitSpinner,autoStopTimeUnitSpinner;
 
 
     SettingsFragmentPresenter presenter;
@@ -107,19 +107,23 @@ implements CustomPagerView.IonPageAppear
         speedTUnitsSpinner.setAdapter(adapter);
 
 
-        autoStopCheckBox = (CheckBox)rootView.findViewById(R.id.autoStopCheckBox);
-        autoStopValueEditText = (EditText)rootView.findViewById(R.id.autoStopValueEditText);
-        autoStopValueEditText.addTextChangedListener(new AutoStopValueWatcher());
+        autoStopDistanceCheckBox = (CheckBox)rootView.findViewById(R.id.autoStopDistanceCheckBox);
+        autoStopDistanceValueEditText = (EditText)rootView.findViewById(R.id.autoStopDistanceValueEditText);
+        autoStopDistanceValueEditText.addTextChangedListener(new AutoStopDistanceValueWatcher());
 
-        autoStopUnitSpinner=(Spinner)rootView.findViewById(R.id.autoStopUnitSpinner);
-        ArrayList<String> autostopUnits=new ArrayList(6);
-        autostopUnits.addAll(Arrays.asList(getResources().getStringArray(R.array.time_unit_plural)));
-        autostopUnits.addAll(Arrays.asList(getResources().getStringArray(R.array.distance_unit)));
-        adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item,autostopUnits);
+        autoStopDistanceUnitSpinner=(Spinner)rootView.findViewById(R.id.autoStopDistanceUnitSpinner);
+        adapter =  ArrayAdapter.createFromResource(getContext(), R.array.distance_unit,android.R.layout.simple_spinner_item );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        autoStopUnitSpinner.setAdapter(adapter);
+        autoStopDistanceUnitSpinner.setAdapter(adapter);
 
-       // getDialog().setTitle(getText(R.string.Settings));
+        autoStopTimeCheckBox = (CheckBox)rootView.findViewById(R.id.autoStopTimeCheckBox);
+        autoStopTimeValueEditText = (EditText)rootView.findViewById(R.id.autoStopTimeValueEditText);
+        autoStopTimeValueEditText.addTextChangedListener(new AutoStopTimeValueWatcher());
+
+        autoStopTimeUnitSpinner=(Spinner)rootView.findViewById(R.id.autoStopTimeUnitSpinner);
+        adapter =  ArrayAdapter.createFromResource(getContext(), R.array.time_unit_plural,android.R.layout.simple_spinner_item );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        autoStopTimeUnitSpinner.setAdapter(adapter);
 
         loadData();
         return rootView;
@@ -177,24 +181,17 @@ implements CustomPagerView.IonPageAppear
         speedTUnitsSpinner.setSelection(settings.getSpeedUnitTime());
 
 
-        if(settings.getAutoStopDistance())
-        {
-            autoStopCheckBox.setChecked(true);
-            autoStopValueEditText.setText(String.valueOf(settings.getAutoStopDistanceValue()));
-            autoStopUnitSpinner.setSelection(3+settings.getAutoStopTimeUnit());
-        }
-        else
-        if(settings.getAutoStopTime())
-        {
-            autoStopCheckBox.setChecked(true);
-            autoStopValueEditText.setText(String.valueOf(settings.getAutoStopTimeValue()));
-            autoStopUnitSpinner.setSelection(settings.getAutoStopDistanceUnit());
-        }
-        else {
-            autoStopCheckBox.setChecked(false);
-            autoStopValueEditText.setText("");
-            autoStopUnitSpinner.setSelection(-1);
-        }
+        // auto stop
+        autoStopDistanceCheckBox.setChecked(settings.getAutoStopDistance());
+        autoStopDistanceValueEditText.setText(String.format("%.1f",settings.getAutoStopDistanceValue()));
+        autoStopDistanceUnitSpinner.setSelection(settings.getAutoStopTimeUnit());
+
+        // auto stop
+        autoStopTimeCheckBox.setChecked(settings.getAutoStopTime());
+        autoStopTimeValueEditText.setText(String.valueOf(settings.getAutoStopTimeValue()));
+        autoStopTimeUnitSpinner.setSelection(settings.getAutoStopDistanceUnit());
+
+
     }
     private void saveData()
     {
@@ -212,6 +209,14 @@ implements CustomPagerView.IonPageAppear
         settings.setDistanceUnit(distanceUnitsSpinner.getSelectedItemPosition());
 
         settings.setSpeedUnit(speedDUnitsSpinner.getSelectedItemPosition(), speedTUnitsSpinner.getSelectedItemPosition());
+
+        settings.setAutoStopDistance(autoStopDistanceCheckBox.isChecked());
+        settings.setAutoStopDistanceUnit(autoStopDistanceUnitSpinner.getSelectedItemPosition());
+        settings.setAutoStopDistanceValue(Double.parseDouble(autoStopDistanceValueEditText.getText().toString()));
+
+        settings.setAutoStopTime(autoStopTimeCheckBox.isChecked());
+        settings.setAutoStopTimeUnit(autoStopTimeUnitSpinner.getSelectedItemPosition());
+        settings.setAutoStopTimeValue(Long.parseLong(autoStopTimeValueEditText.getText().toString()));
 
         // informs the others that we have new settings
         presenter.onSettingsChanged();
@@ -254,7 +259,31 @@ implements CustomPagerView.IonPageAppear
 
         }
     }
-    class AutoStopValueWatcher implements TextWatcher {
+    class AutoStopDistanceValueWatcher implements TextWatcher {
+        //TextWatcher
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            double v = -1;
+            try {
+                v = Double.parseDouble(s.toString());
+            } catch (Exception e) {
+            }
+            ;
+            if ((v < 0 || v > 99999) && autoStopDistanceCheckBox.isChecked()) {
+                autoStopDistanceValueEditText.setError(getText(R.string.Incorrect_value));
+            } else
+                autoStopDistanceValueEditText.setError(null);
+
+        }
+    }
+    //----------------------------------------------
+    class AutoStopTimeValueWatcher implements TextWatcher {
         //TextWatcher
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -270,11 +299,10 @@ implements CustomPagerView.IonPageAppear
             } catch (Exception e) {
             }
             ;
-            if ((v < 0 || v > 99999) && autoStopCheckBox.isChecked()) {
-                autoStopValueEditText.setError(getText(R.string.Incorrect_value));
+            if ((v < 0 || v > 99999) && autoStopTimeCheckBox.isChecked()) {
+                autoStopTimeValueEditText.setError(getText(R.string.Incorrect_value));
             } else
-                autoStopValueEditText.setError(null);
-
+                autoStopTimeValueEditText.setError(null);
         }
     }
     //----------------------------------------------

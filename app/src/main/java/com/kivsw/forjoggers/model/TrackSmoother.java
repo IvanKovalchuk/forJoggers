@@ -33,10 +33,16 @@ public abstract class TrackSmoother extends Track
         return newTrack.getGeoPoints().size()!=track.getGeoPoints().size();
     }
     @Override
-    public long getTrackTime(boolean totalTime)
+    public long getTrackPointsTime()
     {
         if(track==null) return 0;
-        return track.getTrackTime(totalTime);
+        return track.getTrackPointsTime();
+    };
+    @Override
+    public long getTrackTime()
+    {
+        if(track==null) return 0;
+        return track.getTrackTime();
     };
 
     @Override

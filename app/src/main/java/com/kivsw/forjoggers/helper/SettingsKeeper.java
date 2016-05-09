@@ -225,7 +225,7 @@ public class SettingsKeeper {
         long v=sharedPreferences.getLong("autoStopDistanceValue", 0);
         return Double.longBitsToDouble(v);
     };
-    double getAutoStopDistanceMeters()
+    public double getAutoStopDistanceMeters()
     {
         double v=getAutoStopDistanceValue();
         switch(getAutoStopDistanceUnit())
@@ -241,7 +241,7 @@ public class SettingsKeeper {
         }
         return v;
     }
-    public void setAutoStopDistanceValue(double v, int type)
+    public void setAutoStopDistanceValue(double v)
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         long vl= Double.doubleToLongBits(v);
@@ -272,10 +272,10 @@ public class SettingsKeeper {
         e.commit();
     }
 
-    public void setAutoStopTimeValue(long v, int type)
+    public void setAutoStopTimeValue(long v)
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
-        e.putLong("autoStopDistanceValue", v);
+        e.putLong("autoStopTimeValue", v);
         e.commit();
     }
     public  long getAutoStopTimeValue()
