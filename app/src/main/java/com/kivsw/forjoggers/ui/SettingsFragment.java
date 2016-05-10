@@ -16,8 +16,6 @@ import android.widget.Spinner;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -174,7 +172,7 @@ implements CustomPagerView.IonPageAppear
         weightEditText.setText(String.valueOf(settings.getMyWeight()));
         weightUnitsSpinner.setSelection(settings.getMyWeightUnit());
 
-       // currentActivitySpinner.setSelection(CurrentTrack.getInstance(getActivity()).activityType);
+        currentActivitySpinner.setSelection(presenter.getCurrentTrack().getActivityType());
         defaultActivitySpinner.setSelection(settings.getActivityType());
 
         distanceUnitsSpinner.setSelection(settings.getDistanceUnit());

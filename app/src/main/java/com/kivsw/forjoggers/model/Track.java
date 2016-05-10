@@ -101,30 +101,6 @@ public class Track {
                 onChange.onAddPoint();
         return r;
 
-        /*try {
-            File file = new File(fileName);
-
-            StringBuilder data=new StringBuilder();
-            long totalsize=file.length();
-            int s;
-            char buff[]= new char[8*1024];
-            FileReader reader = new FileReader(fileName);
-            while(data.length()<totalsize) {
-                s = reader.read(buff);
-                if(s<=0) break;
-                data.append(buff,0,s);
-            };
-            reader.close();
-
-            fromJSON(data.toString());
-
-        }catch(Exception e)
-        {
-            return false;
-        }
-
-
-        return true;*/
     };
     String toGPX()
     {

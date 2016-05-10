@@ -28,8 +28,14 @@ public class MapViewEnvelope extends MapView {
 
     @Override
     public boolean dispatchTouchEvent(final MotionEvent event) {
-        if(event.getAction()==MotionEvent.ACTION_DOWN) touchCount++;
-        else if(event.getAction()==MotionEvent.ACTION_UP ) touchCount--;
+        if(event.getAction()==MotionEvent.ACTION_DOWN)
+            touchCount++;
+        else if(event.getAction()==MotionEvent.ACTION_UP )
+            touchCount--;
+        else if(event.getAction()==MotionEvent.ACTION_CANCEL )
+            touchCount=0;
+
+        if(touchCount<0) touchCount=0;
 
         return super.dispatchTouchEvent(event);
     }
