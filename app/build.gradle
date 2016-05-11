@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.kivsw.forjoggers"
         minSdkVersion 10
-        targetSdkVersion 23
+        targetSdkVersion 15
         versionCode 2
         versionName '1.0.1'
     }
@@ -30,15 +30,12 @@ dependencies {
     compile project(':GraphView')
     //compile 'org.slf4j:slf4j-simple:1.6.1'
     //compile 'org.osmdroid:osmdroid-android:4.3'
-
     compile 'org.osmdroid:osmdroid-android:5.1@aar'
     //compile(name:'osmbonuspack_v5.7', ext:'aar')
     //compile 'org.osmdroid:osmdroid-android:5.1@aar'
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.squareup.okhttp:okhttp:2.6.0'
-
-
     compile 'com.android.support:design:23.3.0'
     compile 'com.android.support:support-v4:23.3.0'
     compile 'com.android.support:appcompat-v7:23.3.0'

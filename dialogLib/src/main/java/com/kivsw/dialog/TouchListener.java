@@ -8,21 +8,21 @@ package com.kivsw.dialog;
 
 import android.content.Context;
 import android.os.SystemClock;
-//import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-//import android.widget.TextView;
-import android.view.Display;
+import android.view.ViewConfiguration;
 import android.view.WindowManager;
 
-//import java.util.Collection;
-//import java.util.HashMap;
-import java.lang.Math;
 import java.util.EnumSet;
 import java.util.Set;
-import android.view.ViewConfiguration;
+
+//import android.graphics.Point;
+//import android.widget.TextView;
+//import java.util.Collection;
+//import java.util.HashMap;
 
 public class TouchListener implements  android.view.View.OnTouchListener
 {
@@ -41,7 +41,7 @@ public class TouchListener implements  android.view.View.OnTouchListener
 	
 	boolean isGestureEnd=true; // true if the current gesture is finished
 	public enum Gesture {gRotation, gPinch, gHSwipe, gVSwipe, gTap, gLongTap, gDoubleTap}; // all recognized gestures
-	EnumSet<Gesture> setGestures=null; // set holds the recognized gestures
+	EnumSet<Gesture> gesturesSet =null; // set holds the recognized gestures
 	
 	long previousTapTime=0;            // hold the time of previous Tap event
 	View previousTapedView=null;       // hold view that has been taped
@@ -59,7 +59,7 @@ public class TouchListener implements  android.view.View.OnTouchListener
 		this.context = context;
 		pointers = new SparseArray<Pointer>();
 		diaplayMetrics = new DisplayMetrics();
-		setGestures=EnumSet.noneOf(Gesture.class);
+		gesturesSet =EnumSet.noneOf(Gesture.class);
 		
 
 		
@@ -76,7 +76,7 @@ public class TouchListener implements  android.view.View.OnTouchListener
 		{ // clear old data
 			pointers.clear(); 
 			isGestureEnd = false;
-			setGestures.clear(); // clear flags of the recognizable gestures  
+			gesturesSet.clear(); // clear flags of the recognizable gestures
 			Display display = 
 						((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
             display.getMetrics (diaplayMetrics);
@@ -180,36 +180,36 @@ public class TouchListener implements  android.view.View.OnTouchListener
 	{
 		
 		// check the start of rotation
-		if(!setGestures.contains(Gesture.gRotation))
+		if(!gesturesSet.contains(Gesture.gRotation))
 		{
 			double angle = getRotationAngle();
 			if(angle<-rotateThreshold || angle>rotateThreshold)
-				setGestures.add(Gesture.gRotation);
+				gesturesSet.add(Gesture.gRotation);
 		}
 		// check the start of zooming
-		if(!setGestures.contains(Gesture.gPinch))
+		if(!gesturesSet.contains(Gesture.gPinch))
 		{
 			double zoom = getZoom();
 			if(zoom<1-zoomingThreshold || zoom>1+zoomingThreshold)
-				setGestures.add(Gesture.gPinch);
+				gesturesSet.add(Gesture.gPinch);
 		}
 		
 		// check the start of sweeping up/down
-		if(!setGestures.contains(Gesture.gVSwipe))
+		if(!gesturesSet.contains(Gesture.gVSwipe))
 		{
 			double sweep = getVSwipe();
 			if(sweep>swipeThreshold || sweep < -swipeThreshold)
-				setGestures.add(Gesture.gVSwipe);
+				gesturesSet.add(Gesture.gVSwipe);
 		}
 		//check the start of sweeping left/right
-		if(!setGestures.contains(Gesture.gHSwipe))
+		if(!gesturesSet.contains(Gesture.gHSwipe))
 		{
 			double sweep = getHSwipe();
 			if(sweep>swipeThreshold || sweep < -swipeThreshold)
-				setGestures.add(Gesture.gHSwipe);
+				gesturesSet.add(Gesture.gHSwipe);
 		}
 		// recognize gTap, gLongTap and gDoubleTap
-		if(isGestureEnd && setGestures.isEmpty() 
+		if(isGestureEnd && gesturesSet.isEmpty()
 				&& pointers.size()==1) // if the gesture ended and there is not another gesture
 		{
 			
@@ -217,22 +217,22 @@ public class TouchListener implements  android.view.View.OnTouchListener
 			if( ((pointers.valueAt(0).t0-previousTapTime) <= ViewConfiguration.getDoubleTapTimeout())&& // check the time between the end of the previous tab and the start of the current tap
 			    (v==previousTapedView))
 			{
-				setGestures.add(Gesture.gDoubleTap);
+				gesturesSet.add(Gesture.gDoubleTap);
 			}
 
 		    if((pointers.valueAt(0).tcur-pointers.valueAt(0).t0)>=ViewConfiguration.getLongPressTimeout())
 		    {
-		    	setGestures.add(Gesture.gLongTap);
+		    	gesturesSet.add(Gesture.gLongTap);
 		    }
 
-		    if(setGestures.isEmpty())
-	    	    setGestures.add(Gesture.gTap);
+		    if(gesturesSet.isEmpty())
+	    	    gesturesSet.add(Gesture.gTap);
 	    	
 			previousTapTime = pointers.valueAt(0).tcur;
 			previousTapedView = v;
 		}
 		
-		onGesture(v,isGestureEnd, setGestures);
+		onGesture(v,isGestureEnd, gesturesSet);
 	};
 	//-----------------------------------------------------------------------------
 	// this method should be overridden

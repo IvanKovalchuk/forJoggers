@@ -82,6 +82,8 @@
     <string name="Incorrect_value">Incorrect value!</string>
 
     <string name="auto_stop">Auto stop</string>
+    <string name="tts_engine">TTS:</string>
+    <string name="defaultTTS">default</string>
 
     <!-- MENU -->
     <string name="action_settings">Settings</string>

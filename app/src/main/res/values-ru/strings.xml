@@ -80,6 +80,8 @@
     <string name="Incorrect_value">Некорректное значение!</string>
 
     <string name="auto_stop">Автоматически останавливать</string>
+    <string name="tts_engine">TTS:</string>
+    <string name="defaultTTS">по-умолчанию</string>
 
     <!-- MENU -->
     <string name="action_settings">Настройки</string>

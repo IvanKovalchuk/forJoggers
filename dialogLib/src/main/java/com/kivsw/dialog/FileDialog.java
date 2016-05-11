@@ -101,7 +101,12 @@ public class FileDialog extends BaseDialog
 	        View v = inflater.inflate(R.layout.filedialog, container, false);
 	        
 	        buttonOk = (Button)v.findViewById(R.id.dlFilebuttonOk);
+			buttonOk.setText(android.R.string.ok);
+			buttonOk.setOnClickListener(this);
 			buttonCancel = (Button)v.findViewById(R.id.dlFilebuttonCancel);
+			buttonCancel.setTag(android.R.string.cancel);
+			buttonCancel.setOnClickListener(this);
+
 			editPath = (TextView)v.findViewById(R.id.dlFileEditPath);
 			labelFile = (TextView)v.findViewById(R.id.dlTextView2);
 			editFile = (EditText)v.findViewById(R.id.dlFileEditFileName);
@@ -109,11 +114,7 @@ public class FileDialog extends BaseDialog
 			fileNameLayout = (LinearLayout)v;
 			
 			fileListView = (FileListView)v.findViewById(R.id.FileList);
-			
-			buttonOk.setOnClickListener(this);
-			buttonCancel.setOnClickListener(this);
 			fileListView.setOnCreateContextMenuListener(this);
-			
 			fileListView.setOnFileClick(this);
 			//fileListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 

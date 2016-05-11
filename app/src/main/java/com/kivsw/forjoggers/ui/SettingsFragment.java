@@ -1,7 +1,10 @@
 package com.kivsw.forjoggers.ui;
 
 import android.app.Activity;
+import android.content.pm.ApplicationInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,9 +16,12 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.kivsw.dialog.IconSpinnerAdapter;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.helper.Speaker;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -40,7 +46,8 @@ implements CustomPagerView.IonPageAppear
             distanceUnitsSpinner,
             speedDUnitsSpinner,
             speedTUnitsSpinner,
-                    autoStopDistanceUnitSpinner,autoStopTimeUnitSpinner;
+            autoStopDistanceUnitSpinner,autoStopTimeUnitSpinner,
+            ttsSpinner;
 
 
     SettingsFragmentPresenter presenter;
@@ -123,6 +130,9 @@ implements CustomPagerView.IonPageAppear
         adapter =  ArrayAdapter.createFromResource(getContext(), R.array.time_unit_plural,android.R.layout.simple_spinner_item );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         autoStopTimeUnitSpinner.setAdapter(adapter);
+
+        ttsSpinner=(Spinner)rootView.findViewById(R.id.ttsSpinner);
+        ttsSpinner.setAdapter(getTTS_Adapter());
 
         loadData();
         return rootView;
@@ -304,5 +314,53 @@ implements CustomPagerView.IonPageAppear
         }
     }
     //----------------------------------------------
+
+    IconSpinnerAdapter getTTS_Adapter()
+    {
+        Speaker speaker=new Speaker(getContext(),null);
+        List<TextToSpeech.EngineInfo> list=speaker.getEngines();
+        speaker.release();
+
+        Drawable icons[];
+        String names[];
+
+        if(list==null)
+        {
+            names=new String[1];
+            icons = null;
+        }
+        else
+        {
+            names=new String[1+list.size()];
+            icons = new Drawable[1+list.size()];
+
+            int i=1;
+            Drawable appIcon;
+            for(TextToSpeech.EngineInfo engineInfo:list)
+            {
+                appIcon=null;
+
+                try {
+                    ApplicationInfo appInfo = getContext().getPackageManager().getApplicationInfo(engineInfo.name, 0);
+                    appIcon = getContext().getPackageManager().getDrawable(engineInfo.name, engineInfo.icon, appInfo);
+                }catch(Exception e) {}
+
+                if(appIcon==null)
+                    try {
+                        appIcon = getContext().getPackageManager().getApplicationIcon(engineInfo.name);
+                    }catch (Exception ee) { }
+
+                names[i]=engineInfo.label;
+                icons[i]=appIcon;
+                i++;
+            }
+        }
+
+        names[0]=getText(R.string.defaultTTS).toString();
+        icons[0]=null;
+
+        return new IconSpinnerAdapter(getContext(),names,icons);
+
+    }
 
 }

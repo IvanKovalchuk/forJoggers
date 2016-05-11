@@ -1,18 +1,24 @@
 package com.kivsw.dialog;
-
-import com.kivsw.dialoglib.R;
-
+/**
+ * This class is a dialog (DialogFragment) that is meant to input a value
+ * this class is not reusable, so you should create a new instance when you need to show this dialog
+ */
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.view.View.OnClickListener;
+
+import com.kivsw.dialoglib.R;
 
 public class InputDialog extends BaseDialog 
 implements OnClickListener
@@ -20,7 +26,7 @@ implements OnClickListener
 	
 	public interface OnCloseListener  // interface allows to get result
 	{
-		void onClickOk(InputDialog dlg, String value, String initialValue);
+		void onClickOk(InputDialog dlg, String newValue, String initialValue);
 		void onClickCancel(InputDialog dlg);
 	};
 	
@@ -28,12 +34,18 @@ implements OnClickListener
 	Button okBtn,cancelBtn;
 	TextView textView;
 	EditText editText;
-	
-	//-------------------------------------------------------------
-	public static InputDialog newInstance(int dlgId, String title, String msg, String value, int inputType, final OnCloseListener listener)
+
+    public static InputDialog newInstance(int dlgId, String title, String msg, String value, int inputType, final OnCloseListener listener)
 	{
-		InputDialog Instance=new InputDialog();
-		Instance.setOnCloseListener(listener);
+        InputDialog instance=new InputDialog();
+        initNewInstance(instance,  dlgId,  title,  msg,  value,  inputType, listener);
+        return instance;
+
+	}
+	//-------------------------------------------------------------
+	protected static void initNewInstance(InputDialog instance, int dlgId, String title, String msg, String value, int inputType, final OnCloseListener listener)
+	{
+		instance.setOnCloseListener(listener);
 		
         Bundle args = new Bundle();
         args.putString("title",title);
@@ -41,9 +53,9 @@ implements OnClickListener
         args.putString("value",value);
         args.putInt("inputType", inputType);
         args.putInt("dlgId",dlgId);
-        Instance.setArguments(args);
+        instance.setArguments(args);
 
-        return Instance;
+
 	}
 	//-------------------------------------------------------------
 	@Override
@@ -53,24 +65,34 @@ implements OnClickListener
     	View v=inflater.inflate(R.layout.inputdialog, null);
     	
     	okBtn= (Button)v.findViewById(R.id.dlButtonOk);
+		okBtn.setOnClickListener(this);
+		okBtn.setText(android.R.string.ok);
         cancelBtn=(Button)v.findViewById(R.id.dlButtonCancel);
-        textView=(TextView)v.findViewById(R.id.dlInputValTextView);
+		cancelBtn.setOnClickListener(this);
+		cancelBtn.setText(android.R.string.cancel);
+
         editText=(EditText)v.findViewById(R.id.dlEditValue);
-        
-        okBtn.setOnClickListener(this);
-        cancelBtn.setOnClickListener(this);
         
         editText.setInputType(this.getArguments().getInt("inputType"));
         editText.setText(this.getArguments().getString("value"));
-        textView.setText(this.getArguments().getString("msg"));
+		editText.requestFocus();
+		editText.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0, 0, 0));
+		editText.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0, 0, 0));
+        //getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+		textView=(TextView)v.findViewById(R.id.dlInputValTextView);
+		textView.setText(this.getArguments().getString("msg"));
+
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
     	builder.setTitle(getArguments().getString("title"));
     	builder.setView(v);
     	
     	setDlgId(getArguments().getInt("dlgId"));
-    	
-    	return builder.create();
+
+        return builder.create();
 	}
 	//-------------------------------------------------------------------
 
@@ -80,9 +102,9 @@ implements OnClickListener
 		if(getOnCloseListener()!=null) getOnCloseListener().onClickCancel(this);
 	}
 	//-------------------------------------------------------------------
-	void setOnCloseListener(OnCloseListener listener)
+	protected void setOnCloseListener(OnCloseListener listener)
 	{
-		super.setOnCloseLister((Object)listener);
+		super.setOnCloseLister((Object) listener);
 	};
 	//-------------------------------------------------------------------
 	OnCloseListener getOnCloseListener()
@@ -95,15 +117,34 @@ implements OnClickListener
 		int id=v.getId();
 		if(id==R.id.dlButtonOk)
 		{
-			if(getOnCloseListener()!=null)
-				getOnCloseListener().onClickOk(this,editText.getText().toString(),getArguments().getString("value"));
+            doOk();
 		}
 		else if(id==R.id.dlButtonCancel)
 		{
-			if(getOnCloseListener()!=null) getOnCloseListener().onClickCancel(this);
+            doCancel();
 		}
 		setOnCloseListener( null);// set to null in order to prevent to invoke onClickCancel in onCancel method
 		dismiss();
-		
 	}
+
+    /**
+     * user presses Ok button
+     */
+    protected void doOk()
+    {
+        if(getOnCloseListener()!=null)
+            getOnCloseListener().onClickOk(this,getValue(),getArguments().getString("value"));
+    }
+    /**
+     * user presses Cancel button
+     */
+    protected void doCancel()
+    {
+        if(getOnCloseListener()!=null)
+            getOnCloseListener().onClickCancel(this);
+    }
+    public String getValue()
+    {
+        return editText.getText().toString();
+    }
 }

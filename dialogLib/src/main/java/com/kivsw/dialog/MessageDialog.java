@@ -40,6 +40,7 @@ public class MessageDialog extends BaseDialog implements OnClickListener
 		void onClickExtra(MessageDialog msg);
 	};
 
+
 	private boolean doDismiss; // allow to dismiss dialog after any button was pressed 
 	Button okBtn= null, cancelBtn= null, extraBtn= null;
 	TextView tv;
@@ -48,6 +49,7 @@ public class MessageDialog extends BaseDialog implements OnClickListener
 	// creates a message dialog, that holds only "ok" button
 	public static MessageDialog newInstance(String title, String msg)
 	{
+		//android.R.string.error_message_title;
 		return  newInstance(-1,title, msg, false, null, "", null, null);
 	}
 
@@ -116,7 +118,7 @@ public class MessageDialog extends BaseDialog implements OnClickListener
     	
     	if(okTitle!=null)
     	{
-    		if(okTitle.length()==0) okTitle=getText(R.string.OK).toString();
+    		if(okTitle.length()==0) okTitle=getText(android.R.string.ok).toString();
     		okBtn.setText(okTitle);
     		okBtn.setVisibility(View.VISIBLE);
     	}
@@ -124,7 +126,7 @@ public class MessageDialog extends BaseDialog implements OnClickListener
 
     	if(cancelTitle!=null)
     	{
-    		if(cancelTitle.length()==0) cancelTitle=getText(R.string.Cancel).toString();
+    		if(cancelTitle.length()==0) cancelTitle=getText(android.R.string.cancel).toString();
     		cancelBtn.setText(cancelTitle);
     		cancelBtn.setVisibility(View.VISIBLE);
     	}
@@ -132,7 +134,7 @@ public class MessageDialog extends BaseDialog implements OnClickListener
     	
     	if(extraTitle!=null)
     	{
-    		if(extraTitle.length()==0) extraTitle=getText(R.string.I_dont_know).toString();
+    		if(extraTitle.length()==0) extraTitle=getText(android.R.string.unknownName).toString();
     		extraBtn.setText(extraTitle);
     		extraBtn.setVisibility(View.VISIBLE);
     	}

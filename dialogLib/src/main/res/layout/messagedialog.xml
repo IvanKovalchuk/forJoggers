@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    >
 
     <ScrollView
         android:id="@+id/dlScrollView1"
@@ -32,28 +33,29 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        >
 
         <Button
             android:id="@+id/dlButtonOk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/OK" />
+            android:text="OK" />
 
         <Button
             android:id="@+id/dlButtonCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/Cancel" />
+            android:text="Cancel" />
 
         <Button
             android:id="@+id/dlButtonExtra"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/I_dont_know"
+            android:text=""
             android:visibility="visible" />
 
     </LinearLayout>
