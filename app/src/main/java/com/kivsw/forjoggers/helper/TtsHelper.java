@@ -5,58 +5,84 @@ import android.content.Context;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
 
+import java.util.HashMap;
 import java.util.List;
-
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.functions.Func2;
+import java.util.Locale;
 
 
 /**
  * This class is meant for Text-to-speech
  */
-public class Speaker {
-    interface OnError{
-        void call();
-    }
+public class TtsHelper {
+
     TextToSpeech tts=null;
     Context context;
 
     TextToSpeech.OnInitListener onInitListener=null; // listener for TTS
-    Action1<String> onNewTextListener=null;          // listener for new Text to pronounce
-    Subscription subscription=null;
 
-    OnError onError=null;
     int speakingCount=0;
 
-    public Speaker(Context context, OnError onError)
+
+    boolean ready=false, needToRelease=false;
+
+    public TtsHelper(Context context, String engineName, final TextToSpeech.OnInitListener onInitL)
     {
         this.context=context;
-        this.onError=onError;
-        init(null);
+        ready=false;
+        this.onInitListener=new TextToSpeech.OnInitListener(){
+            @Override
+            public void onInit(int status) {
+                ready= (status==TextToSpeech.SUCCESS);
+                onInitL.onInit(status);
+            }
+        };
+        init(engineName);
+    }
+
+    public boolean isReady() {
+        return ready;
     }
 
     @TargetApi(14)
     void init(String engineName)
     {
-        if(tts!=null) release();
+        if(tts!=null) doRelease();
+        needToRelease=false;
+        speakingFinished=true;
 
-        initRx(); // creates all listeners
+        //initRx(); // creates all listeners
         if(engineName==null || (Build.VERSION.SDK_INT<14) )
              tts=new TextToSpeech(context, onInitListener);
         else
              tts=new TextToSpeech(context, onInitListener,engineName);
+
+        tts.setOnUtteranceCompletedListener (new TextToSpeech.OnUtteranceCompletedListener(){
+            @Override
+            public void onUtteranceCompleted(String utteranceId) {
+                if(lastUtteranceId.equals(utteranceId))
+                    speakingFinished=true;
+
+                if(speakingFinished && needToRelease)
+                    doRelease();
+            }
+        });
     };
 
     public void release()
     {
+        if(speakingFinished) // if tts is not speaking
+            doRelease();
+        else
+            needToRelease=true; // release when tts stops speaking
+    }
+    private void doRelease()
+    {
         if(tts!=null) {
-            tts.stop();
+
             tts.shutdown();
         }
         tts=null;
+        ready=false;
     }
 
     @TargetApi(14)
@@ -67,7 +93,7 @@ public class Speaker {
         return tts.getEngines();
     }
 
-    private void initRx()
+  /*  private void initRx()
     {
         // create observable for init
         onInitListener=null;
@@ -114,7 +140,7 @@ public class Speaker {
                    }).subscribe(new Action1<String> (){
                     @Override
                     public void call(String text) {
-                        if(tts!=null) return;
+                        if(tts==null) return;
 
                         if(tts.isSpeaking()) speakingCount++;
                         else speakingCount=0;
@@ -126,20 +152,55 @@ public class Speaker {
                 } );
 
 
+    };*/
+    public boolean isCurrentLanguageSupported()
+    {
+        Locale l=Locale.getDefault();
+//        Locale 	ll=tts.getLanguage();
+
+        int v=tts.isLanguageAvailable(l);
+        switch(v)
+        {
+            case TextToSpeech.LANG_AVAILABLE:
+            case TextToSpeech.LANG_COUNTRY_AVAILABLE:
+                return true;
+        }
+        return false;
+    };
+    public boolean setLanguge(Locale loc)
+    {
+        int v=tts.setLanguage(loc);
+        switch(v)
+        {
+            case TextToSpeech.LANG_AVAILABLE:
+            case TextToSpeech.LANG_COUNTRY_AVAILABLE:
+                return true;
+        }
+        return false;
     };
 
     public void speak(String text)
     {
-        onNewTextListener.call(text);
+        //onNewTextListener.call(text);
+        doSpeak(text);
     };
 
+
     //@TargetApi(21)
+    static int id=0;
+    String lastUtteranceId="";
+    boolean speakingFinished=true;
     private void doSpeak(String text)
     {
-        if(Build.VERSION.SDK_INT<21)
-           tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        lastUtteranceId=String.valueOf(id++);
+        speakingFinished=false;
+        if(Build.VERSION.SDK_INT<21) {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID ,lastUtteranceId);
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, params);
+        }
         else
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null,"");
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, lastUtteranceId);
     }
 
 

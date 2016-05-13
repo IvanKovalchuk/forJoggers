@@ -333,7 +333,7 @@ implements
 
 
     String getCalloriesStr(Track trackSmoother) {
-        double e = trackSmoother.getСalories(settings.getMyWeightKg());
+        double e = trackSmoother.getСalories(settings.getMyWeight().getWeightKg());
         String res = null;
 
         if (e > 1) {

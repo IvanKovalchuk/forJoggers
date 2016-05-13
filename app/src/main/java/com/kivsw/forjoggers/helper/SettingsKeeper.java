@@ -98,46 +98,49 @@ public class SettingsKeeper {
         e.commit();
     }
     //-----------------------------------------------------
-    public  String getLastPath()
+    public  String getLastDirPath()
     {
         return sharedPreferences.getString("LastPath", null);
     };
-    public void setLastPath(String t)
+    public void setLastDirPath(String t)
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putString("LastPath", t);
         e.commit();
     }
     //-----------------------------------------------------
-    public int getMyWeight()
+    public FlexibleWeight getMyWeight()
     {
-        int v= sharedPreferences.getInt("myWeight", 70);
-        return v;
+        FlexibleWeight r=new FlexibleWeight();
+        r.load(sharedPreferences,"myWeight");
+        return r;
+        /*int v= sharedPreferences.getInt("myWeight", 70);
+        return v;*/
     }
-    public double getMyWeightKg()
+/*    public double getMyWeightKg()
     {
         double w=getMyWeight();
         if(getMyWeightUnit()==LB)
             w=(w*0.45359237f);
         return w;
-    }
+    }*/
     /**
      *
      * @param weight is my weight
-     * @param weightUnits the weight's unit. 0-kg, 1-lb
      */
-    static final int KG = 0, LB = 1;
-    public int getMyWeightUnit()
+
+   /* public int getMyWeightUnit()
     {
         return sharedPreferences.getInt("weightUnits", 0);
-    }
+    }*/
 
-    public void setMyWeight(int weight, int weightUnits)
+    public void setMyWeight(FlexibleWeight weight)
     {
-        SharedPreferences.Editor e= sharedPreferences.edit();
+        weight.save(sharedPreferences,"myWeight");
+        /*SharedPreferences.Editor e= sharedPreferences.edit();
         e.putInt("myWeight", weight);
         e.putInt("weightUnits", weightUnits);
-        e.commit();
+        e.commit();*/
     }
     //-------------------------------------------------------------
     /**
@@ -156,7 +159,7 @@ public class SettingsKeeper {
         e.commit();
     }
     //-------------------------------------------------------------
-    public static final int METERS=0, KILOMETERS=1, MILES=2;
+
     public int getDistanceUnit()
     {
         return sharedPreferences.getInt("distanceUnit", 1);
@@ -198,18 +201,28 @@ public class SettingsKeeper {
     }
     //-----------------------------------------------------
     // sets autostop for distance
-    public  boolean getAutoStopDistance()
+    public  boolean getIsDistanceAutoStop()
     {
-        return sharedPreferences.getBoolean("autoStopDistance", false);
+        return sharedPreferences.getBoolean("IsDistanceAutoStop", false);
     };
-    public void setAutoStopDistance(boolean v)
+    public void setIsDistanceAutoStop(boolean v)
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
-        e.putBoolean("autoStopDistance", v);
+        e.putBoolean("IsDistanceAutoStop", v);
         e.commit();
     }
 
-    public  int getAutoStopDistanceUnit()
+    public FlexibleDistance getAutoStopDistance()
+    {
+        FlexibleDistance r=new FlexibleDistance();
+        r.load(sharedPreferences,"autoStopDistance");
+        return r;
+    }
+    public void setAutoStopDistance(FlexibleDistance d)
+    {
+        d.save(sharedPreferences,"autoStopDistance");
+    }
+ /*   public  int getAutoStopDistanceUnit()
     {
         return sharedPreferences.getInt("autoStopDistanceUnit", 0);
     };
@@ -247,21 +260,30 @@ public class SettingsKeeper {
         long vl= Double.doubleToLongBits(v);
         e.putLong("autoStopDistanceValue", vl);
         e.commit();
-    }
+    }*/
     //-----------------------------------------------------
     // sets autostop for time
-    public  boolean getAutoStopTime()
+    public  boolean getIsAutoStopTime()
     {
         return sharedPreferences.getBoolean("autoStopTime", false);
     };
-    public void setAutoStopTime(boolean v)
+    public void setIsAutoStopTime(boolean v)
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("autoStopTime", v);
         e.commit();
     }
-
-    public  int getAutoStopTimeUnit()
+    public FlexibleTime getAutoStopTime()
+    {
+        FlexibleTime r=new FlexibleTime();
+        r.load(sharedPreferences,"autoStopTime");
+        return r;
+    };
+    public void setAutoStopTime(FlexibleTime t)
+    {
+        t.save(sharedPreferences,"autoStopTime");
+    };
+   /* public  int getAutoStopTimeUnit()
     {
         return sharedPreferences.getInt("autoStopTimeUnit", 0);
     };
@@ -298,5 +320,188 @@ public class SettingsKeeper {
                 break;
         }
         return v;
+    };*/
+    //-----------------------------------------
+    public void setTTS_engine(String engine)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putString("TTSengine", engine);
+        e.commit();
+    }
+    public  String getTTS_engine()
+    {
+        String v=sharedPreferences.getString("TTSengine", "");
+        return v;
     };
+
+    /**
+     * pronounce all the start stop events
+     * @return
+     */
+    public  boolean getIsStartStopSpeaking()
+    {
+        return sharedPreferences.getBoolean("StartStopSpeaking", false);
+    };
+    public void setIsStartStopSpeaking(boolean v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putBoolean("StartStopSpeaking", v);
+        e.commit();
+    }
+    // sets distance speaking
+    public  boolean getIsDistanceSpeaking()
+    {
+        return sharedPreferences.getBoolean("IsDistanceSpeaking", false);
+    };
+    public void setIsDistanceSpeaking(boolean v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putBoolean("IsDistanceSpeaking", v);
+        e.commit();
+    }
+
+    public FlexibleDistance getDistanceSpeaking()
+    {
+        FlexibleDistance r=new FlexibleDistance();
+        r.load(sharedPreferences, "DistanceSpeaking");
+        return r;
+    }
+    public void setDistanceSpeaking(FlexibleDistance v)
+    {
+        v.save(sharedPreferences, "DistanceSpeaking");
+    }
+    // sets time speaking
+    public  boolean getIsTimeSpeaking()
+    {
+        return sharedPreferences.getBoolean("IsTimeSpeaking", false);
+    };
+    public void setIsTimeSpeaking(boolean v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putBoolean("IsTimeSpeaking", v);
+        e.commit();
+    }
+    public FlexibleTime getTimeSpeaking()
+    {
+        FlexibleTime r=new FlexibleTime();
+        r.load(sharedPreferences, "TimeSpeaking");
+        return r;
+    }
+    public void setTimeSpeaking(FlexibleTime v)
+    {
+        v.save(sharedPreferences, "TimeSpeaking");
+    }
+
+    /**
+     *  hold data value and its units
+     */
+    public static class FlexibleData
+    {
+        protected int unit, defaultUnit;
+        protected long value,defaultValue;
+
+        FlexibleData()
+        {
+            unit=0; value=0; defaultValue=0; defaultUnit=0;
+        }
+
+        void save(SharedPreferences sharedPreferences, String name)
+        {
+            SharedPreferences.Editor e= sharedPreferences.edit();
+            //long vl= Double.doubleToLongBits(value);
+            e.putLong(name+"Value", value);
+            e.putInt(name+"Unit", unit);
+            e.commit();
+        }
+
+        void load(SharedPreferences sharedPreferences,String name)
+        {
+            //value =Double.longBitsToDouble();
+            value=sharedPreferences.getLong(name+"Value",defaultValue);
+            unit = sharedPreferences.getInt(name+"Unit",defaultUnit);
+        }
+
+
+        protected double getDoubleValue() {
+            return Double.longBitsToDouble(value);
+        }
+
+        protected void setDoubleValue(double value) {
+            this.value = Double.doubleToLongBits(value);
+        }
+        public int getUnit() {
+            return unit;
+        }
+
+    }
+
+    public static class FlexibleTime extends FlexibleData
+    {
+        public FlexibleTime(){super();}
+        public FlexibleTime(long t, int u)
+          {value=t; unit=u;}
+        public long getTime() {return value;};
+
+        public long getTimeSeconds()
+        {
+            long v=value;
+            switch(unit)
+            {
+                case SECOND:
+                    break;
+                case MINUTE:
+                    v*=60;
+                    break;
+                case HOUR:
+                    v*=60*60;
+                    break;
+            }
+            return v;
+        }
+    }
+
+    public static final int METERS=0, KILOMETERS=1, MILES=2;
+    public static class FlexibleDistance extends FlexibleData
+    {
+        public FlexibleDistance(){super();}
+        public FlexibleDistance(double d, int u)
+          {setDoubleValue(d); unit=u;};
+
+        public double getDistance() {return getDoubleValue();};
+        public double getDistanceMeters()
+        {
+            double v=getDoubleValue();
+            switch(unit)
+            {
+                case METERS:
+                    break;
+                case KILOMETERS:
+                    v*=1000;
+                    break;
+                case MILES:
+                    v*=1609;
+                    break;
+            }
+            return v;
+        }
+    }
+
+    static final int KG = 0, LB = 1;
+    public static class FlexibleWeight extends FlexibleData
+    {
+        public FlexibleWeight()
+          {super(); defaultValue=70;}
+        public FlexibleWeight(long w, int u)
+          {value=w; unit=u; defaultUnit=70;};
+
+        public long getWeight() {return value;};
+        public double getWeightKg()
+        {
+            double w=getDoubleValue();
+                if(unit==LB)
+                    w=(w*0.45359237f);
+            return w;
+        }
+    }
+
 }

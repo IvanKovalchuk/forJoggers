@@ -19,7 +19,7 @@ import android.widget.Spinner;
 import com.kivsw.dialog.IconSpinnerAdapter;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
-import com.kivsw.forjoggers.helper.Speaker;
+import com.kivsw.forjoggers.helper.TtsHelper;
 
 import java.util.List;
 import java.util.Locale;
@@ -37,8 +37,10 @@ implements CustomPagerView.IonPageAppear
     {
         void onSettingsChanged();
     }*/
-    CheckBox keepInBackgroundCheckBox,autoStopDistanceCheckBox,autoStopTimeCheckBox;
-    EditText weightEditText, autoStopDistanceValueEditText,autoStopTimeValueEditText;
+    CheckBox keepInBackgroundCheckBox,autoStopDistanceCheckBox,autoStopTimeCheckBox,
+            startStopSpeakCheckBox,timeSpeakCheckBox,distanceSpeakCheckBox;
+    EditText weightEditText, autoStopDistanceValueEditText,autoStopTimeValueEditText,
+            timeSpeakValueEditText,distanceSpeakValueEditText;
     Spinner weightUnitsSpinner,
             currentActivitySpinner,
             defaultActivitySpinner,
@@ -47,7 +49,7 @@ implements CustomPagerView.IonPageAppear
             speedDUnitsSpinner,
             speedTUnitsSpinner,
             autoStopDistanceUnitSpinner,autoStopTimeUnitSpinner,
-            ttsSpinner;
+            ttsSpinner,timeSpeakUnitSpinner,distanceSpeakUnitSpinner;
 
 
     SettingsFragmentPresenter presenter;
@@ -112,7 +114,7 @@ implements CustomPagerView.IonPageAppear
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         speedTUnitsSpinner.setAdapter(adapter);
 
-
+        // auto stop options
         autoStopDistanceCheckBox = (CheckBox)rootView.findViewById(R.id.autoStopDistanceCheckBox);
         autoStopDistanceValueEditText = (EditText)rootView.findViewById(R.id.autoStopDistanceValueEditText);
         autoStopDistanceValueEditText.addTextChangedListener(new AutoStopDistanceValueWatcher());
@@ -131,8 +133,25 @@ implements CustomPagerView.IonPageAppear
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         autoStopTimeUnitSpinner.setAdapter(adapter);
 
+// speaking with tts
         ttsSpinner=(Spinner)rootView.findViewById(R.id.ttsSpinner);
         ttsSpinner.setAdapter(getTTS_Adapter());
+
+        startStopSpeakCheckBox= (CheckBox)rootView.findViewById(R.id.startStopSpeakCheckBox);
+
+        timeSpeakCheckBox= (CheckBox)rootView.findViewById(R.id.timeSpeakCheckBox);
+        timeSpeakValueEditText=(EditText)rootView.findViewById(R.id.timeSpeakValueEditText);
+        timeSpeakUnitSpinner=(Spinner)rootView.findViewById(R.id.timeSpeakUnitSpinner);
+        adapter =  ArrayAdapter.createFromResource(getContext(), R.array.time_unit_plural,android.R.layout.simple_spinner_item );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        timeSpeakUnitSpinner.setAdapter(adapter);
+
+        distanceSpeakCheckBox= (CheckBox)rootView.findViewById(R.id.distanceSpeakCheckBox);
+        distanceSpeakValueEditText=(EditText)rootView.findViewById(R.id.distanceSpeakValueEditText);
+        distanceSpeakUnitSpinner=(Spinner)rootView.findViewById(R.id.distanceSpeakUnitSpinner);
+        adapter =  ArrayAdapter.createFromResource(getContext(), R.array.distance_unit,android.R.layout.simple_spinner_item );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        distanceSpeakUnitSpinner.setAdapter(adapter);
 
         loadData();
         return rootView;
@@ -179,8 +198,10 @@ implements CustomPagerView.IonPageAppear
     private void loadData()
     {
         keepInBackgroundCheckBox.setChecked(settings.getKeepBackGround());
-        weightEditText.setText(String.valueOf(settings.getMyWeight()));
-        weightUnitsSpinner.setSelection(settings.getMyWeightUnit());
+
+        SettingsKeeper.FlexibleWeight weight=settings.getMyWeight();
+        weightEditText.setText(String.valueOf(weight.getWeight()));
+        weightUnitsSpinner.setSelection(weight.getUnit());
 
         currentActivitySpinner.setSelection(presenter.getCurrentTrack().getActivityType());
         defaultActivitySpinner.setSelection(settings.getActivityType());
@@ -191,25 +212,46 @@ implements CustomPagerView.IonPageAppear
 
 
         // auto stop
-        autoStopDistanceCheckBox.setChecked(settings.getAutoStopDistance());
-        //autoStopDistanceValueEditText.setText(String.format("%.1f",settings.getAutoStopDistanceValue()));
-        autoStopDistanceValueEditText.setText(  String.format(Locale.US,"%.1f",settings.getAutoStopDistanceValue()));
-        autoStopDistanceUnitSpinner.setSelection(settings.getAutoStopTimeUnit());
+        autoStopDistanceCheckBox.setChecked(settings.getIsDistanceAutoStop());
+
+        SettingsKeeper.FlexibleDistance d=settings.getAutoStopDistance();
+        autoStopDistanceValueEditText.setText(  String.format(Locale.US,"%.1f",d.getDistance()));
+        autoStopDistanceUnitSpinner.setSelection(d.getUnit());
 
         // auto stop
-        autoStopTimeCheckBox.setChecked(settings.getAutoStopTime());
-        autoStopTimeValueEditText.setText(String.valueOf(settings.getAutoStopTimeValue()));
-        autoStopTimeUnitSpinner.setSelection(settings.getAutoStopDistanceUnit());
+        autoStopTimeCheckBox.setChecked(settings.getIsAutoStopTime());
+
+        SettingsKeeper.FlexibleTime t=settings.getAutoStopTime();
+        autoStopTimeValueEditText.setText(String.valueOf(t.getTime()));
+        autoStopTimeUnitSpinner.setSelection(t.getUnit());
+
+
+        // tts
+        ttsSpinner.setSelection(getTTSengineIndex(settings.getTTS_engine()));
+        startStopSpeakCheckBox.setChecked(settings.getIsStartStopSpeaking());
+
+        timeSpeakCheckBox.setChecked(settings.getIsTimeSpeaking());
+        t=settings.getTimeSpeaking();
+        timeSpeakValueEditText.setText(String.valueOf(t.getTime()));
+        timeSpeakUnitSpinner.setSelection(t.getUnit());
+
+        distanceSpeakCheckBox.setChecked(settings.getIsDistanceSpeaking());
+        d=settings.getDistanceSpeaking();
+        distanceSpeakValueEditText.setText(String.format(Locale.US,"%.1f",d.getDistance()));
+        distanceSpeakUnitSpinner.setSelection(d.getUnit());
+
 
 
     }
     private void saveData()
     {
         int i;
+        double d;
         settings.setKeepBackGround(keepInBackgroundCheckBox.isChecked());
+
         try{i=Integer.parseInt(weightEditText.getText().toString());}
         catch(Exception e){i=0;};
-        settings.setMyWeight(i, weightUnitsSpinner.getSelectedItemPosition());
+        settings.setMyWeight(new SettingsKeeper.FlexibleWeight(i, weightUnitsSpinner.getSelectedItemPosition()));
 
       //  CurrentTrack.getInstance(getActivity()).setActivityType(
         //        currentActivitySpinner.getSelectedItemPosition());
@@ -220,13 +262,28 @@ implements CustomPagerView.IonPageAppear
 
         settings.setSpeedUnit(speedDUnitsSpinner.getSelectedItemPosition(), speedTUnitsSpinner.getSelectedItemPosition());
 
-        settings.setAutoStopDistance(autoStopDistanceCheckBox.isChecked());
-        settings.setAutoStopDistanceUnit(autoStopDistanceUnitSpinner.getSelectedItemPosition());
-        settings.setAutoStopDistanceValue(Double.parseDouble(autoStopDistanceValueEditText.getText().toString()));
+        settings.setIsDistanceAutoStop(autoStopDistanceCheckBox.isChecked());
 
-        settings.setAutoStopTime(autoStopTimeCheckBox.isChecked());
-        settings.setAutoStopTimeUnit(autoStopTimeUnitSpinner.getSelectedItemPosition());
-        settings.setAutoStopTimeValue(Long.parseLong(autoStopTimeValueEditText.getText().toString()));
+        settings.setAutoStopDistance(new SettingsKeeper.FlexibleDistance(Double.parseDouble(autoStopDistanceValueEditText.getText().toString()),autoStopDistanceUnitSpinner.getSelectedItemPosition()) );
+
+        settings.setIsAutoStopTime(autoStopTimeCheckBox.isChecked());
+
+        settings.setAutoStopTime(new SettingsKeeper.FlexibleTime(Long.parseLong(autoStopTimeValueEditText.getText().toString()), autoStopTimeUnitSpinner.getSelectedItemPosition()));
+
+        // tts
+        settings.setTTS_engine(getTTSengineName(ttsSpinner.getSelectedItemPosition()));
+        settings.setIsStartStopSpeaking(startStopSpeakCheckBox.isChecked());
+
+        settings.setIsTimeSpeaking(timeSpeakCheckBox.isChecked());
+        try{i=Integer.parseInt(timeSpeakValueEditText.getText().toString());}
+        catch(Exception e){i=0;};
+        settings.setTimeSpeaking(new SettingsKeeper.FlexibleTime(i,timeSpeakUnitSpinner.getSelectedItemPosition()));
+
+        settings.setIsDistanceSpeaking( distanceSpeakCheckBox.isChecked());
+        try{d=Double.parseDouble(distanceSpeakValueEditText.getText().toString());}
+        catch(Exception e){d=0;};
+        settings.setDistanceSpeaking(new SettingsKeeper.FlexibleDistance(d,distanceSpeakUnitSpinner.getSelectedItemPosition()));
+
 
         // informs the others that we have new settings
         presenter.onSettingsChanged();
@@ -315,28 +372,48 @@ implements CustomPagerView.IonPageAppear
     }
     //----------------------------------------------
 
+    List<TextToSpeech.EngineInfo> ttsEngineList=null;
+    int getTTSengineIndex(String packageName)
+    {
+        int i=0;
+        for(;i<ttsEngineList.size();i++)
+        {
+            if(ttsEngineList.get(i).name.equals(packageName))
+            {
+                return i+1; // add one because the first item is "default" in getTTS_Adapter()
+            };
+        }
+        return 0; // default
+    }
+    String getTTSengineName(int index)
+    {
+        index--; // the first index is "default" in getTTS_Adapter(), so substract 1
+        if(index<0 || index >= ttsEngineList.size()) return "";
+
+        return ttsEngineList.get(index).name;
+    }
     IconSpinnerAdapter getTTS_Adapter()
     {
-        Speaker speaker=new Speaker(getContext(),null);
-        List<TextToSpeech.EngineInfo> list=speaker.getEngines();
+        TtsHelper speaker=new TtsHelper(getContext(),null,null);
+        ttsEngineList=speaker.getEngines();
         speaker.release();
 
         Drawable icons[];
         String names[];
 
-        if(list==null)
+        if(ttsEngineList==null)
         {
             names=new String[1];
             icons = null;
         }
         else
         {
-            names=new String[1+list.size()];
-            icons = new Drawable[1+list.size()];
+            names=new String[1+ttsEngineList.size()];
+            icons = new Drawable[1+ttsEngineList.size()];
 
             int i=1;
             Drawable appIcon;
-            for(TextToSpeech.EngineInfo engineInfo:list)
+            for(TextToSpeech.EngineInfo engineInfo:ttsEngineList)
             {
                 appIcon=null;
 

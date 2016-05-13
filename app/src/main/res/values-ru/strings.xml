@@ -83,6 +83,15 @@
     <string name="tts_engine">TTS:</string>
     <string name="defaultTTS">по-умолчанию</string>
 
+    <string name="speak_time">Озвучивать время</string>
+    <string name="speak_distance">Озвучивать расстояние</string>
+    <string name="speak_start_stop">Озвучивать начало/конец трека</string>
+
+    <!-- tts messages -->
+    <string name="tts_init_error">Ошибка инициализации системы TTS</string>
+    <string name="tts_start">старт</string>
+    <string name="tts_stop">стоп</string>
+
     <!-- MENU -->
     <string name="action_settings">Настройки</string>
     <string name="action_load_track">Загрузить трек</string>

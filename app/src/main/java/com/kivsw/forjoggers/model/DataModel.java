@@ -46,6 +46,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
     Context context;
     SettingsKeeper settings;
     UsingCounter<String> usingCounter;
+    Speaker speaker=null;
 
     boolean isTracking=false;
 
@@ -78,6 +79,9 @@ public class DataModel implements UsingCounter.IUsingChanged{
     public void release()
     {
         RxGps.release();
+        if(speaker!=null)
+            speaker.release();
+        speaker=null;
     }
     //----------------------------------------------------------
 
@@ -268,6 +272,9 @@ public class DataModel implements UsingCounter.IUsingChanged{
         doUpdateCurrentSmoothTrackView();
         doUpdateFileNameView();
 
+        speaker=new Speaker(context);
+        if(settings.getIsStartStopSpeaking())
+            speaker.speakStart();
     }
 
     /**
@@ -290,6 +297,11 @@ public class DataModel implements UsingCounter.IUsingChanged{
         isTracking = false;
 
         MapFragmentPresenter.getInstance(context).onAfterStopTracking();
+
+        if(settings.getIsStartStopSpeaking())
+            speaker.speakStop();
+        speaker.release();
+        speaker=null;
 
     };
 
@@ -376,15 +388,15 @@ public class DataModel implements UsingCounter.IUsingChanged{
     {
         Track track=trackSmoother;
 
-        if(track!=null && settings.getAutoStopDistance())
+        if(track!=null && settings.getIsDistanceAutoStop())
         {
-            if(track.getTrackDistance() > settings.getAutoStopDistanceMeters())
+            if(track.getTrackDistance() > settings.getAutoStopDistance().getDistanceMeters())
                 stopTracking();
         }
 
-        if(settings.getAutoStopTime())
+        if(settings.getIsAutoStopTime())
         {
-            if(currentTrack.getTrackTime()>(settings.getAutoStopTimeSeconds()*1000))
+            if(currentTrack.getTrackTime()>(settings.getAutoStopTime().getTimeSeconds()*1000))
                 stopTracking();
         }
     }
@@ -398,6 +410,9 @@ public class DataModel implements UsingCounter.IUsingChanged{
             TrackingServicePresenter.getInstance(context).startBackground();
         else
             TrackingServicePresenter.getInstance(context).endBackground();
+
+        if(speaker!=null)
+            speaker.release();
 
     }
 

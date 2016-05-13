@@ -85,6 +85,17 @@
     <string name="tts_engine">TTS:</string>
     <string name="defaultTTS">default</string>
 
+    <string name="speak_time">Pronounce time</string>
+    <string name="speak_distance">Pronounce distance</string>
+    <string name="speak_start_stop">Pronounce start/stop tracking</string>
+
+    <!-- tts messages -->
+    <string name="tts_init_error">can not initialize TTS system</string>
+    <string name="tts_start">start</string>
+    <string name="tts_start_en" translatable="false">start</string>
+    <string name="tts_stop">stop</string>
+    <string name="tts_stop_en" translatable="false">stop</string>
+
     <!-- MENU -->
     <string name="action_settings">Settings</string>
     <string name="action_load_track">Load track</string>

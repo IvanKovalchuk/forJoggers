@@ -11,6 +11,7 @@
               android:orientation="vertical"
              >
 
+    <!-- common settings -->
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -157,7 +158,7 @@
 
     </LinearLayout>
 
-
+    <!-- auto stop settings -->
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -165,7 +166,8 @@
         android:id="@+id/autoStopDistanceCheckBox"
         android:layout_gravity="center_horizontal|left"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="10dp"
+        android:checked="false"/>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -216,16 +218,22 @@
 
     </LinearLayout>
 
+
+
+    <!-- TTS settings -->
+
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/current_activity"
+            android:text="@string/tts_engine"
             android:id="@+id/ttsTextView"
             android:layout_marginBottom="10dp"
             android:layout_weight="1"/>
@@ -236,6 +244,72 @@
             android:id="@+id/ttsSpinner"
             />
 
+    </LinearLayout>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/speak_start_stop"
+        android:id="@+id/startStopSpeakCheckBox"
+        android:layout_gravity="center_horizontal|left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/speak_distance"
+        android:id="@+id/distanceSpeakCheckBox"
+        android:layout_gravity="center_horizontal|left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/distanceSpeakValueEditText"
+            android:layout_weight="1"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/distanceSpeakUnitSpinner"
+            />
+
+    </LinearLayout>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/speak_time"
+        android:id="@+id/timeSpeakCheckBox"
+        android:layout_gravity="center_horizontal|left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/timeSpeakValueEditText"
+            android:layout_weight="1"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/timeSpeakUnitSpinner"
+            />
     </LinearLayout>
 
 </LinearLayout>

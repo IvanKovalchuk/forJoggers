@@ -233,7 +233,7 @@ implements  FileDialog.OnCloseListener,
 
     private void saveCurrentTrack()
     {
-        String dir=settings.getLastPath();
+        String dir=settings.getLastDirPath();
         if(dir==null)
             dir=Environment.getExternalStorageDirectory().getAbsolutePath();
         FileDialog fd;
@@ -243,7 +243,7 @@ implements  FileDialog.OnCloseListener,
 
     private void loadCurrentTrack()
     {
-        String dir=settings.getLastPath();
+        String dir=settings.getLastDirPath();
         if(dir==null)
             dir=Environment.getExternalStorageDirectory().getAbsolutePath();
         FileDialog fd;
@@ -283,7 +283,7 @@ implements  FileDialog.OnCloseListener,
         if(success) {
             File f = new File(fileName);
             if (f.exists())
-                settings.setLastPath(f.getParent());
+                settings.setLastDirPath(f.getParent());
         }
     }
 
