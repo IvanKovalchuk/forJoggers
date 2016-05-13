@@ -20,9 +20,6 @@ public class TtsHelper {
 
     TextToSpeech.OnInitListener onInitListener=null; // listener for TTS
 
-    int speakingCount=0;
-
-
     boolean ready=false, needToRelease=false;
 
     public TtsHelper(Context context, String engineName, final TextToSpeech.OnInitListener onInitL)
@@ -33,7 +30,8 @@ public class TtsHelper {
             @Override
             public void onInit(int status) {
                 ready= (status==TextToSpeech.SUCCESS);
-                onInitL.onInit(status);
+                if(onInitL!=null)
+                     onInitL.onInit(status);
             }
         };
         init(engineName);
@@ -190,6 +188,7 @@ public class TtsHelper {
     static int id=0;
     String lastUtteranceId="";
     boolean speakingFinished=true;
+
     private void doSpeak(String text)
     {
         lastUtteranceId=String.valueOf(id++);
@@ -197,12 +196,12 @@ public class TtsHelper {
         if(Build.VERSION.SDK_INT<21) {
             HashMap<String, String> params = new HashMap<>();
             params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID ,lastUtteranceId);
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, params);
+            tts.speak(text, TextToSpeech.QUEUE_ADD, params);
         }
         else
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, lastUtteranceId);
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null, lastUtteranceId);
     }
-
+    public boolean isSpeaking(){return !speakingFinished;}
 
 
 }

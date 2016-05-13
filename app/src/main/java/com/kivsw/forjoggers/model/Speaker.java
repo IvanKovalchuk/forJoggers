@@ -42,6 +42,7 @@ public class Speaker {
         ttsHelper = new TtsHelper(context, settings.getTTS_engine(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
+                if(ttsHelper==null) return;
                 if (!ttsHelper.isReady()) {
                     MainActivityPresenter.getInstance(context)
                             .showError(context.getText(R.string.tts_init_error).toString());
@@ -75,6 +76,9 @@ public class Speaker {
     public void speakTrack()
     {
         init();
+        if(utteranceQueue.size()>2 || ttsHelper.isSpeaking())
+            return;
+
         while(utteranceQueue.contains(UtteranceType.TRACKSTATE))
             utteranceQueue.remove(UtteranceType.TRACKSTATE);
         utteranceQueue.add(UtteranceType.TRACKSTATE);
@@ -93,8 +97,13 @@ public class Speaker {
                 case START:
                     doSpeakStart();
                     break;
-                case STOP:
-                    doSpeakStop();
+                case STOP: {
+                    Track t = DataModel.getInstance(context).getTrackSmoother();
+                    if (t != null)
+                        doSpeakStop(t.getTrackDistance(), t.getTrackTime());
+                    else
+                        doSpeakStop(0, 0);
+                    }
                     break;
                 case TRACKSTATE: {
                     Track t=DataModel.getInstance(context).getTrackSmoother();
@@ -112,14 +121,22 @@ public class Speaker {
         else  str=context.getText(R.string.tts_start).toString();
         ttsHelper.speak(str);
     }
-    private void doSpeakStop()
+    private void doSpeakStop(double d, long t)
     {
         String str;
         if(useEngMessages) str=context.getText(R.string.tts_stop_en).toString();
         else  str=context.getText(R.string.tts_stop).toString();
-        ttsHelper.speak(str);
+
+        String str2=createTrackInfo( d, t);
+        ttsHelper.speak(str+" \n "+str2);
+
     }
     private void doSpeakTrack(double d, long t)
+    {
+        String str=createTrackInfo( d,  t);
+        ttsHelper.speak(str.toString());
+    }
+    String createTrackInfo(double d, long t)
     {
         StringBuilder str=new StringBuilder();
         int id_hour, id_min, id_sec, id_meter, id_kilimeter, id_mile, id_miles;
@@ -162,34 +179,33 @@ public class Speaker {
 
         if(s>0)
             str.append(res.getQuantityString(id_sec, (int)s,(int)s));
-        str.append(" ");
+        str.append(" \n ");
 
         // forms distance
         if(settings.getDistanceUnit()==SettingsKeeper.MILES)
         { // miles
             d=d/1609.0;
-            str.append(String.format(Locale.US, "%.1",d));
+            str.append(String.format(Locale.US, "%.1f",d));
             str.append(res.getText(id_miles));
 
         }
         else
         { // kilometers
-             long meters=(long)(d+0.5);
-             long km;
+            long meters=(long)(d+0.5);
+            long km;
 
-             km = (meters/1000);
-             meters=meters%1000;
+            km = (meters/1000);
+            meters=meters%1000;
 
-             if(km>0)
-                 str.append(res.getQuantityString(id_kilimeter, (int)km,(int)km));
+            if(km>0)
+                str.append(res.getQuantityString(id_kilimeter, (int)km,(int)km));
             str.append(" ");
             if(meters>0)
                 str.append(res.getQuantityString(id_meter, (int)meters,(int)meters));
             str.append(" ");
         }
 
-        ttsHelper.speak(str.toString());
-
+        return str.toString();
     }
 
 }

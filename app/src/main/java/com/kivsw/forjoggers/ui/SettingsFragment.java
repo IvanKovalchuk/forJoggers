@@ -117,7 +117,7 @@ implements CustomPagerView.IonPageAppear
         // auto stop options
         autoStopDistanceCheckBox = (CheckBox)rootView.findViewById(R.id.autoStopDistanceCheckBox);
         autoStopDistanceValueEditText = (EditText)rootView.findViewById(R.id.autoStopDistanceValueEditText);
-        autoStopDistanceValueEditText.addTextChangedListener(new AutoStopDistanceValueWatcher());
+        autoStopDistanceValueEditText.addTextChangedListener(new DistanceValueWatcher(autoStopDistanceValueEditText));
 
         autoStopDistanceUnitSpinner=(Spinner)rootView.findViewById(R.id.autoStopDistanceUnitSpinner);
         adapter =  ArrayAdapter.createFromResource(getContext(), R.array.distance_unit,android.R.layout.simple_spinner_item );
@@ -126,7 +126,7 @@ implements CustomPagerView.IonPageAppear
 
         autoStopTimeCheckBox = (CheckBox)rootView.findViewById(R.id.autoStopTimeCheckBox);
         autoStopTimeValueEditText = (EditText)rootView.findViewById(R.id.autoStopTimeValueEditText);
-        autoStopTimeValueEditText.addTextChangedListener(new AutoStopTimeValueWatcher());
+        autoStopTimeValueEditText.addTextChangedListener(new TimeValueWatcher(autoStopTimeValueEditText));
 
         autoStopTimeUnitSpinner=(Spinner)rootView.findViewById(R.id.autoStopTimeUnitSpinner);
         adapter =  ArrayAdapter.createFromResource(getContext(), R.array.time_unit_plural,android.R.layout.simple_spinner_item );
@@ -141,6 +141,7 @@ implements CustomPagerView.IonPageAppear
 
         timeSpeakCheckBox= (CheckBox)rootView.findViewById(R.id.timeSpeakCheckBox);
         timeSpeakValueEditText=(EditText)rootView.findViewById(R.id.timeSpeakValueEditText);
+        timeSpeakValueEditText.addTextChangedListener(new TimeValueWatcher(timeSpeakValueEditText));
         timeSpeakUnitSpinner=(Spinner)rootView.findViewById(R.id.timeSpeakUnitSpinner);
         adapter =  ArrayAdapter.createFromResource(getContext(), R.array.time_unit_plural,android.R.layout.simple_spinner_item );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -148,6 +149,7 @@ implements CustomPagerView.IonPageAppear
 
         distanceSpeakCheckBox= (CheckBox)rootView.findViewById(R.id.distanceSpeakCheckBox);
         distanceSpeakValueEditText=(EditText)rootView.findViewById(R.id.distanceSpeakValueEditText);
+        distanceSpeakValueEditText.addTextChangedListener(new DistanceValueWatcher(distanceSpeakValueEditText));
         distanceSpeakUnitSpinner=(Spinner)rootView.findViewById(R.id.distanceSpeakUnitSpinner);
         adapter =  ArrayAdapter.createFromResource(getContext(), R.array.distance_unit,android.R.layout.simple_spinner_item );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -326,8 +328,12 @@ implements CustomPagerView.IonPageAppear
 
         }
     }
-    class AutoStopDistanceValueWatcher implements TextWatcher {
-        //TextWatcher
+    class DistanceValueWatcher implements TextWatcher {
+        EditText editText;
+        DistanceValueWatcher(EditText et)
+        {
+            editText=et;
+        }
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
@@ -342,15 +348,19 @@ implements CustomPagerView.IonPageAppear
             } catch (Exception e) {
             } ;
             if ((v < 0 || v > 99999) ) {
-                autoStopDistanceValueEditText.setError(getText(R.string.Incorrect_value));
+                editText.setError(getText(R.string.Incorrect_value));
             } else
-                autoStopDistanceValueEditText.setError(null);
+                editText.setError(null);
 
         }
     }
     //----------------------------------------------
-    class AutoStopTimeValueWatcher implements TextWatcher {
-        //TextWatcher
+    class TimeValueWatcher implements TextWatcher {
+        EditText editText;
+        TimeValueWatcher(EditText et)
+        {
+            editText=et;
+        }
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
@@ -365,9 +375,9 @@ implements CustomPagerView.IonPageAppear
             } catch (Exception e) {
             } ;
             if ((v < 0 || v > 99999)) {
-                autoStopTimeValueEditText.setError(getText(R.string.Incorrect_value));
+                editText.setError(getText(R.string.Incorrect_value));
             } else
-                autoStopTimeValueEditText.setError(null);
+                editText.setError(null);
         }
     }
     //----------------------------------------------

@@ -230,7 +230,8 @@ public class DataModel implements UsingCounter.IUsingChanged{
         currentTrack.setActivityType(settings.getActivityType());
         currentTrack.timeStart= SystemClock.elapsedRealtime();
         isTracking=true;
-
+        nextTimeTospeak=settings.getTimeSpeaking().getTimeSeconds();
+        nextDistanseToSpeak=(long)settings.getDistanceSpeaking().getDistanceMeters();
 
         trackingSubscriber = new Subscriber<Location>() { // this entity adds new data from GPS to the track
             @Override
@@ -264,6 +265,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
                     @Override
                     public void call(Long aLong) {
                         checkAutoStop();
+                        checkSpeak();
                     }
                 });
 
@@ -300,7 +302,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
         if(settings.getIsStartStopSpeaking()) {
             speaker.speakStop();
-            speaker.speakTrack();
+            //speaker.speakTrack();
         }
         speaker.release();
         speaker=null;
@@ -402,6 +404,28 @@ public class DataModel implements UsingCounter.IUsingChanged{
                 stopTracking();
         }
     }
+
+    /**
+     * check if it should prounce track information
+     */
+    long nextTimeTospeak, nextDistanseToSpeak;
+    void checkSpeak()
+    {
+        if(trackSmoother==null) return;
+
+        if(settings.getIsDistanceSpeaking() && (nextDistanseToSpeak<trackSmoother.getTrackDistance()))
+        {
+            speaker.speakTrack();
+            nextDistanseToSpeak+=settings.getDistanceSpeaking().getDistanceMeters();
+        };
+
+        if(settings.getIsTimeSpeaking() && (nextTimeTospeak<(trackSmoother.getTrackTime()/1000) ))
+        {
+            speaker.speakTrack();
+            nextTimeTospeak += settings.getTimeSpeaking().getTimeSeconds();
+        };
+    };
+
     /**
      * is invoked when the user has changes the settings
      */
