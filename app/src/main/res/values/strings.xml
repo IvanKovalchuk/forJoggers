@@ -96,6 +96,67 @@
     <string name="tts_stop">stop</string>
     <string name="tts_stop_en" translatable="false">stop</string>
 
+    <string name="tts_miles">miles</string>
+    <string name="tts_miles_en" translatable="false">miles</string>
+
+    <plurals name="numberOfhours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+
+    <plurals name="numberOfminutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+
+    <plurals name="numberOfseconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <plurals name="numberOfmeters">
+        <item quantity="one">%d metre</item>
+        <item quantity="other">%d metres</item>
+    </plurals>
+
+    <plurals name="numberOfkilometers">
+        <item quantity="one">%d kilometer</item>
+        <item quantity="other">%d kilometers</item>
+    </plurals>
+    <plurals name="numberOfmiles">
+        <item quantity="one">%d mile</item>
+        <item quantity="other">%d miles</item>
+    </plurals>
+
+    <plurals name="numberOfhours_en">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+
+    <plurals name="numberOfminutes_en">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+
+    <plurals name="numberOfseconds_en">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <plurals name="numberOfmeters_en">
+        <item quantity="one">%d metre</item>
+        <item quantity="other">%d metres</item>
+    </plurals>
+
+    <plurals name="numberOfkilometers_en">
+        <item quantity="one">%d kilometer</item>
+        <item quantity="other">%d kilometers</item>
+    </plurals>
+    <plurals name="numberOfmiles_en">
+        <item quantity="one">%d mile</item>
+        <item quantity="other">%d miles</item>
+    </plurals>
+
     <!-- MENU -->
     <string name="action_settings">Settings</string>
     <string name="action_load_track">Load track</string>

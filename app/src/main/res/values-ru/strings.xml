@@ -91,6 +91,55 @@
     <string name="tts_init_error">Ошибка инициализации системы TTS</string>
     <string name="tts_start">старт</string>
     <string name="tts_stop">стоп</string>
+    <string name="tts_miles">мили</string>
+
+    <plurals name="numberOfhours">
+        <item quantity="one">%d час</item>
+        <item quantity="two">%d часа</item>
+        <item quantity="few">%d часа</item>
+        <item quantity="other">%d часов</item>
+        <item quantity="many">%d часов</item>
+    </plurals>
+
+    <plurals name="numberOfminutes">
+        <item quantity="one">%d минута</item>
+        <item quantity="two">%d минуты</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="other">%d минут</item>
+        <item quantity="many">%d минут</item>
+    </plurals>
+
+    <plurals name="numberOfseconds">
+        <item quantity="one">%d секунда</item>
+        <item quantity="two">%d секунды</item>
+        <item quantity="few">%d секунды</item>
+        <item quantity="other">%d секунд</item>
+        <item quantity="many">%d секунд</item>
+    </plurals>
+
+    <plurals name="numberOfmeters">
+        <item quantity="one">%d метр</item>
+        <item quantity="two">%d метра</item>
+        <item quantity="few">%d метра</item>
+        <item quantity="other">%d метров</item>
+        <item quantity="many">%d метров</item>
+    </plurals>
+
+    <plurals name="numberOfkilometers">
+        <item quantity="one">%d километр</item>
+        <item quantity="two">%d километра</item>
+        <item quantity="few">%d километра</item>
+        <item quantity="other">%d километров</item>
+        <item quantity="many">%d километров</item>
+    </plurals>
+
+    <plurals name="numberOfmiles">
+        <item quantity="one">%d миля</item>
+        <item quantity="two">%d мили</item>
+        <item quantity="few">%d мили</item>
+        <item quantity="other">%d миль</item>
+        <item quantity="many">%d миль</item>
+    </plurals>
 
     <!-- MENU -->
     <string name="action_settings">Настройки</string>

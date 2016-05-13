@@ -1,6 +1,7 @@
 package com.kivsw.forjoggers.model;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.speech.tts.TextToSpeech;
 
 import com.kivsw.forjoggers.R;
@@ -118,8 +119,76 @@ public class Speaker {
         else  str=context.getText(R.string.tts_stop).toString();
         ttsHelper.speak(str);
     }
-    private void doSpeakTrack(double d, double t)
+    private void doSpeakTrack(double d, long t)
     {
+        StringBuilder str=new StringBuilder();
+        int id_hour, id_min, id_sec, id_meter, id_kilimeter, id_mile, id_miles;
+        // choose ids for the text
+        if(useEngMessages) {
+            id_hour=R.plurals.numberOfhours_en;
+            id_min=R.plurals.numberOfminutes_en;
+            id_sec=R.plurals.numberOfseconds_en;
+            id_meter=R.plurals.numberOfmeters_en;
+            id_kilimeter=R.plurals.numberOfkilometers_en;
+            id_mile=R.plurals.numberOfmiles_en;
+            id_miles = R.string.tts_miles_en;
+        }
+        else {
+            id_hour=R.plurals.numberOfhours;
+            id_min=R.plurals.numberOfminutes;
+            id_sec=R.plurals.numberOfseconds;
+            id_meter=R.plurals.numberOfmeters;
+            id_kilimeter=R.plurals.numberOfkilometers;
+            id_mile=R.plurals.numberOfmiles;
+            id_miles = R.string.tts_miles;
+        }
+
+        // forms time
+        long h,m,s;
+        Resources res=context.getResources();
+
+        t=t/1000;
+        h=t/3600; t=t%3600;
+        m=t/60; t=t%60;
+        s=t;
+
+
+        if(h>0)
+            str.append(res.getQuantityString(id_hour, (int)h,(int)h));
+        str.append(" ");
+        if(m>0)
+            str.append(res.getQuantityString(id_min, (int)m,(int)m));
+        str.append(" ");
+
+        if(s>0)
+            str.append(res.getQuantityString(id_sec, (int)s,(int)s));
+        str.append(" ");
+
+        // forms distance
+        if(settings.getDistanceUnit()==SettingsKeeper.MILES)
+        { // miles
+            d=d/1609.0;
+            str.append(String.format(Locale.US, "%.1",d));
+            str.append(res.getText(id_miles));
+
+        }
+        else
+        { // kilometers
+             long meters=(long)(d+0.5);
+             long km;
+
+             km = (meters/1000);
+             meters=meters%1000;
+
+             if(km>0)
+                 str.append(res.getQuantityString(id_kilimeter, (int)km,(int)km));
+            str.append(" ");
+            if(meters>0)
+                str.append(res.getQuantityString(id_meter, (int)meters,(int)meters));
+            str.append(" ");
+        }
+
+        ttsHelper.speak(str.toString());
 
     }
 

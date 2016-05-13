@@ -298,8 +298,10 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
         MapFragmentPresenter.getInstance(context).onAfterStopTracking();
 
-        if(settings.getIsStartStopSpeaking())
+        if(settings.getIsStartStopSpeaking()) {
             speaker.speakStop();
+            speaker.speakTrack();
+        }
         speaker.release();
         speaker=null;
 

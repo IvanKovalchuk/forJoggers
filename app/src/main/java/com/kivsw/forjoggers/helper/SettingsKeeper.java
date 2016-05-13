@@ -159,7 +159,7 @@ public class SettingsKeeper {
         e.commit();
     }
     //-------------------------------------------------------------
-
+    public static final int METERS=0, KILOMETERS=1, MILES=2;
     public int getDistanceUnit()
     {
         return sharedPreferences.getInt("distanceUnit", 1);
@@ -460,7 +460,7 @@ public class SettingsKeeper {
         }
     }
 
-    public static final int METERS=0, KILOMETERS=1, MILES=2;
+
     public static class FlexibleDistance extends FlexibleData
     {
         public FlexibleDistance(){super();}
