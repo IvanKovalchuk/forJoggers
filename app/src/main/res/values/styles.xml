@@ -1,8 +1,19 @@
 <resources>
 
+    <color name="settings_caption_color">#88000055</color>
+    <color name="settings_caption_font_color">#ffffffff</color>
+    <color name="light_background_color">#66aaaaaa</color>
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
+
+        <item name="android:textColor">#FF000000</item>
+        <item name="android:checkboxStyle">@style/customCheckBoxStyle</item>
+    </style>
+
+    <style name="customCheckBoxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:textColor">#FF000000</item>
     </style>
 
 </resources>

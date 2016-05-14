@@ -64,6 +64,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
         settings = SettingsKeeper.getInstance(context);
         currentTrack = new CurrentTrack();
+        currentTrack.setActivityType(settings.getActivityType());
 
         initSmoothCalculation();
         initCurrentTrackUpdating();
@@ -411,7 +412,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
     long nextTimeTospeak, nextDistanseToSpeak;
     void checkSpeak()
     {
-        if(trackSmoother==null) return;
+        if(trackSmoother==null || speaker==null) return;
 
         if(settings.getIsDistanceSpeaking() && (nextDistanseToSpeak<trackSmoother.getTrackDistance()))
         {

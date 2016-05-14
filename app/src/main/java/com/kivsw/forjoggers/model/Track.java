@@ -350,8 +350,6 @@ public class Track {
 
     public double getСalories(double weight)
     {
-
-
         Location prevLoc=null;
         double res=0;
         if(mGeoPoints==null) return 0;

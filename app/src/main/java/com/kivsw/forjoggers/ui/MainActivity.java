@@ -2,6 +2,7 @@ package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -59,18 +60,6 @@ implements  FileDialog.OnCloseListener,
         pager =(ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
         pager.addOnPageChangeListener(new MyOnPageChange());
-       // mapFragment = pager.insta
-
-        /*pager.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });*/
-
-        //mapFragment = (MapFragment)getSupportFragmentManager().findFragmentById(R.id.mapFragment);
-
 
         settings=SettingsKeeper.getInstance(this);
 
@@ -111,6 +100,7 @@ implements  FileDialog.OnCloseListener,
         super.onDestroy();
 
     }
+
     //----------------------------------------------------------
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -208,14 +198,15 @@ implements  FileDialog.OnCloseListener,
     protected void onStart()
     {
         super.onStart();
-       // trackingServiceEventReceiver = TrackingServiceEventReceiver.createAndRegister(this, this);
+        presenter.onStartActivity();
+        setVolumeControlStream (AudioManager.STREAM_MUSIC );
 
     }
     //----------------------------------------------------------
     @Override
     protected void onStop()
     {
-       // trackingServiceEventReceiver.unregister();
+        presenter.onStopActivity();
         super.onStop();
 
     }

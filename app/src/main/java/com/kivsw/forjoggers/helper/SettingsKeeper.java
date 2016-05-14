@@ -64,17 +64,6 @@ public class SettingsKeeper {
     }
 
     //-----------------------------------------------------
-  /*  public  String getCurrentTrack()
-    {
-        return sharedPreferences.getString("currentTrack", "");
-    };
-    public void setCurrentTrack(String t)
-    {
-        SharedPreferences.Editor e= sharedPreferences.edit();
-        e.putString("currentTrack", t);
-        e.commit();
-    }*/
-    //-----------------------------------------------------
     public  String getCurrentFileName()
     {
         return sharedPreferences.getString("FileName", null);
@@ -114,33 +103,12 @@ public class SettingsKeeper {
         FlexibleWeight r=new FlexibleWeight();
         r.load(sharedPreferences,"myWeight");
         return r;
-        /*int v= sharedPreferences.getInt("myWeight", 70);
-        return v;*/
-    }
-/*    public double getMyWeightKg()
-    {
-        double w=getMyWeight();
-        if(getMyWeightUnit()==LB)
-            w=(w*0.45359237f);
-        return w;
-    }*/
-    /**
-     *
-     * @param weight is my weight
-     */
 
-   /* public int getMyWeightUnit()
-    {
-        return sharedPreferences.getInt("weightUnits", 0);
-    }*/
+    }
 
     public void setMyWeight(FlexibleWeight weight)
     {
         weight.save(sharedPreferences,"myWeight");
-        /*SharedPreferences.Editor e= sharedPreferences.edit();
-        e.putInt("myWeight", weight);
-        e.putInt("weightUnits", weightUnits);
-        e.commit();*/
     }
     //-------------------------------------------------------------
     /**
@@ -150,7 +118,7 @@ public class SettingsKeeper {
     public static final int HIKING=0, JOGGING=1, BICYCLING=2;
     public int getActivityType()
     {
-        return sharedPreferences.getInt("activityType", 1);
+        return sharedPreferences.getInt("activityType", JOGGING);
     }
     public  void setActivityType(int activityType)
     {
@@ -215,6 +183,7 @@ public class SettingsKeeper {
     public FlexibleDistance getAutoStopDistance()
     {
         FlexibleDistance r=new FlexibleDistance();
+        r.setDefault(5000,METERS);
         r.load(sharedPreferences,"autoStopDistance");
         return r;
     }
@@ -222,45 +191,6 @@ public class SettingsKeeper {
     {
         d.save(sharedPreferences,"autoStopDistance");
     }
- /*   public  int getAutoStopDistanceUnit()
-    {
-        return sharedPreferences.getInt("autoStopDistanceUnit", 0);
-    };
-    public void setAutoStopDistanceUnit(int v)
-    {
-        SharedPreferences.Editor e= sharedPreferences.edit();
-        e.putInt("autoStopDistanceUnit", v);
-        e.commit();
-    }
-
-    public  double getAutoStopDistanceValue()
-    {
-        long v=sharedPreferences.getLong("autoStopDistanceValue", 0);
-        return Double.longBitsToDouble(v);
-    };
-    public double getAutoStopDistanceMeters()
-    {
-        double v=getAutoStopDistanceValue();
-        switch(getAutoStopDistanceUnit())
-        {
-            case METERS:
-                break;
-            case KILOMETERS:
-                v*=1000;
-                break;
-            case MILES:
-                v*=1609;
-                break;
-        }
-        return v;
-    }
-    public void setAutoStopDistanceValue(double v)
-    {
-        SharedPreferences.Editor e= sharedPreferences.edit();
-        long vl= Double.doubleToLongBits(v);
-        e.putLong("autoStopDistanceValue", vl);
-        e.commit();
-    }*/
     //-----------------------------------------------------
     // sets autostop for time
     public  boolean getIsAutoStopTime()
@@ -276,6 +206,7 @@ public class SettingsKeeper {
     public FlexibleTime getAutoStopTime()
     {
         FlexibleTime r=new FlexibleTime();
+        r.setDefault(1,HOUR);
         r.load(sharedPreferences,"autoStopTime");
         return r;
     };
@@ -283,44 +214,7 @@ public class SettingsKeeper {
     {
         t.save(sharedPreferences,"autoStopTime");
     };
-   /* public  int getAutoStopTimeUnit()
-    {
-        return sharedPreferences.getInt("autoStopTimeUnit", 0);
-    };
-    public void setAutoStopTimeUnit(int v)
-    {
-        SharedPreferences.Editor e= sharedPreferences.edit();
-        e.putInt("autoStopTimeUnit", v);
-        e.commit();
-    }
 
-    public void setAutoStopTimeValue(long v)
-    {
-        SharedPreferences.Editor e= sharedPreferences.edit();
-        e.putLong("autoStopTimeValue", v);
-        e.commit();
-    }
-    public  long getAutoStopTimeValue()
-    {
-        long v=sharedPreferences.getLong("autoStopTimeValue", 0);
-        return v;
-    };
-    public  long getAutoStopTimeSeconds()
-    {
-        long v=getAutoStopTimeValue();
-        switch(getAutoStopTimeUnit())
-        {
-            case SECOND:
-                break;
-            case MINUTE:
-                v*=60;
-                break;
-            case HOUR:
-                v*=60*60;
-                break;
-        }
-        return v;
-    };*/
     //-----------------------------------------
     public void setTTS_engine(String engine)
     {
@@ -363,6 +257,7 @@ public class SettingsKeeper {
     public FlexibleDistance getDistanceSpeaking()
     {
         FlexibleDistance r=new FlexibleDistance();
+        r.setDefault(500,METERS);
         r.load(sharedPreferences, "DistanceSpeaking");
         return r;
     }
@@ -384,6 +279,7 @@ public class SettingsKeeper {
     public FlexibleTime getTimeSpeaking()
     {
         FlexibleTime r=new FlexibleTime();
+        r.setDefault(2,MINUTE);
         r.load(sharedPreferences, "TimeSpeaking");
         return r;
     }
@@ -408,7 +304,7 @@ public class SettingsKeeper {
         void save(SharedPreferences sharedPreferences, String name)
         {
             SharedPreferences.Editor e= sharedPreferences.edit();
-            //long vl= Double.doubleToLongBits(value);
+
             e.putLong(name+"Value", value);
             e.putInt(name+"Unit", unit);
             e.commit();
@@ -416,7 +312,6 @@ public class SettingsKeeper {
 
         void load(SharedPreferences sharedPreferences,String name)
         {
-            //value =Double.longBitsToDouble();
             value=sharedPreferences.getLong(name+"Value",defaultValue);
             unit = sharedPreferences.getInt(name+"Unit",defaultUnit);
         }
@@ -440,8 +335,9 @@ public class SettingsKeeper {
         public FlexibleTime(){super();}
         public FlexibleTime(long t, int u)
           {value=t; unit=u;}
-        public long getTime() {return value;};
 
+        public void setDefault(long dt, int u) { defaultValue=dt; defaultUnit=u;};
+        public long getTime() {return value;};
         public long getTimeSeconds()
         {
             long v=value;
@@ -467,6 +363,7 @@ public class SettingsKeeper {
         public FlexibleDistance(double d, int u)
           {setDoubleValue(d); unit=u;};
 
+        public void setDefault(double dd, int u) { defaultValue=Double.doubleToLongBits(dd); defaultUnit=u;};
         public double getDistance() {return getDoubleValue();};
         public double getDistanceMeters()
         {
@@ -497,7 +394,7 @@ public class SettingsKeeper {
         public long getWeight() {return value;};
         public double getWeightKg()
         {
-            double w=getDoubleValue();
+            double w=value;
                 if(unit==LB)
                     w=(w*0.45359237f);
             return w;

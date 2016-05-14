@@ -34,7 +34,7 @@
     <string name="keep_in_backgroung">работать в фоне</string>
     <string name="my_weight">Мой вес:</string>
 
-    <string name="current_activity">Деятельность текущго трека:</string>
+    <string name="current_activity">Деятельность текущего трека:</string>
     <string name="default_activity">Деятельность по умолчанию:</string>
     <string-array name="activities">
         <item>Ходьба</item>
@@ -80,12 +80,14 @@
     <string name="Incorrect_value">Некорректное значение!</string>
 
     <string name="auto_stop">Автоматически останавливать</string>
+    <string name="after">После:</string>
+
+    <string name="pronounce">Звуковое информирование</string>
     <string name="tts_engine">TTS:</string>
     <string name="defaultTTS">по-умолчанию</string>
 
-    <string name="speak_time">Озвучивать время</string>
-    <string name="speak_distance">Озвучивать расстояние</string>
-    <string name="speak_start_stop">Озвучивать начало/конец трека</string>
+    <string name="every">Каждые:</string>
+    <string name="speak_start_stop">Начало/конец трека</string>
 
     <!-- tts messages -->
     <string name="tts_init_error">Ошибка инициализации системы TTS</string>

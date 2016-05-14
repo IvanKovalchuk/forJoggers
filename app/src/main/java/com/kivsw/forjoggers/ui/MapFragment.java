@@ -47,7 +47,7 @@ implements
     private MapViewEnvelope mapView = null;
 
     private TextView textTrackInfo,textCurrentSpeedInfo;
-    ImageView satelliteImageView;
+    ImageView satelliteImageView, activityImageView;
     Boolean isGpsAvailable=null;
 
     TextView fileNameTextView;
@@ -128,6 +128,8 @@ implements
 
         satelliteImageView = (ImageView) rootView.findViewById(R.id.satelliteImageView);
         satelliteImageView.setVisibility(View.INVISIBLE);
+
+        activityImageView = (ImageView) rootView.findViewById(R.id.activityImageView);
 
         fileNameTextView = (TextView) rootView.findViewById(R.id.fileNameTextView);
 
@@ -286,6 +288,19 @@ implements
         updateTrackInfo();
     }*/
     public void updateTrackInfo(TrackSmoother trackSmoother, Track currentTrack ) {
+
+        switch(currentTrack.getActivityType()) {
+            case SettingsKeeper.HIKING:
+                activityImageView.setImageResource(R.drawable.walking_c);
+                break;
+            case SettingsKeeper.JOGGING:
+                activityImageView.setImageResource(R.drawable.jogging_c);
+                break;
+            case SettingsKeeper.BICYCLING:
+                activityImageView.setImageResource(R.drawable.bycicling_c);
+                break;
+        }
+
         if((trackSmoother==null) ||
            (!presenter.isTracking() && trackSmoother.getGeoPoints().size()<2)    )
         {

@@ -2,6 +2,10 @@ package com.kivsw.forjoggers.ui;
 
 import android.app.Activity;
 import android.content.pm.ApplicationInfo;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -88,13 +92,11 @@ implements CustomPagerView.IonPageAppear
         weightUnitsSpinner.setAdapter(adapter);
 
         currentActivitySpinner = (Spinner)rootView.findViewById(R.id.currentActivitySpinner);
-        adapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.activities, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        currentActivitySpinner.setAdapter(adapter);
+        currentActivitySpinner.setAdapter(getActivityAdapter());
 
         defaultActivitySpinner= (Spinner)rootView.findViewById(R.id.defaultActivitySpinner);
-        defaultActivitySpinner.setAdapter(adapter);
+        defaultActivitySpinner.setAdapter(getActivityAdapter());
 
         distanceUnitsSpinner = (Spinner)rootView.findViewById(R.id.distanceUnitsSpinner);
         adapter = ArrayAdapter.createFromResource(getActivity(),
@@ -254,9 +256,7 @@ implements CustomPagerView.IonPageAppear
         try{i=Integer.parseInt(weightEditText.getText().toString());}
         catch(Exception e){i=0;};
         settings.setMyWeight(new SettingsKeeper.FlexibleWeight(i, weightUnitsSpinner.getSelectedItemPosition()));
-
-      //  CurrentTrack.getInstance(getActivity()).setActivityType(
-        //        currentActivitySpinner.getSelectedItemPosition());
+        presenter.getCurrentTrack().setActivityType(currentActivitySpinner.getSelectedItemPosition());
 
         settings.setActivityType(defaultActivitySpinner.getSelectedItemPosition());
 
@@ -448,6 +448,16 @@ implements CustomPagerView.IonPageAppear
 
         return new IconSpinnerAdapter(getContext(),names,icons);
 
+    }
+    IconSpinnerAdapter getActivityAdapter()
+    {
+        String activities[]=getResources().getStringArray(R.array.activities);
+        Drawable icons[]=new Drawable[3];
+        icons[0]=  new BitmapDrawable(getResources(), BitmapFactory.decodeResource(getResources(),R.drawable.walking_c) );//getResources().getDrawable(R.drawable.walking,null);
+        icons[1]=  new BitmapDrawable(getResources(), BitmapFactory.decodeResource(getResources(),R.drawable.jogging_c) );
+        icons[2]=  new BitmapDrawable(getResources(), BitmapFactory.decodeResource(getResources(),R.drawable.bycicling_c) );
+
+        return new IconSpinnerAdapter(getContext(),activities,icons);
     }
 
 }

@@ -69,7 +69,7 @@ public class MapFragmentPresenter  extends BasePresenter {
 
             final WeakReference<MapFragment> fragment=new WeakReference<MapFragment>(mapFragment);
 
-            // emits GPS locations
+            // receives GPS locations
             rxGps= RxGps.getGprsUiObservable(context).subscribe(new Action1<Location>() {
                 @Override
                 public void call(Location location) {
@@ -83,7 +83,7 @@ public class MapFragmentPresenter  extends BasePresenter {
                 }
             });
 
-            // emits events to update GPS status
+            // receives events to update GPS status
             rxGpsStateUpdate = Observable.interval(300,1000, TimeUnit.MILLISECONDS,AndroidSchedulers.mainThread())
                      .subscribe(new Action1<Long>(){
                          @Override

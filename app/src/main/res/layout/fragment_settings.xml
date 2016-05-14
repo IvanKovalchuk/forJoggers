@@ -8,17 +8,30 @@
 <LinearLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-              android:orientation="vertical"
+             android:orientation="vertical"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
              >
 
     <!-- common settings -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/Settings"
+        android:id="@+id/captionTextView"
+        android:background="@color/settings_caption_color"
+        android:textColor="@color/settings_caption_font_color"
+        android:gravity="center_vertical|center_horizontal" />
+
     <CheckBox
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/keep_in_backgroung"
         android:id="@+id/keepInBackgroundCheckBox"
         android:layout_gravity="center_horizontal|left"
-        android:layout_marginLeft="10dp"/>
+        android:layout_marginLeft="10dp"
+        android:background="@color/light_background_color"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -45,7 +58,8 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/light_background_color">
 
         <TextView
             android:layout_width="0dp"
@@ -98,7 +112,8 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/light_background_color">
 
         <TextView
             android:layout_width="0dp"
@@ -159,20 +174,32 @@
     </LinearLayout>
 
     <!-- auto stop settings -->
-    <CheckBox
-        android:layout_width="wrap_content"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/auto_stop"
-        android:id="@+id/autoStopDistanceCheckBox"
-        android:layout_gravity="center_horizontal|left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:checked="false"/>
+        android:id="@+id/autoStopTextView"
+        android:background="@color/settings_caption_color"
+        android:textColor="@color/settings_caption_font_color"
+        android:layout_marginTop="15dp"
+        android:gravity="center_vertical|center_horizontal" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/light_background_color">
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/after"
+            android:id="@+id/autoStopDistanceCheckBox"
+            android:layout_gravity="center_horizontal|left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:checked="false"/>
 
         <EditText
             android:layout_width="0dp"
@@ -189,19 +216,20 @@
 
     </LinearLayout>
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/auto_stop"
-        android:id="@+id/autoStopTimeCheckBox"
-        android:layout_gravity="center_horizontal|left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"/>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/after"
+            android:id="@+id/autoStopTimeCheckBox"
+            android:layout_gravity="center_horizontal|left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"/>
 
         <EditText
             android:layout_width="0dp"
@@ -222,26 +250,36 @@
 
     <!-- TTS settings -->
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/pronounce"
+        android:id="@+id/pronounceTextView"
+        android:background="@color/settings_caption_color"
+        android:textColor="@color/settings_caption_font_color"
+        android:layout_marginTop="15dp"
+        android:gravity="center_vertical|center_horizontal" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:background="@color/light_background_color">
 
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/tts_engine"
             android:id="@+id/ttsTextView"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"/>
+            android:layout_marginBottom="10dp" />
 
         <Spinner
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/ttsSpinner"
+            android:layout_weight="1"
             />
 
     </LinearLayout>
@@ -255,19 +293,21 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"/>
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/speak_distance"
-        android:id="@+id/distanceSpeakCheckBox"
-        android:layout_gravity="center_horizontal|left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"/>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/light_background_color">
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/every"
+            android:id="@+id/distanceSpeakCheckBox"
+            android:layout_gravity="center_horizontal|left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"/>
 
         <EditText
             android:layout_width="0dp"
@@ -284,19 +324,21 @@
 
     </LinearLayout>
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/speak_time"
-        android:id="@+id/timeSpeakCheckBox"
-        android:layout_gravity="center_horizontal|left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"/>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/every"
+            android:id="@+id/timeSpeakCheckBox"
+            android:layout_gravity="center_horizontal|left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"/>
 
         <EditText
             android:layout_width="0dp"

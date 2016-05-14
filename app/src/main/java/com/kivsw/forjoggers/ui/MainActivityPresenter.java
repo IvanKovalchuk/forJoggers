@@ -28,15 +28,19 @@ public class MainActivityPresenter extends BasePresenter {
     public void onCreateActivity(MainActivity activity)
     {
         this.activity=activity;
-        DataModel.getInstance(activity).getUsingCounter().startUsingBy(MainActivity.TAG);
-
     }
     public void onDestroyActivity()
     {
-        DataModel.getInstance(activity).getUsingCounter().stopUsingBy(MainActivity.TAG);
         this.activity=null;
     }
-
+    public void onStartActivity()
+    {
+        DataModel.getInstance(activity).getUsingCounter().startUsingBy(MainActivity.TAG);
+    }
+    public void onStopActivity()
+    {
+        DataModel.getInstance(activity).getUsingCounter().stopUsingBy(MainActivity.TAG);
+    }
     @Override
     public void onSettingsChanged() {
 

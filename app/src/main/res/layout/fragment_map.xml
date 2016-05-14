@@ -5,11 +5,11 @@
     xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.MapFragment">
 
-    <!-- org.osmdroid.views.MapView -->
-    <com.kivsw.forjoggers.ui.MapViewEnvelope
-        android:id="@+id/map"
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent" />
+    <!--  org.osmdroid.views.MapView -->
+     <com.kivsw.forjoggers.ui.MapViewEnvelope
+         android:id="@+id/map"
+                                 android:layout_width="fill_parent"
+                                 android:layout_height="fill_parent" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -21,6 +21,7 @@
         android:layout_gravity="left|top"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="15sp"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,6 +32,7 @@
         android:layout_gravity="right|top"
         android:layout_marginRight="10dp"
         android:layout_marginTop="50dp"/>
+
     <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -77,15 +79,31 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="fileNameTextView"
-        android:id="@+id/fileNameTextView"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|top">
 
-        android:layout_gravity="left|top"
-        android:textStyle="bold"
-        android:textColor="#FF000000"
-        android:textSize="15sp"/>
+              <ImageView
+                  android:layout_width="20dp"
+                  android:layout_height="20dp"
+                  android:id="@+id/activityImageView"
+                  android:layout_gravity="right|top"
+                  android:layout_marginRight="5dp"
+                  android:layout_marginLeft="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="fileNameTextView"
+                android:id="@+id/fileNameTextView"
+
+                android:textStyle="bold"
+                android:textColor="#FF000000"
+                android:textSize="15sp"/>
+        </LinearLayout>
+
+
 
 </FrameLayout>

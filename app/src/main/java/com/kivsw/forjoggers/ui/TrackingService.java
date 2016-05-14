@@ -111,7 +111,6 @@ public class TrackingService extends Service {
                 break;
             case ACTION_STOP:  doStop(reason);
                 break;
-
         }
 
         if(usingCounter.count()==0) {

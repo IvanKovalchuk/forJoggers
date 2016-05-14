@@ -82,12 +82,15 @@
     <string name="Incorrect_value">Incorrect value!</string>
 
     <string name="auto_stop">Auto stop</string>
+    <string name="after">After:</string>
+
+    <string name="pronounce">Sound information</string>
+
     <string name="tts_engine">TTS:</string>
     <string name="defaultTTS">default</string>
 
-    <string name="speak_time">Pronounce time</string>
-    <string name="speak_distance">Pronounce distance</string>
-    <string name="speak_start_stop">Pronounce start/stop tracking</string>
+    <string name="every">Every:</string>
+    <string name="speak_start_stop">Start/stop tracking</string>
 
     <!-- tts messages -->
     <string name="tts_init_error">can not initialize TTS system</string>
