@@ -18,6 +18,7 @@ public class MainActivityPresenter extends BasePresenter {
     };
 
     MainActivity activity=null;
+    boolean isActivityStarted=false;
 
     private MainActivityPresenter(Context context)
     {
@@ -35,10 +36,12 @@ public class MainActivityPresenter extends BasePresenter {
     }
     public void onStartActivity()
     {
+        isActivityStarted=true;
         DataModel.getInstance(activity).getUsingCounter().startUsingBy(MainActivity.TAG);
     }
     public void onStopActivity()
     {
+        isActivityStarted=false;
         DataModel.getInstance(activity).getUsingCounter().stopUsingBy(MainActivity.TAG);
     }
     @Override
@@ -67,7 +70,7 @@ public class MainActivityPresenter extends BasePresenter {
         if(!hasTrackData()) return;
         MapFragmentPresenter.getInstance(context).actionAnimateTrack();
     };
-    void actionQuit()
+    void actionExit()
     {
          if(this.activity!=null)
              this.activity.finish();
@@ -86,7 +89,7 @@ public class MainActivityPresenter extends BasePresenter {
 
     public void menuUpdate()
     {
-        if(this.activity!=null)
+        if(this.activity!=null && isActivityStarted)
             activity.supportInvalidateOptionsMenu();
     }
 }

@@ -138,7 +138,7 @@ implements  FileDialog.OnCloseListener,
          item.setVisible(/*hasTrackData &&*/ !isTracking && BuildConfig.DEBUG);
 
          item=menu.findItem(R.id.action_quit);
-         item.setVisible(settings.getKeepBackGround());
+         item.setVisible(settings.getKeepBackGround() && !presenter.isTracking());
 
          return super.onPrepareOptionsMenu(menu);
      }
@@ -187,7 +187,7 @@ implements  FileDialog.OnCloseListener,
                 break;
 
             case R.id.action_quit:
-                presenter.actionQuit();
+                presenter.actionExit();
                 break;
         }
 

@@ -218,7 +218,8 @@ public class MapFragmentPresenter  extends BasePresenter {
     }
     public void onAfterStopTracking()
     {
-        mapFragment.showStartButton();
+        if(mapFragment!=null)
+            mapFragment.showStartButton();
         MainActivityPresenter.getInstance(context).menuUpdate();
         stopTrackingUpdating();
     }

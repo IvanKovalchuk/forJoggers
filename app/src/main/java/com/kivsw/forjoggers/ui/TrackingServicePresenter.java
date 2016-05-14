@@ -53,34 +53,72 @@ public class TrackingServicePresenter extends BasePresenter {
         return t;
     }
     //-------------------------------------------------
+
+    /**
+     * accomplishes the notification's action "exit"
+     */
+    void action_exit()
+    {
+        MainActivityPresenter.getInstance(context).actionExit();
+    };
+
+    /**
+     *  accomplishes the notification's action "stop tracking"
+     */
+    void stop_tracking()
+    {
+        DataModel.getInstance(context).stopTracking();
+    };
+    //-------------------------------------------------
+    /**
+     * inform service that tracking has been started
+     */
     public void startTracking()
     {
         TrackingService.start(context, TrackingService.TRACKING);
     }
+
+    /**
+     * inform service that tracking has been stopped
+     */
 
     public void endTracking()
     {
         TrackingService.stop(context, TrackingService.TRACKING);
     }
     //-------------------------------------------------
+
+    /**
+     * inform service that the file saving process  has been started
+     */
     public void startSaving()
     {
         TrackingService.start(context,TrackingService.SAVING);
     }
-
+    /**
+     * inform service that the file saving process has been stopped
+     */
     public void endSaving()
     {
         TrackingService.stop(context, TrackingService.SAVING);
     }
 
     //-------------------------------------------------
+
+    /**
+     * inform service that the background working has been started
+     */
     public void startBackground()
     {
         TrackingService.start(context,TrackingService.BACKGROUND);
     }
-
+    /**
+     * inform service that the background working  has been stopped
+     */
     public void endBackground()
     {
         TrackingService.stop(context, TrackingService.BACKGROUND);
     }
+
+
 }

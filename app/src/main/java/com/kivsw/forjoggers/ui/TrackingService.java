@@ -1,5 +1,6 @@
 package com.kivsw.forjoggers.ui;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -30,7 +32,9 @@ import java.util.SimpleTimeZone;
 public class TrackingService extends Service {
     public static final String TAG="TrackingService";
     public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
-                        ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP";
+                        ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP",
+                        ACTION_NOTIFICATION_EXIT ="com.kivsw.forjoggers.ACTION_NOTIFICATION_EXIT",
+                        ACTION_NOTIFICATION_STOP ="com.kivsw.forjoggers.ACTION_NOTIFICATION_STOP";
 
     //------------------------------------------------
     boolean isWorking=false;
@@ -107,9 +111,17 @@ public class TrackingService extends Service {
 
         switch(action)
         {
-            case ACTION_START: doStart(reason);
+            case ACTION_START: doStart(reason); // start service
                 break;
-            case ACTION_STOP:  doStop(reason);
+
+             case ACTION_STOP:  doStop(reason); // stop service
+                break;
+
+            case ACTION_NOTIFICATION_EXIT:
+                presenter.action_exit(); // accomplishes the notification's action "exit"
+                break;
+            case ACTION_NOTIFICATION_STOP: // accomplishes the notification's action "stop tracking"
+                presenter.stop_tracking();
                 break;
         }
 
@@ -119,6 +131,7 @@ public class TrackingService extends Service {
         }
         return START_NOT_STICKY;
     }
+
     //-----------------------------------------
     private void doStart(String reason)
     {
@@ -212,8 +225,9 @@ public class TrackingService extends Service {
         sdf.setTimeZone(new SimpleTimeZone(0, ""));
         sdf.format(new Date(workingTime));
         mBuilder.setContentText(sdf.format(new Date(workingTime)));
-
         mBuilder.setContentIntent(createNotificationIntent());
+
+        addNotificationAction(mBuilder,getText(R.string.Stop).toString(), ACTION_NOTIFICATION_STOP, R.drawable.man );
 
         return mBuilder.build();
     }
@@ -239,6 +253,8 @@ public class TrackingService extends Service {
         mBuilder.setContentText(getText(R.string.background));
         mBuilder.setContentIntent(createNotificationIntent());
 
+        addNotificationAction(mBuilder,getText(R.string.action_quit).toString(), ACTION_NOTIFICATION_EXIT, R.drawable.exit );
+
         return mBuilder.build();
     }
 
@@ -251,6 +267,17 @@ public class TrackingService extends Service {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         return PendingIntent.getActivity(this, -1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    @TargetApi(16)
+    void addNotificationAction(NotificationCompat.Builder mBuilder , String title, String action, int icon)
+    {
+        if(Build.VERSION.SDK_INT<16) return;
+
+        Intent intent=new Intent(action, null, this, TrackingService.class);
+
+        mBuilder.addAction(icon, title,
+                PendingIntent.getService(this, -1, intent, PendingIntent.FLAG_UPDATE_CURRENT));
     }
 
     //------------------------------------------------------

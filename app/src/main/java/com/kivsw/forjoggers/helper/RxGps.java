@@ -95,10 +95,42 @@ public class RxGps {
      * then it puts coreGpsObservable on its place
      * @param list
      */
+    private static Subscription emuIntervalSubscription=null;
     public static void setEmulationData(final List<Location> list)
     {
 
         if(gpsObservableSubscription!=null) gpsObservableSubscription.unsubscribe();
+
+        final PublishSubject<Long> ps= PublishSubject.create();
+        emuIntervalSubscription=Observable.interval(250, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread()).subscribe(ps);
+
+        Observable o= ps.map(new Func1<Long,Location>() {
+            @Override
+            public Location call(Long i) {
+                if(list.size()>i)
+                    return list.get(i.intValue());
+
+                gpsObservableSubscription.unsubscribe();
+                emuIntervalSubscription.unsubscribe();
+                gpsObservableSubscription=  getCoreObservable(null).subscribe(gpsObservable);// subscribe normal GPS again
+
+                return null;
+            }
+        })
+                .filter(new Func1<Location, Boolean>() {  // remembers the time when the last location was received
+                    @Override
+                    public Boolean call(Location location) {
+                        if(location==null)
+                            return false;
+                        lastLocationTime = SystemClock.elapsedRealtime();
+                        return true;// really I don't filter
+                    }
+                });
+        gpsObservableSubscription = o.subscribe(gpsObservable);
+
+
+
+/*        if(gpsObservableSubscription!=null) gpsObservableSubscription.unsubscribe();
 
         Observable o=Observable.interval(250, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .map(new Func1<Long,Location>() {
@@ -109,17 +141,20 @@ public class RxGps {
 
                         gpsObservableSubscription.unsubscribe(); // subscribe normal GPS again
                         gpsObservableSubscription=  getCoreObservable(null).subscribe(gpsObservable);
-                        return list.get(list.size()-1);
+
+                        return null;
                     }
                 })
                 .filter(new Func1<Location, Boolean>() {  // remembers the time when the last location was received
                     @Override
                     public Boolean call(Location location) {
+                        if(location==null)
+                               return false;
                         lastLocationTime = SystemClock.elapsedRealtime();
                         return true;// really I don't filter
                     }
                 });
-        gpsObservableSubscription = o.subscribe(gpsObservable);
+        gpsObservableSubscription = o.subscribe(gpsObservable);*/
 
     }
 
@@ -128,7 +163,13 @@ public class RxGps {
      */
     public static void release()
     {
-        if(gpsListener!=null) {
+        if(emuIntervalSubscription!=null) // track emulation
+        {
+            emuIntervalSubscription.unsubscribe();
+            emuIntervalSubscription=null;
+        }
+
+        if(gpsListener!=null) { // release GPS
             gpsListener.releaseInstance();
             gpsListener.subscriber.onCompleted();
             gpsListener = null;
