@@ -383,6 +383,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
     protected void doUpdateFileNameView()
     {
         MapFragmentPresenter.getInstance(context).updateFileName();
+        MainActivityPresenter.getInstance(context).menuUpdate();
     }
 
     /**
@@ -438,8 +439,10 @@ public class DataModel implements UsingCounter.IUsingChanged{
         else
             TrackingServicePresenter.getInstance(context).endBackground();
 
-        if(speaker!=null)
-            speaker.release();
+        if(speaker!=null) {
+            if(!settings.getTTS_engine().equals(speaker.currentEngine)) // if the user has changed TTS-engine
+                speaker.release();
+        }
 
     }
 

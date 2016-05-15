@@ -20,7 +20,10 @@ public class Speaker {
     TtsHelper ttsHelper = null;
     Context context;
     SettingsKeeper settings;
-    boolean useEngMessages=false;
+    boolean useEngMessages=false,
+            speakingFinished = true,
+            needToRelease=false;
+    String currentEngine=null;
     LinkedList<UtteranceType> utteranceQueue = new LinkedList();
     enum UtteranceType {START , STOP , TRACKSTATE};
 
@@ -31,16 +34,28 @@ public class Speaker {
     }
 
     void release() {
+
+        if(speakingFinished)
+            doRelease();
+        else
+            needToRelease=true; // it will invoke doRelease() when speaking is finished
+
+    }
+    private  void doRelease()
+    {
         if (ttsHelper != null)
             ttsHelper.release();
         ttsHelper = null;
     }
 
     void init() {
+        needToRelease=false;
+
         if (ttsHelper != null) return;
         useEngMessages=false;
 
-        ttsHelper = new TtsHelper(context, settings.getTTS_engine(), new TtsHelper.TTS_Helperlistener() {
+        currentEngine = settings.getTTS_engine();
+        ttsHelper = new TtsHelper(context,currentEngine , new TtsHelper.TTS_Helperlistener() {
             @Override
             public void onInit(int status) {
                 if(ttsHelper==null) return;
@@ -61,6 +76,9 @@ public class Speaker {
             @Override
             public void onStopSpeaking() {
                 TrackingServicePresenter.getInstance(context).endTTSspeaking();
+                speakingFinished=true;
+                if(needToRelease)
+                    doRelease();
             }
 
         });
@@ -69,16 +87,22 @@ public class Speaker {
 
     public void speakStart() {
         init();
+
         TrackingServicePresenter.getInstance(context).startTTSspeaking();
         utteranceQueue.add(UtteranceType.START);
+        speakingFinished=false;
+
         processUtterances();
     }
 
     public void speakStop()
     {
         init();
+
         TrackingServicePresenter.getInstance(context).startTTSspeaking();
         utteranceQueue.add(UtteranceType.STOP);
+        speakingFinished=false;
+
         processUtterances();
     }
     public void speakTrack()
@@ -90,8 +114,10 @@ public class Speaker {
 
         while(utteranceQueue.contains(UtteranceType.TRACKSTATE))
             utteranceQueue.remove(UtteranceType.TRACKSTATE);
+
         TrackingServicePresenter.getInstance(context).startTTSspeaking();
         utteranceQueue.add(UtteranceType.TRACKSTATE);
+        speakingFinished=false;
 
         processUtterances();
     }
