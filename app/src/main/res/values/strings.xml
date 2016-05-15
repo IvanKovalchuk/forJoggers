@@ -172,5 +172,6 @@
     <!-- TrackingService -->
     <string name="file_saving">Saving...</string>
     <string name="background">Background</string>
+    <string name="tts_speaking">Speaking...</string>
 
 </resources>

@@ -43,7 +43,8 @@ public class TrackingService extends Service {
     MyHandler mHandler;
 
 
-    public final static String TRACKING="tracking", BACKGROUND="background", SAVING="saving"; // processes that may keep this service working
+    public final static String TRACKING="tracking", BACKGROUND="background", // processes that may keep this service working
+            SAVING="saving", TTS_SPEAKS="tts_speaks";
     UsingCounter<String> usingCounter=null;
 
     //------------------------------------------------------
@@ -54,8 +55,8 @@ public class TrackingService extends Service {
      */
     static void start(Context context, String reason)
     {
-        if(!reason.equals(TRACKING) &&  !reason.equals(BACKGROUND) &&  !reason.equals(SAVING))
-            return;
+        if(!reason.equals(TRACKING) &&  !reason.equals(BACKGROUND) &&  !reason.equals(SAVING) &&  !reason.equals(TTS_SPEAKS))
+            throw new RuntimeException("TrackingService.start() Invalid parameter");
 
         Intent i=new Intent(ACTION_START, null,context, TrackingService.class);
         i.putExtra("reason", reason);
@@ -169,7 +170,9 @@ public class TrackingService extends Service {
     final private int NOTIFICATION_ID=1;
     void turnIntoForeground()
     {
-        startForeground(NOTIFICATION_ID, getNotification());
+        Notification n=getNotification();
+        if(n==null) stopForeground(true);
+        else startForeground(NOTIFICATION_ID, n);
 
         if(usingCounter.contains(TRACKING))
             mHandler.scheduleUpdateNotification();
@@ -211,7 +214,10 @@ public class TrackingService extends Service {
         {
             return getBackgroundgNotification();
         }
-
+        else  if(usingCounter.contains(TTS_SPEAKS))
+        {
+            return getTTSNotification();
+        }
         return null;
     }
     private Notification getTrackingNotification()
@@ -254,6 +260,19 @@ public class TrackingService extends Service {
         mBuilder.setContentIntent(createNotificationIntent());
 
         addNotificationAction(mBuilder,getText(R.string.action_quit).toString(), ACTION_NOTIFICATION_EXIT, R.drawable.exit );
+
+        return mBuilder.build();
+    }
+
+    private Notification getTTSNotification()
+    {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.tortoise_ltl);
+        mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+        mBuilder.setContentTitle(this.getText(R.string.app_name));
+
+        mBuilder.setContentText(getText(R.string.tts_speaking));
+        mBuilder.setContentIntent(createNotificationIntent());
 
         return mBuilder.build();
     }

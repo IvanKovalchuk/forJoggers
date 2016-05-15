@@ -371,6 +371,7 @@ implements
             isGpsAvailable = Boolean.TRUE;
         } else{
             satelliteImageView.setImageResource(R.drawable.gps_disconnected);
+            textCurrentSpeedInfo.setText("");
             isGpsAvailable = Boolean.FALSE;
         }
 
@@ -435,13 +436,23 @@ implements
         if(settings.getReturnToMyLocation())
             checkMyLocationVisibility();
 
+        String resStr="";
         if(location.hasSpeed()) {
-            StringBuilder str=new StringBuilder();
-            str.append(unitUtils.speedToStr(location.getSpeed()));
-            textCurrentSpeedInfo.setText(str);
+            resStr =unitUtils.speedToStr(location.getSpeed());
         }
         else
-            textCurrentSpeedInfo.setText("");
+        if(presenter.getTrackSmoother()!=null &&
+                presenter.getTrackSmoother().getGeoPoints()!=null &&
+                presenter.getTrackSmoother().getGeoPoints().size()>1)
+        {
+            ArrayList<Location> points=presenter.getTrackSmoother().getGeoPoints();
+            Location l=points.get(points.size()-1);
+            if(l.hasSpeed())
+                resStr ="~"+unitUtils.speedToStr(l.getSpeed());
+        }
+
+        textCurrentSpeedInfo.setText(resStr);
+
     };
     //----------------------------------------------
 

@@ -8,6 +8,7 @@ import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.TtsHelper;
 import com.kivsw.forjoggers.ui.MainActivityPresenter;
+import com.kivsw.forjoggers.ui.TrackingServicePresenter;
 
 import java.util.LinkedList;
 import java.util.Locale;
@@ -39,7 +40,7 @@ public class Speaker {
         if (ttsHelper != null) return;
         useEngMessages=false;
 
-        ttsHelper = new TtsHelper(context, settings.getTTS_engine(), new TextToSpeech.OnInitListener() {
+        ttsHelper = new TtsHelper(context, settings.getTTS_engine(), new TtsHelper.TTS_Helperlistener() {
             @Override
             public void onInit(int status) {
                 if(ttsHelper==null) return;
@@ -57,12 +58,18 @@ public class Speaker {
                 processUtterances();
             }
 
+            @Override
+            public void onStopSpeaking() {
+                TrackingServicePresenter.getInstance(context).endTTSspeaking();
+            }
+
         });
 
     }
 
     public void speakStart() {
         init();
+        TrackingServicePresenter.getInstance(context).startTTSspeaking();
         utteranceQueue.add(UtteranceType.START);
         processUtterances();
     }
@@ -70,18 +77,22 @@ public class Speaker {
     public void speakStop()
     {
         init();
+        TrackingServicePresenter.getInstance(context).startTTSspeaking();
         utteranceQueue.add(UtteranceType.STOP);
         processUtterances();
     }
     public void speakTrack()
     {
         init();
+
         if(utteranceQueue.size()>2 || ttsHelper.isSpeaking())
             return;
 
         while(utteranceQueue.contains(UtteranceType.TRACKSTATE))
             utteranceQueue.remove(UtteranceType.TRACKSTATE);
+        TrackingServicePresenter.getInstance(context).startTTSspeaking();
         utteranceQueue.add(UtteranceType.TRACKSTATE);
+
         processUtterances();
     }
 
@@ -120,6 +131,7 @@ public class Speaker {
         if(useEngMessages) str=context.getText(R.string.tts_start_en).toString();
         else  str=context.getText(R.string.tts_start).toString();
         ttsHelper.speak(str);
+
     }
     private void doSpeakStop(double d, long t)
     {
@@ -129,7 +141,6 @@ public class Speaker {
 
         String str2=createTrackInfo( d, t);
         ttsHelper.speak(str+" \n "+str2);
-
     }
     private void doSpeakTrack(double d, long t)
     {

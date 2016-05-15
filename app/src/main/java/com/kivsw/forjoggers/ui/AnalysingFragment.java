@@ -3,6 +3,7 @@ package com.kivsw.forjoggers.ui;
 
 import android.app.Activity;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kivsw.dialog.MessageDialog;
+import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.model.Track;
@@ -74,6 +76,9 @@ public class AnalysingFragment extends Fragment
         graphSpiner.setAdapter(spinnerAdpter);
         graphSpiner.setOnItemSelectedListener(this);
         graphSpiner.setSelection(2);
+
+        if(BuildConfig.DEBUG) graphSpiner.setVisibility(View.VISIBLE);
+        else  graphSpiner.setVisibility(View.GONE);
 
         presenter = AnalysingFragmentPresenter.getInstance(getActivity());
 

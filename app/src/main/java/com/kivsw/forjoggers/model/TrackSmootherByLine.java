@@ -101,48 +101,12 @@ public class TrackSmootherByLine extends TrackSmoother {
 
 
             Location avLoc = getAvarageFor(i, avB, avE); // interpolates interval [avB, avE) with a line
-           /* if(prevLoc!=null)
-            {
-                float distanceAndBearing[]=new float[3];
-                Location.distanceBetween(prevLoc.getLatitude(), prevLoc.getLongitude(),
-                                    avLoc.getLatitude(), avLoc.getLongitude(),distanceAndBearing);
-                avLoc.setBearing(distanceAndBearing[1]);
-                avLoc.setSpeed((float) distanceAndBearing[0]*1000f/(avLoc.getTime()-prevLoc.getTime()));
-            }*/
 
             mResGeoPoints.add(avLoc);
             prevLoc = avLoc;
         }
         return mResGeoPoints;
-       /* ArrayList<Location> original=track.getGeoPoints();
-        int s= original.size();
 
-        mGeoPoints=new ArrayList<Location>(s);
-
-        int avE=0, avB=0;
-        for(int i=0;i<s;i++)
-        {
-            Location loc=original.get(i);
-            long Tmin= loc.getTime()-deltaT, Tmax=loc.getTime()+deltaT;
-            // looks for the first point of the interval
-            while(avB<i){
-                Location l=original.get(avB);
-                if((l.getTime()>Tmin) && (deltaDistance>loc.distanceTo(l))) //Track.distance(l,loc)
-                  break;
-                avB++;
-            };
-
-            // looks for the last point of the interval
-            while(avE<s){
-                Location l=original.get(avE);
-                if((l.getTime()>Tmax) || (deltaDistance<loc.distanceTo(l))  ) //Track.distance(l,loc)
-                    break;
-                avE++;
-            };
-
-            Location avLoc=getAvarageFor(i, avB, avE);
-            mGeoPoints.add(avLoc);
-        }*/
     };
 
 

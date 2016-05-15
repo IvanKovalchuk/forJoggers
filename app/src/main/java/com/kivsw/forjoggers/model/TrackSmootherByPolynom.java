@@ -36,13 +36,12 @@ public class TrackSmootherByPolynom extends TrackSmootherByLine {
     @Override
     void doSmooth()
     {
-
         super.doSmooth();
         improveGeoPoints();
     }
 
     void improveGeoPoints()
-    {
+    { // thin out points
         if(mGeoPoints.size()<5) return;
         ArrayList<Location> origin = track.getGeoPoints();
         int s=origin.size();
@@ -60,7 +59,7 @@ public class TrackSmootherByPolynom extends TrackSmootherByLine {
 
             if((lastLoc.distanceTo(loc)>maxDistance) || (loc.getTime()-lastLoc.getTime()>2) || (turn>20) || time>maxDeltaT)
             {
-                lastLoc=mGeoPoints.get(i);
+                lastLoc=loc;
                 result.add(lastLoc);
             }
         }

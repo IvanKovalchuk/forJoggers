@@ -287,7 +287,6 @@ public class DataModel implements UsingCounter.IUsingChanged{
     {
         if(!isTracking) return;
 
-        TrackingServicePresenter.getInstance(context).endTracking();
         trackingSubscriber.unsubscribe();
         trackingSubscriber=null;
 
@@ -305,6 +304,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
             speaker.speakStop();
             //speaker.speakTrack();
         }
+        TrackingServicePresenter.getInstance(context).endTracking();
         speaker.release();
         speaker=null;
 
@@ -414,13 +414,13 @@ public class DataModel implements UsingCounter.IUsingChanged{
     {
         if(trackSmoother==null || speaker==null) return;
 
-        if(settings.getIsDistanceSpeaking() && (nextDistanseToSpeak<trackSmoother.getTrackDistance()))
+        if(settings.getIsDistanceSpeaking() && (nextDistanseToSpeak<=trackSmoother.getTrackDistance()))
         {
             speaker.speakTrack();
             nextDistanseToSpeak+=settings.getDistanceSpeaking().getDistanceMeters();
         };
 
-        if(settings.getIsTimeSpeaking() && (nextTimeTospeak<(trackSmoother.getTrackTime()/1000) ))
+        if(settings.getIsTimeSpeaking() && (nextTimeTospeak<=(trackSmoother.getTrackTime()/1000) ))
         {
             speaker.speakTrack();
             nextTimeTospeak += settings.getTimeSpeaking().getTimeSeconds();

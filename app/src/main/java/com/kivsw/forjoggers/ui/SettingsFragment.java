@@ -177,7 +177,8 @@ implements CustomPagerView.IonPageAppear
     @Override
     public void onPause()
     {
-        saveData();
+        if(isVisible) // if the page is visible and the user could change smth
+            saveData();
         super.onPause();
 
     }
@@ -293,8 +294,10 @@ implements CustomPagerView.IonPageAppear
     }
     //----------------------------------------------
     // CustomPagerView.IonPageAppear
+    boolean isVisible=false;
     @Override
     public void onPageAppear() {
+        isVisible=true;
         loadData();
     }
 
@@ -302,7 +305,9 @@ implements CustomPagerView.IonPageAppear
     public void onPageDisappear() {
         View focus= getView().findFocus();
         if(focus!=null) focus.clearFocus(); // clear focus to hide the virtual keyboard
-        saveData();
+        if(isVisible)
+           saveData();
+        isVisible=false;
     }
     ////--------------------------------------------
     class WeightWatcher implements TextWatcher {

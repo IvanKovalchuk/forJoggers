@@ -1,8 +1,16 @@
 package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
+import android.database.Observable;
 
 import com.kivsw.forjoggers.model.DataModel;
+
+import java.util.concurrent.TimeUnit;
+
+import rx.Scheduler;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 /**
  * This is the presenter for the service
@@ -119,6 +127,37 @@ public class TrackingServicePresenter extends BasePresenter {
     {
         TrackingService.stop(context, TrackingService.BACKGROUND);
     }
+    //-------------------------------------------------
 
+    /**
+     * inform service that the background working has been started
+     */
+    Subscription speakingWachdogTimer=null;
+    public void startTTSspeaking()
+    {
+        if(speakingWachdogTimer!=null)
+            speakingWachdogTimer.unsubscribe();
+
+        TrackingService.start(context,TrackingService.TTS_SPEAKS);
+
+        speakingWachdogTimer = rx.Observable.timer(30, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        endTTSspeaking();
+                    }
+                });
+    }
+    /**
+     * inform service that the background working  has been stopped
+     */
+    public void endTTSspeaking()
+    {
+        if(speakingWachdogTimer!=null)
+           speakingWachdogTimer.unsubscribe();
+        speakingWachdogTimer=null;
+
+        TrackingService.stop(context, TrackingService.TTS_SPEAKS);
+    }
 
 }

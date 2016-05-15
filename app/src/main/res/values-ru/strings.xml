@@ -155,5 +155,6 @@
     <!-- TrackingService -->
     <string name="file_saving">Сохранение...</string>
     <string name="background">Фоновая работа</string>
+    <string name="tts_speaking">Озвучивание...</string>
 
 </resources>

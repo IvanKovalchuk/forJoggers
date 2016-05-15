@@ -15,23 +15,30 @@ import java.util.Locale;
  */
 public class TtsHelper {
 
+    public interface  TTS_Helperlistener
+    {
+        void onInit(int status);
+        void onStopSpeaking(); // is invoked when last utterance has been finished
+    }
     TextToSpeech tts=null;
     Context context;
+    TTS_Helperlistener listener=null;
 
     TextToSpeech.OnInitListener onInitListener=null; // listener for TTS
 
     boolean ready=false, needToRelease=false;
 
-    public TtsHelper(Context context, String engineName, final TextToSpeech.OnInitListener onInitL)
+    public TtsHelper(Context context, String engineName, final TTS_Helperlistener aListener)
     {
         this.context=context;
         ready=false;
+        listener=aListener;
         this.onInitListener=new TextToSpeech.OnInitListener(){
             @Override
             public void onInit(int status) {
                 ready= (status==TextToSpeech.SUCCESS);
-                if(onInitL!=null)
-                     onInitL.onInit(status);
+                if(listener!=null)
+                    listener.onInit(status);
             }
         };
         init(engineName);
@@ -60,8 +67,12 @@ public class TtsHelper {
                 if(lastUtteranceId.equals(utteranceId))
                     speakingFinished=true;
 
+                if(listener!=null && speakingFinished)
+                    listener.onStopSpeaking();
+
                 if(speakingFinished && needToRelease)
                     doRelease();
+
             }
         });
     };
