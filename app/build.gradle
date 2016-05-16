@@ -7,8 +7,8 @@ android {
         applicationId "com.kivsw.forjoggers"
         minSdkVersion 10
         targetSdkVersion 15
-        versionCode 5
-        versionName '1.5'
+        versionCode 6
+        versionName '2.0'
     }
     buildTypes {
         release {
