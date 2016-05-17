@@ -39,7 +39,7 @@ implements CustomPagerView.IonPageAppear
 
     /*public interface onSettingsCloseListener
     {
-        void onSettingsChanged();
+        void updateChart();
     }*/
     CheckBox keepInBackgroundCheckBox,autoStopDistanceCheckBox,autoStopTimeCheckBox,
             startStopSpeakCheckBox,timeSpeakCheckBox,distanceSpeakCheckBox;

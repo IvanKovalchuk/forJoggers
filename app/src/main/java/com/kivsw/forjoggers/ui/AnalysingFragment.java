@@ -216,7 +216,7 @@ public class AnalysingFragment extends Fragment
     }
     //----------------------------------------------
 
-    public void onSettingsChanged() {
+    public void updateChart() {
         needUpdate=true;
         if(isVisible)
             showGraph(graphSpiner.getSelectedItemPosition());

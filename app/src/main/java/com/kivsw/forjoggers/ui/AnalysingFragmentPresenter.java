@@ -2,6 +2,8 @@ package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
 
+import com.kivsw.forjoggers.model.Track;
+
 /**
  * Created by ivan on 01.05.2016.
  */
@@ -35,9 +37,20 @@ public class AnalysingFragmentPresenter extends BasePresenter  {
         analysingFragment=fragment;
     }
 
+    /**
+     * Method is invoked when currentTrack is changed
+     * @param track
+     */
+    public void onCurrentTrackUpdate(Track track)
+    {
+        if(analysingFragment==null) return;
+        analysingFragment.updateChart();
+
+    }
+
     @Override
     public void onSettingsChanged() {
         if(analysingFragment==null) return;
-        analysingFragment.onSettingsChanged();
+        analysingFragment.updateChart();
     }
 }

@@ -8,6 +8,7 @@ import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.RxGps;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
+import com.kivsw.forjoggers.ui.AnalysingFragmentPresenter;
 import com.kivsw.forjoggers.ui.MainActivityPresenter;
 import com.kivsw.forjoggers.ui.MapFragmentPresenter;
 import com.kivsw.forjoggers.ui.TrackingServicePresenter;
@@ -371,10 +372,12 @@ public class DataModel implements UsingCounter.IUsingChanged{
     protected void doUpdateCurrentTrackView()
     {
         MapFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
+
     }
     protected void doUpdateCurrentSmoothTrackView()
     {
-         MapFragmentPresenter.getInstance(context).onSmoothTrackUpdate(trackSmoother);
+        MapFragmentPresenter.getInstance(context).onSmoothTrackUpdate(trackSmoother);
+        AnalysingFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
     }
     protected void doUpdateFileNameView()
     {
