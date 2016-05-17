@@ -38,6 +38,7 @@ public class MainActivityPresenter extends BasePresenter {
     {
         isActivityStarted=true;
         DataModel.getInstance(activity).getUsingCounter().startUsingBy(MainActivity.TAG);
+        DataModel.getInstance(activity).onActivityStarted();
     }
     public void onStopActivity()
     {

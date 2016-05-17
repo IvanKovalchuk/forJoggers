@@ -72,10 +72,6 @@ public class DataModel implements UsingCounter.IUsingChanged{
         // load the last track
         loadLastData();
 
-        // starts background working
-        if(settings.getKeepBackGround())
-            TrackingServicePresenter.getInstance(context).startBackground();
-
     };
     public void release()
     {
@@ -445,5 +441,12 @@ public class DataModel implements UsingCounter.IUsingChanged{
         }
 
     }
+
+    public void onActivityStarted()
+    {
+        // starts background working
+        if(settings.getKeepBackGround())
+            TrackingServicePresenter.getInstance(context).startBackground();
+    };
 
 }

@@ -145,7 +145,8 @@ public class MapFragmentPresenter  extends BasePresenter {
     }
     void actionAnimateTrack()
     {
-        RxGps.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
+        //RxGps.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
+        RxGps.setEmulationData(new ArrayList<Location>(getTrackSmoother().getGeoPoints()));
     }
     //----------------------------------------------------------
 
