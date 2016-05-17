@@ -18,7 +18,6 @@ import android.support.v4.app.NotificationCompat;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
-import com.kivsw.forjoggers.model.DataModel;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -223,7 +222,7 @@ public class TrackingService extends Service {
     private Notification getTrackingNotification()
     {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.tortoise_ltl);
+        mBuilder.setSmallIcon(R.drawable.runner_ltl);
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         mBuilder.setContentTitle(this.getText(R.string.app_name));
         long workingTime= presenter.getTrackingTime();
@@ -240,7 +239,7 @@ public class TrackingService extends Service {
     private Notification getSavingNotification()
     {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.tortoise_ltl);
+        mBuilder.setSmallIcon(R.drawable.runner_ltl);
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         mBuilder.setContentTitle(this.getText(R.string.app_name));
 
@@ -252,7 +251,7 @@ public class TrackingService extends Service {
     private Notification getBackgroundgNotification()
     {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.tortoise_ltl);
+        mBuilder.setSmallIcon(R.drawable.runner_ltl);
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         mBuilder.setContentTitle(this.getText(R.string.app_name));
 
@@ -267,7 +266,7 @@ public class TrackingService extends Service {
     private Notification getTTSNotification()
     {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.tortoise_ltl);
+        mBuilder.setSmallIcon(R.drawable.runner_ltl);
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         mBuilder.setContentTitle(this.getText(R.string.app_name));
 
