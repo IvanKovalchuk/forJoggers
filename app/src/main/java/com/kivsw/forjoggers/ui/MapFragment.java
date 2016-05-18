@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kivsw.dialog.MessageDialog;
-import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UnitUtils;
@@ -276,17 +275,11 @@ implements
         settings.setZoomLevel(settings.getZoomLevel(), cl.getLatitude(), cl.getLongitude());
     }
 
-
     /**
-     * update the CurrentTrack if it's necessary
+     * shows the current track's information
+     * @param trackSmoother
+     * @param currentTrack
      */
-    /*void updateTrack(boolean always)
-    {
-        if(always || currentTrack.getGeoPoints().size() != originalPath.getNumberOfPoints()) {
-            putCurrentTrackOnMap();
-        }
-        updateTrackInfo();
-    }*/
     public void updateTrackInfo(TrackSmoother trackSmoother, Track currentTrack ) {
 
         switch(currentTrack.getActivityType()) {
@@ -316,11 +309,11 @@ implements
 
         str.append(getText(R.string.distance));
         str.append(unitUtils.distanceToStr(distance));
-        if (BuildConfig.DEBUG) {
+        /*if (BuildConfig.DEBUG) {
             str.append(" (");
             str.append(unitUtils.distanceToStr(currentTrack.getTrackDistance()));
             str.append(")");
-        }
+        }*/
         str.append("\n");
 
         str.append(getText(R.string.time));
