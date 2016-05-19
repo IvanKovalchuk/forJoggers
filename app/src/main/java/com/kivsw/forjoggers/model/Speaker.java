@@ -2,16 +2,16 @@ package com.kivsw.forjoggers.model;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.speech.tts.TextToSpeech;
 
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.TtsHelper;
-import com.kivsw.forjoggers.ui.MainActivityPresenter;
 import com.kivsw.forjoggers.ui.TrackingServicePresenter;
 
 import java.util.LinkedList;
 import java.util.Locale;
+
+import rx.functions.Action1;
 
 /**
  * Created by ivan on 5/12/16.
@@ -27,10 +27,13 @@ public class Speaker {
     LinkedList<UtteranceType> utteranceQueue = new LinkedList();
     enum UtteranceType {START , STOP , TRACKSTATE};
 
+    Action1<String> onErrorListener=null;
 
-    Speaker(Context cnt) {
+
+    Speaker(Context cnt, Action1<String> anOnErrorListener) {
         context = cnt;
         settings = SettingsKeeper.getInstance(context);
+        onErrorListener=anOnErrorListener;
     }
 
     void release() {
@@ -60,8 +63,8 @@ public class Speaker {
             public void onInit(int status) {
                 if(ttsHelper==null) return;
                 if (!ttsHelper.isReady()) {
-                    MainActivityPresenter.getInstance(context)
-                            .showError(context.getText(R.string.tts_init_error).toString());
+                    if(onErrorListener!=null)
+                        onErrorListener.call(context.getText(R.string.tts_init_error).toString());
                     return;
                 }
                 if(!ttsHelper.isCurrentLanguageSupported()) {

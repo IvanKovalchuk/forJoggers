@@ -1,19 +1,17 @@
 package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
-import android.database.Observable;
 
 import com.kivsw.forjoggers.model.DataModel;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Scheduler;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 /**
- * This is the presenter for the service
+ * This is the presenter for the service's UI
  */
 public class TrackingServicePresenter extends BasePresenter {
 
@@ -73,7 +71,7 @@ public class TrackingServicePresenter extends BasePresenter {
     /**
      *  accomplishes the notification's action "stop tracking"
      */
-    void stop_tracking()
+    void action_stopTracking()
     {
         DataModel.getInstance(context).stopTracking();
     };

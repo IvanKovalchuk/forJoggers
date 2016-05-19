@@ -111,17 +111,17 @@ public class TrackingService extends Service {
 
         switch(action)
         {
-            case ACTION_START: doStart(reason); // start service
+            case ACTION_START: doStartService(reason); // start service
                 break;
 
-             case ACTION_STOP:  doStop(reason); // stop service
+             case ACTION_STOP:  doStopService(reason); // stop service
                 break;
 
             case ACTION_NOTIFICATION_EXIT:
                 presenter.action_exit(); // accomplishes the notification's action "exit"
                 break;
             case ACTION_NOTIFICATION_STOP: // accomplishes the notification's action "stop tracking"
-                presenter.stop_tracking();
+                presenter.action_stopTracking();
                 break;
         }
 
@@ -133,7 +133,7 @@ public class TrackingService extends Service {
     }
 
     //-----------------------------------------
-    private void doStart(String reason)
+    private void doStartService(String reason)
     {
         if(!usingCounter.startUsingBy(reason)) // if we have already had this reason
             return;
@@ -146,7 +146,7 @@ public class TrackingService extends Service {
 
     }
 
-    private void doStop(String reason)
+    private void doStopService(String reason)
     {
         if(!usingCounter.stopUsingBy(reason))// if we have already had this reason
             return;
@@ -159,7 +159,7 @@ public class TrackingService extends Service {
         Object reasons[]=usingCounter.array();
         for(Object reason:reasons)
         {
-            doStop((String)reason);
+            doStopService((String)reason);
         }
     }
 

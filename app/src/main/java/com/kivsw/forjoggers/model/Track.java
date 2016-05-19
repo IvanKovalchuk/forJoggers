@@ -23,7 +23,7 @@ public class Track {
     {
         void onAddPoint();
         void onClear();
-        void onError(Throwable msg);
+        //void onError(Throwable msg);
 
     }
     //-----------------------------------------------------
@@ -58,6 +58,8 @@ public class Track {
         timeStop = track.timeStop;
         activityType = track.activityType;
         mGeoPoints = (ArrayList<Location>)track.mGeoPoints.clone();
+        if(onChange!=null)
+            onChange.onAddPoint();
     }
 
     //-----------------------------------------------------

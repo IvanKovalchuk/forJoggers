@@ -65,7 +65,6 @@ public class AnalysingFragment extends Fragment
         //graph.getViewport().setScalable(true);
         //graph.getViewport().setScrollable(true);
 
-
         graphSpiner=(Spinner)rootView.findViewById(R.id.spinner);
 
         spinnerAdpter=ArrayAdapter.createFromResource(getActivity(),

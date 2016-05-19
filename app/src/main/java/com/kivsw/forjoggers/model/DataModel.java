@@ -8,8 +8,6 @@ import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.RxGps;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
-import com.kivsw.forjoggers.ui.AnalysingFragmentPresenter;
-import com.kivsw.forjoggers.ui.MainActivityPresenter;
 import com.kivsw.forjoggers.ui.MapFragmentPresenter;
 import com.kivsw.forjoggers.ui.TrackingServicePresenter;
 
@@ -17,7 +15,6 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -68,7 +65,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
         currentTrack.setActivityType(settings.getActivityType());
 
         initSmoothCalculation();
-        initCurrentTrackUpdating();
+      //  initCurrentTrackUpdating();
 
         // load the last track
         loadLastData();
@@ -129,6 +126,12 @@ public class DataModel implements UsingCounter.IUsingChanged{
     {
         return isTracking;
     }
+    private void setTracking(boolean v)
+    {
+        isTracking=v;
+        if(startStopObservable!=null)
+            startStopObservable.onNext(isTracking);
+    }
     public boolean hasTrackData()
     {
         return getCurrentTrack().getGeoPoints().size()>1;
@@ -177,7 +180,9 @@ public class DataModel implements UsingCounter.IUsingChanged{
             public TrackSmoother call(TrackSmoother track) {
                 trackSmoother = track;
                 isTrackSmoothing=false;
-                doUpdateCurrentSmoothTrackView();
+                if(trackSmootherObservable!=null)
+                    trackSmootherObservable.onNext(trackSmoother);
+                //doUpdateCurrentSmoothTrackView();
                 return null;
             }
         })
@@ -187,7 +192,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
     /**
      * informs the View about new data in the current track
-     */
+
     private void initCurrentTrackUpdating()
     {
         currentTrack.getObservable()
@@ -198,7 +203,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
                         @Override
                         public void onError(Throwable e) {
-                            MapFragmentPresenter.getInstance(DataModel.this.context).updateFileName();
+                            MapFragmentPresenter.getInstance(DataModel.this.context).doUpdateFileName();
                             MainActivityPresenter.getInstance(DataModel.this.context).showError(e.getMessage());
                         }
 
@@ -207,7 +212,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
                             doUpdateCurrentTrackView();
                         }
                     });
-    }
+    }*/
     //------------------------------------------------------------------
     private String getTempFileName()
     {
@@ -227,7 +232,9 @@ public class DataModel implements UsingCounter.IUsingChanged{
         currentTrack.clear();
         currentTrack.setActivityType(settings.getActivityType());
         currentTrack.timeStart= SystemClock.elapsedRealtime();
-        isTracking=true;
+
+        setTracking(true);
+
         nextTimeTospeak=settings.getTimeSpeaking().getTimeSeconds();
         nextDistanseToSpeak=(long)settings.getDistanceSpeaking().getDistanceMeters();
 
@@ -267,12 +274,21 @@ public class DataModel implements UsingCounter.IUsingChanged{
                     }
                 });
 
-        // updates all the views
-        doUpdateCurrentTrackView();
-        doUpdateCurrentSmoothTrackView();
-        doUpdateFileNameView();
 
-        speaker=new Speaker(context);
+        // updates all the views
+        //if(fileNameObservable!=null) fileNameObservable.onNext(currentTrack.getFileName());
+        if(trackSmootherObservable !=null) trackSmootherObservable.onNext(trackSmoother);
+
+       // doUpdateCurrentTrackView();
+        //doUpdateCurrentSmoothTrackView();
+        //doUpdateFileNameView();
+
+        speaker=new Speaker(context, new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        errorMessageObservable.onNext(s);
+                    }
+                });
         if(settings.getIsStartStopSpeaking())
             speaker.speakStart();
     }
@@ -293,9 +309,10 @@ public class DataModel implements UsingCounter.IUsingChanged{
         currentTrack.timeStop= SystemClock.elapsedRealtime();
 
         saveTrack(getTempFileName());
-        isTracking = false;
 
-        MapFragmentPresenter.getInstance(context).onAfterStopTracking();
+        setTracking(false);
+
+        //MapFragmentPresenter.getInstance(context).onAfterStopTracking();
 
         if(settings.getIsStartStopSpeaking()) {
             speaker.speakStop();
@@ -314,23 +331,27 @@ public class DataModel implements UsingCounter.IUsingChanged{
     {
         TrackingServicePresenter.getInstance(context).startSaving(); // starts service
 
-        boolean r=getCurrentTrack().saveGeoPoint(fileName, new Action2<Boolean,String>() {
+        boolean r=getCurrentTrack().saveGeoPoint(fileName,getTempFileName().equals(fileName),
+                new Action2<Boolean,String>() {
             @Override
             public void call(Boolean aBoolean, String aFileName) {
                 TrackingServicePresenter.getInstance(context).endSaving(); // stops service
                 if(aBoolean.booleanValue())
                 {
                     if(currentTrack.getFileName().equals(getTempFileName())) // don't keep the temporary file's name
-                        currentTrack.fileName="";
+                        currentTrack.setFileName("");
 
-                    doUpdateFileNameView();
+                    //doUpdateFileNameView();
                     settings.setCurrentFileName(currentTrack.getFileName());
                 }
                 else
                 {
-                    MainActivityPresenter.getInstance(context)
-                            .showError(String.format(context.getText(R.string.cannot_save_file).toString(),aFileName));
+                    /*MainActivityPresenter.getInstance(context)
+                            .showError(String.format(context.getText(R.string.cannot_save_file).toString(),aFileName));*/
+                    if(errorMessageObservable!=null)
+                        errorMessageObservable.onNext(String.format(context.getText(R.string.cannot_save_file).toString(),aFileName));
                 }
+
             }
         });
 
@@ -343,46 +364,34 @@ public class DataModel implements UsingCounter.IUsingChanged{
     public boolean loadTrack(String fileName)
     {
         trackSmoother=null;
-        doUpdateCurrentSmoothTrackView();
-        boolean r= getCurrentTrack().loadGeoPoint(fileName,new Action2<Boolean,String>() {
+        if(trackSmootherObservable!=null) trackSmootherObservable.onNext(trackSmoother);
+
+        boolean r= getCurrentTrack().loadGeoPoint(fileName, getTempFileName().equals(fileName),
+                new Action2<Boolean,String>() {
             @Override
             public void call(Boolean aBoolean, String aFileName) {
                 if(aBoolean.booleanValue())
                 {
                     if(aFileName.equals(getTempFileName()))
-                        currentTrack.fileName="";
-                    doUpdateFileNameView();
+                        currentTrack.setFileName("");
+
                     MapFragmentPresenter.getInstance(context).actionShowCurrentTrack();
                     settings.setCurrentFileName(currentTrack.getFileName());
                 }
                 else
                 {
-                    MapFragmentPresenter.getInstance(context).updateFileName();
+                    if(errorMessageObservable!=null)
+                       errorMessageObservable.onNext(String.format(context.getText(R.string.cannot_load_file).toString(),aFileName));
+                   /* MapFragmentPresenter.getInstance(context).doUpdateFileName();
                     MainActivityPresenter.getInstance(context)
                             .showError(String.format(context.getText(R.string.cannot_load_file).toString(),aFileName));
-                    doUpdateFileNameView();
+                    doUpdateFileNameView();*/
                 }
             }
         });
-        doUpdateFileNameView();
+
 
         return r;
-    }
-    //--------------------------------------------------------------------
-    protected void doUpdateCurrentTrackView()
-    {
-        MapFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
-
-    }
-    protected void doUpdateCurrentSmoothTrackView()
-    {
-        MapFragmentPresenter.getInstance(context).onSmoothTrackUpdate(trackSmoother);
-        AnalysingFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
-    }
-    protected void doUpdateFileNameView()
-    {
-        MapFragmentPresenter.getInstance(context).updateFileName();
-        MainActivityPresenter.getInstance(context).menuUpdate();
     }
 
     /**
@@ -409,8 +418,8 @@ public class DataModel implements UsingCounter.IUsingChanged{
     /**
      * check if it should prounce track information
      */
-    long nextTimeTospeak, nextDistanseToSpeak;
-    void checkSpeak()
+    private long nextTimeTospeak, nextDistanseToSpeak;
+    private void checkSpeak()
     {
         if(trackSmoother==null || speaker==null) return;
 
@@ -427,8 +436,77 @@ public class DataModel implements UsingCounter.IUsingChanged{
         };
     };
 
+    ///---------------------------------------------------------------------------
+    ///--------------------------------------------------------------------------
+    // MODEL OBSERVABLES
     /**
-     * is invoked when the user has changes the settings
+     *  return observable for the current track
+     */
+    public Observable<Track> getCurrentTrackObservable()
+    {
+        return currentTrack.getObservable();
+    }
+    /**
+     *  return observable for the smooth track
+     */
+    PublishSubject<Track> trackSmootherObservable=null;
+    public Observable<Track> getTrackSmootherObservable()
+    {
+        if(trackSmootherObservable==null)
+           trackSmootherObservable = PublishSubject.create();
+        return trackSmootherObservable;
+    }
+
+    /**
+     * observable for an error message
+     */
+    PublishSubject<String> errorMessageObservable=null;
+    public Observable<String> getErrorMessageObservable()
+    {
+        if(errorMessageObservable==null)
+            errorMessageObservable = PublishSubject.create();
+        return errorMessageObservable;
+    }
+    /**
+     * observable for an error message
+     */
+    PublishSubject<Boolean> startStopObservable=null;
+    public Observable<Boolean> getStartStopObservable()
+    {
+        if(startStopObservable==null)
+            startStopObservable = PublishSubject.create();
+        return startStopObservable;
+    }
+    /**
+     *
+     */
+
+    public Observable<String> getFileNamerObservable()
+    {
+        return currentTrack.getFileNameObservable();
+    }
+
+   /*
+    protected void doUpdateCurrentTrackView()
+    {
+        MapFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
+
+    }
+    protected void doUpdateCurrentSmoothTrackView()
+    {
+        MapFragmentPresenter.getInstance(context).doSmoothTrackUpdate(trackSmoother);
+        AnalysingFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
+    }
+    protected void doUpdateFileNameView()
+    {
+        MapFragmentPresenter.getInstance(context).doUpdateFileName();
+        MainActivityPresenter.getInstance(context).menuUpdate();
+    }*/
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    // MODEL OUT INTERFACE
+    /**
+     * is invoked by a presenter when the user has changes the settings
      */
     public void onSettingsChanged() {
 
@@ -444,7 +522,9 @@ public class DataModel implements UsingCounter.IUsingChanged{
         }
 
     }
-
+    /**
+     * is invoked by a presenter when the activity has been started
+     */
     public void onActivityStarted()
     {
         // starts background working

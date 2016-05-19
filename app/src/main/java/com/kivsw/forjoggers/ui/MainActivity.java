@@ -224,22 +224,30 @@ implements  FileDialog.OnCloseListener,
 
     private void saveCurrentTrack()
     {
+        Fragment fr=getSupportFragmentManager().findFragmentByTag("FileDialog");
+        if(fr!=null && fr.isAdded())
+            return;
+
         String dir=settings.getLastDirPath();
         if(dir==null)
             dir=Environment.getExternalStorageDirectory().getAbsolutePath();
         FileDialog fd;
         fd=FileDialog.newInstance(1, FileDialog.TypeDialog.SAVE, dir, "*.gpx", this);
-        fd.show(getSupportFragmentManager(), "");
+        fd.show(getSupportFragmentManager(), "FileDialog");
     }
 
     private void loadCurrentTrack()
     {
+        Fragment fr=getSupportFragmentManager().findFragmentByTag("FileDialog");
+        if(fr!=null && fr.isAdded())
+            return;
+
         String dir=settings.getLastDirPath();
         if(dir==null)
             dir=Environment.getExternalStorageDirectory().getAbsolutePath();
         FileDialog fd;
         fd = FileDialog.newInstance(2, FileDialog.TypeDialog.OPEN, dir, "*.gpx", this);
-        fd.show(getSupportFragmentManager(), "");
+        fd.show(getSupportFragmentManager(), "FileDialog");
     }
 
     //-------------------------------

@@ -5,6 +5,9 @@ import android.content.Context;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.model.DataModel;
 
+import rx.Subscription;
+import rx.functions.Action1;
+
 /**
  * Created by ivan on 4/27/16.
  */
@@ -20,9 +23,19 @@ public class MainActivityPresenter extends BasePresenter {
     MainActivity activity=null;
     boolean isActivityStarted=false;
 
+    Subscription rxTrackingUpdate=null;
+
     private MainActivityPresenter(Context context)
     {
         super(context);
+
+        DataModel.getInstance(context).getErrorMessageObservable()
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        showError(s);
+                    }
+                });
     }
 
 
@@ -37,13 +50,25 @@ public class MainActivityPresenter extends BasePresenter {
     public void onStartActivity()
     {
         isActivityStarted=true;
+        rxTrackingUpdate=DataModel.getInstance(activity).getStartStopObservable()
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        menuUpdate();
+                    }
+                });
+
         DataModel.getInstance(activity).getUsingCounter().startUsingBy(MainActivity.TAG);
         DataModel.getInstance(activity).onActivityStarted();
+
     }
     public void onStopActivity()
     {
         isActivityStarted=false;
         DataModel.getInstance(activity).getUsingCounter().stopUsingBy(MainActivity.TAG);
+
+        if(rxTrackingUpdate!=null) rxTrackingUpdate.unsubscribe();
+        rxTrackingUpdate=null;
     }
     @Override
     public void onSettingsChanged() {
@@ -79,16 +104,16 @@ public class MainActivityPresenter extends BasePresenter {
     }
     ///---------------------------------------------------
 
-    public void showError(String msg)
+    private void showError(String msg)
     {
         showMessage(-1, context.getText(R.string.Error).toString(), msg);
     }
-    public void showMessage(int msgId, String title, String msg)
+    private void showMessage(int msgId, String title, String msg)
     {
          MainActivity.showMessage(context, msgId, title, msg);
     }
 
-    public void menuUpdate()
+    private void menuUpdate()
     {
         if(this.activity!=null && isActivityStarted)
             activity.supportInvalidateOptionsMenu();

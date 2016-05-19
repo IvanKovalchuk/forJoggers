@@ -1,16 +1,9 @@
 package com.kivsw.forjoggers.model;
 
-import android.content.Context;
-
-
-import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.helper.SettingsKeeper;
-
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Action2;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -23,7 +16,9 @@ import rx.subjects.PublishSubject;
  */
 public class CurrentTrack extends Track {
 
-    String fileName;
+
+
+    private String fileName;
 
     public CurrentTrack()
     {
@@ -42,7 +37,7 @@ public class CurrentTrack extends Track {
 
         PublishSubject res = PublishSubject.<Track>create();
 
-        observable.create(new Observable.OnSubscribe<Track>() {
+        Observable.create(new Observable.OnSubscribe<Track>() {
 
             @Override
             public void call(final Subscriber<? super Track> subscriber) {
@@ -58,10 +53,6 @@ public class CurrentTrack extends Track {
                         subscriber.onNext(CurrentTrack.this);
                     }
 
-                    @Override public void onError(Throwable e)
-                    {
-                        subscriber.onError(e);
-                    }
                 });
             }
         }).subscribe(res);
@@ -71,14 +62,32 @@ public class CurrentTrack extends Track {
         return observable;
     }
 
+    /**
+     * Observable for fileName
+     */
+    private PublishSubject<String> fileNameObservable=null;
+    Observable<String> getFileNameObservable()
+    {
+        if(fileNameObservable==null)
+            fileNameObservable=PublishSubject.create();
+        return fileNameObservable;
+    }
+
     public String getFileName() {
         return fileName;
+
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+        if(fileNameObservable!=null)
+            fileNameObservable.onNext(fileName);
     }
 
     @Override
     public void clear()
     {
-        fileName="";
+        setFileName("");
         super.clear();
 
     }
@@ -88,7 +97,7 @@ public class CurrentTrack extends Track {
      * @param aFileName file name
      * @return true if the saving was successful
      */
-    public boolean saveGeoPoint(final String aFileName, final Action2<Boolean,String> onCompletedListener)
+    public boolean saveGeoPoint(final String aFileName, final boolean cachFile, final Action2<Boolean,String> onCompletedListener)
     {
         Observable.just(this)
                 .map(new Func1 < CurrentTrack, Track > () {
@@ -121,10 +130,8 @@ public class CurrentTrack extends Track {
 
                     @Override
                     public void onNext(Boolean r) {
-                        if(r.booleanValue()) {
-                            CurrentTrack.this.fileName = aFileName;
-                            //settings.setCurrentFileName(aFileName);
-                            //onChange.onAddPoint();
+                        if(r.booleanValue() && !cachFile) {
+                            CurrentTrack.this.setFileName(aFileName);
                         }
                         if(onCompletedListener!=null)
                             onCompletedListener.call(r,aFileName);
@@ -140,11 +147,11 @@ public class CurrentTrack extends Track {
      * @param aFileName file name
      * @return true if the loading was successful
      */
-    public boolean loadGeoPoint(final String aFileName, final Action2<Boolean, String> onCompletedListener) {
+    public boolean loadGeoPoint(final String aFileName, final boolean cachFile,final Action2<Boolean, String> onCompletedListener) {
         boolean r=false;
 
         super.clear();
-        this.fileName = "";
+        setFileName( "");
 
         Observable.just(aFileName)
                 .observeOn(Schedulers.io())
@@ -173,17 +180,17 @@ public class CurrentTrack extends Track {
                         clear();
                         if(onCompletedListener!=null)
                              onCompletedListener.call(Boolean.FALSE,aFileName);
-                       // onChange.onError(e);
+
                     }
 
                     @Override
                     public void onNext(Track track) {
 
                         if(track!=null) {
-                            CurrentTrack.this.fileName = aFileName;
+                            if(!cachFile)
+                                CurrentTrack.this.setFileName(aFileName);
                             assign(track);
-                           // settings.setCurrentFileName(CurrentTrack.this.fileName);
-                            onChange.onAddPoint();
+
                             if(onCompletedListener!=null)
                                 onCompletedListener.call(Boolean.TRUE,aFileName);
                         }
@@ -191,7 +198,7 @@ public class CurrentTrack extends Track {
                         {
                             if(onCompletedListener!=null)
                                 onCompletedListener.call(Boolean.FALSE,aFileName);
-                           // CurrentTrack.this.fileName = "";
+
                         }
                     }
                 });
