@@ -136,6 +136,11 @@ public class GPSLocationListener implements android.location.LocationListener{
         }catch (SecurityException e)
         {e.toString();}
 
+       /* if(loc!=null) {
+            loc.removeSpeed();
+            loc.removeBearing();
+        }*/
+
         return loc;
     }
 

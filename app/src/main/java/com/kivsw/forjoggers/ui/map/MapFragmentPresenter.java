@@ -89,8 +89,13 @@ public class MapFragmentPresenter  extends BasePresenter {
                 public void call(Location location) {
                     if(location==null) return;
 
-                    if( mapFragment!=null)
+                    if( mapFragment!=null) {
+                        if(!RxGps.isGPSavailable()) {
+                            location.removeSpeed();
+                            location.removeBearing();
+                        }
                         mapFragment.setCurrentLocation(location);
+                    }
                 }
             });
 
