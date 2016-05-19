@@ -2,6 +2,8 @@ package com.kivsw.forjoggers.model.track;
 
 import android.location.Location;
 
+import com.kivsw.forjoggers.model.math.PolinomApproximator;
+
 import java.util.ArrayList;
 
 /**

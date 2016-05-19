@@ -2,6 +2,9 @@ package com.kivsw.forjoggers.model.track;
 
 import android.location.Location;
 
+import com.kivsw.forjoggers.model.math.LineApproximator;
+import com.kivsw.forjoggers.model.math.iApproximator;
+
 import java.util.ArrayList;
 
 /**

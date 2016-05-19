@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.model.track;
+package com.kivsw.forjoggers.model.math;
 
 /**
  * Created by ivan on 03.12.15.

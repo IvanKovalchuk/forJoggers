@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.model.track;
+package com.kivsw.forjoggers.model.math;
 
 /**
  * Created by ivan on 08.12.15.
@@ -14,7 +14,7 @@ public class PolinomApproximator implements iApproximator {
     private double A_[][];
     private int  IndX[];
 
-    PolinomApproximator()
+    public PolinomApproximator()
     {
         FX=null;
         FY=null;
@@ -22,7 +22,7 @@ public class PolinomApproximator implements iApproximator {
         FA=null;
         FPowPol=0;
     }
-    PolinomApproximator(int aPolPow)
+    public PolinomApproximator(int aPolPow)
     {
         FX=null;
         FY=null;
