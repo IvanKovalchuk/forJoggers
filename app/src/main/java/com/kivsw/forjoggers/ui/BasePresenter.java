@@ -2,16 +2,16 @@ package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
 
-import com.kivsw.forjoggers.model.CurrentTrack;
+import com.kivsw.forjoggers.model.track.CurrentTrack;
 import com.kivsw.forjoggers.model.DataModel;
-import com.kivsw.forjoggers.model.TrackSmoother;
+import com.kivsw.forjoggers.model.track.TrackSmoother;
 
 /**
  * Created by ivan on 4/27/16.
  */
 public abstract class BasePresenter {
     protected Context context;
-    BasePresenter(Context context)
+    public BasePresenter(Context context)
     {
         this.context = context.getApplicationContext();
     }

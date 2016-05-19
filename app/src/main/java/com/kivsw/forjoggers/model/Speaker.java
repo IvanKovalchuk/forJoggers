@@ -6,7 +6,8 @@ import android.content.res.Resources;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.TtsHelper;
-import com.kivsw.forjoggers.ui.TrackingServicePresenter;
+import com.kivsw.forjoggers.model.track.Track;
+import com.kivsw.forjoggers.ui.settings.TrackingServicePresenter;
 
 import java.util.LinkedList;
 import java.util.Locale;
@@ -14,7 +15,11 @@ import java.util.Locale;
 import rx.functions.Action1;
 
 /**
- * Created by ivan on 5/12/16.
+ * this class
+ * - works with TTS via TtsHelper,
+ * - forms the messages for "start", "stop" and the current track information,
+ * - synchronize events of speaking and TTS-realising/initializing
+ *
  */
 public class Speaker {
     TtsHelper ttsHelper = null;

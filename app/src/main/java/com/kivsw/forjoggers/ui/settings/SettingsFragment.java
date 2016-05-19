@@ -1,10 +1,8 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.settings;
 
 import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -24,6 +22,8 @@ import com.kivsw.dialog.IconSpinnerAdapter;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.TtsHelper;
+import com.kivsw.forjoggers.ui.CustomPagerView;
+import com.kivsw.forjoggers.ui.MainActivity;
 
 import java.util.List;
 import java.util.Locale;

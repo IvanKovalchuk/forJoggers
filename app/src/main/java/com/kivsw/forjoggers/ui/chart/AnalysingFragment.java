@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.chart;
 
 
 import android.app.Activity;
@@ -18,9 +18,12 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kivsw.dialog.MessageDialog;
+import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.UnitUtils;
-import com.kivsw.forjoggers.model.Track;
+import com.kivsw.forjoggers.model.track.Track;
+import com.kivsw.forjoggers.ui.CustomPagerView;
+import com.kivsw.forjoggers.ui.MainActivity;
 
 import java.util.Locale;
 
@@ -74,8 +77,8 @@ public class AnalysingFragment extends Fragment
         graphSpiner.setOnItemSelectedListener(this);
         graphSpiner.setSelection(2);
 
-       /* if(BuildConfig.DEBUG) graphSpiner.setVisibility(View.VISIBLE);
-        else*/  graphSpiner.setVisibility(View.GONE);
+        if(BuildConfig.DEBUG) graphSpiner.setVisibility(View.VISIBLE);
+        else  graphSpiner.setVisibility(View.GONE);
 
         presenter = AnalysingFragmentPresenter.getInstance(getActivity());
 

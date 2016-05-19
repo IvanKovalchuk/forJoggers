@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.map;
 
 import android.content.Context;
 import android.util.AttributeSet;

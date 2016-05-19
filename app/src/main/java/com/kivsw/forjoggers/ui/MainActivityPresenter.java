@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.model.DataModel;
+import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
+import com.kivsw.forjoggers.ui.settings.TrackingServicePresenter;
 
 import rx.Subscription;
 import rx.functions.Action1;
@@ -96,7 +98,7 @@ public class MainActivityPresenter extends BasePresenter {
         if(!hasTrackData()) return;
         MapFragmentPresenter.getInstance(context).actionAnimateTrack();
     };
-    void actionExit()
+    public void actionExit()
     {
          if(this.activity!=null)
              this.activity.finish();

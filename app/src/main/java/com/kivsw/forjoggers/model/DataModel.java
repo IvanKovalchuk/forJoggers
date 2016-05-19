@@ -8,8 +8,12 @@ import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.RxGps;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
-import com.kivsw.forjoggers.ui.MapFragmentPresenter;
-import com.kivsw.forjoggers.ui.TrackingServicePresenter;
+import com.kivsw.forjoggers.model.track.CurrentTrack;
+import com.kivsw.forjoggers.model.track.Track;
+import com.kivsw.forjoggers.model.track.TrackSmoother;
+import com.kivsw.forjoggers.model.track.TrackSmootherByPolynom;
+import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
+import com.kivsw.forjoggers.ui.settings.TrackingServicePresenter;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;

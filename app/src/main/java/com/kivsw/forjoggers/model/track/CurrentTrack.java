@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.model;
+package com.kivsw.forjoggers.model.track;
 
 import rx.Observable;
 import rx.Observer;
@@ -66,7 +66,7 @@ public class CurrentTrack extends Track {
      * Observable for fileName
      */
     private PublishSubject<String> fileNameObservable=null;
-    Observable<String> getFileNameObservable()
+    public Observable<String> getFileNameObservable()
     {
         if(fileNameObservable==null)
             fileNameObservable=PublishSubject.create();

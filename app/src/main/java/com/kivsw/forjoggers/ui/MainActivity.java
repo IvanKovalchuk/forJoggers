@@ -18,6 +18,9 @@ import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.ui.chart.AnalysingFragment;
+import com.kivsw.forjoggers.ui.map.MapFragment;
+import com.kivsw.forjoggers.ui.settings.SettingsFragment;
 
 import java.io.File;
 

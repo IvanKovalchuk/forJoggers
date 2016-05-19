@@ -1,6 +1,4 @@
-package com.kivsw.forjoggers.model;
-
-import com.kivsw.forjoggers.model.iApproximator;
+package com.kivsw.forjoggers.model.track;
 
 /**
  * Created by ivan on 03.12.15.

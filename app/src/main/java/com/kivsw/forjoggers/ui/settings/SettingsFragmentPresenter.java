@@ -1,13 +1,16 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.settings;
 
 import android.content.Context;
 
 import com.kivsw.forjoggers.model.DataModel;
+import com.kivsw.forjoggers.ui.chart.AnalysingFragmentPresenter;
+import com.kivsw.forjoggers.ui.BasePresenter;
+import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
 
 /**
  * Created by ivan on 03.05.2016.
  */
-public class SettingsFragmentPresenter extends BasePresenter{
+public class SettingsFragmentPresenter extends BasePresenter {
     static private SettingsFragmentPresenter singletone=null;
 
     static public SettingsFragmentPresenter getInstance(Context context)

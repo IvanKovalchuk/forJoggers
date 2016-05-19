@@ -3,10 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.MapFragment">
+    tools:context=".ui.map.MapFragment">
 
     <!--  org.osmdroid.views.MapView -->
-     <com.kivsw.forjoggers.ui.MapViewEnvelope
+     <com.kivsw.forjoggers.ui.map.MapViewEnvelope
          android:id="@+id/map"
                                  android:layout_width="fill_parent"
                                  android:layout_height="fill_parent" />

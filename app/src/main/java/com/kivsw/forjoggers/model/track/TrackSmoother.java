@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.model;
+package com.kivsw.forjoggers.model.track;
 
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 
@@ -28,7 +28,7 @@ public abstract class TrackSmoother extends Track
      * @param newTrack
      * @return
      */
-    boolean needRecalculate(Track newTrack)
+    public boolean needRecalculate(Track newTrack)
     {
         return newTrack.getGeoPoints().size()!=track.getGeoPoints().size();
     }
@@ -51,7 +51,7 @@ public abstract class TrackSmoother extends Track
         return track.getActivityType();
     };
 
-    abstract void doSmooth();
+    public abstract void doSmooth();
   /*  @Override
     abstract public void onAddPoint();
 

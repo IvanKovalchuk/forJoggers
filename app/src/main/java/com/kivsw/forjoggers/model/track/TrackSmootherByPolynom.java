@@ -1,10 +1,6 @@
-package com.kivsw.forjoggers.model;
+package com.kivsw.forjoggers.model.track;
 
 import android.location.Location;
-
-import com.kivsw.forjoggers.model.PolinomApproximator;
-import com.kivsw.forjoggers.model.Track;
-import com.kivsw.forjoggers.model.TrackSmootherByLine;
 
 import java.util.ArrayList;
 
@@ -34,7 +30,7 @@ public class TrackSmootherByPolynom extends TrackSmootherByLine {
     };//*/
 
     @Override
-    void doSmooth()
+    public void doSmooth()
     {
         super.doSmooth();
         improveGeoPoints();
@@ -54,7 +50,7 @@ public class TrackSmootherByPolynom extends TrackSmootherByLine {
         for(int i=1; i<s-1; i++)
         {
             Location loc=mGeoPoints.get(i);
-            double turn = Track.turn(lastLoc.getBearing(), loc.getBearing());
+            double turn = turn(lastLoc.getBearing(), loc.getBearing());
             double time=(loc.getTime()-lastLoc.getTime())/1000.0;
 
             if((lastLoc.distanceTo(loc)>maxDistance) || (loc.getTime()-lastLoc.getTime()>2) || (turn>20) || time>maxDeltaT)

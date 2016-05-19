@@ -1,8 +1,10 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.settings;
 
 import android.content.Context;
 
 import com.kivsw.forjoggers.model.DataModel;
+import com.kivsw.forjoggers.ui.BasePresenter;
+import com.kivsw.forjoggers.ui.MainActivityPresenter;
 
 import java.util.concurrent.TimeUnit;
 

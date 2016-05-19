@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.map;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -19,8 +19,9 @@ import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UnitUtils;
-import com.kivsw.forjoggers.model.Track;
-import com.kivsw.forjoggers.model.TrackSmoother;
+import com.kivsw.forjoggers.model.track.Track;
+import com.kivsw.forjoggers.model.track.TrackSmoother;
+import com.kivsw.forjoggers.ui.CustomPagerView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.Polyline;

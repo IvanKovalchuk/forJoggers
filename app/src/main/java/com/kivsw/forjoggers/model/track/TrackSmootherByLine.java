@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.model;
+package com.kivsw.forjoggers.model.track;
 
 import android.location.Location;
 
@@ -51,8 +51,8 @@ public class TrackSmootherByLine extends TrackSmoother {
     }*/
 
     //-----------------------------------------------------
-
-    void doSmooth()
+    @Override
+    public void doSmooth()
     {
         if(track==null) return;
         int s=track.getGeoPoints().size();

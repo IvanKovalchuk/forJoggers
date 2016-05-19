@@ -1,9 +1,10 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.chart;
 
 import android.content.Context;
 
 import com.kivsw.forjoggers.model.DataModel;
-import com.kivsw.forjoggers.model.Track;
+import com.kivsw.forjoggers.model.track.Track;
+import com.kivsw.forjoggers.ui.BasePresenter;
 
 import rx.Subscription;
 import rx.functions.Action1;
@@ -11,7 +12,7 @@ import rx.functions.Action1;
 /**
  * Created by ivan on 01.05.2016.
  */
-public class AnalysingFragmentPresenter extends BasePresenter  {
+public class AnalysingFragmentPresenter extends BasePresenter {
     static private AnalysingFragmentPresenter singletone=null;
 
     static public AnalysingFragmentPresenter getInstance(Context context)

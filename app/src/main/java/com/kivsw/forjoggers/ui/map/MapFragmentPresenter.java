@@ -1,12 +1,13 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.map;
 
 import android.content.Context;
 import android.location.Location;
 
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.model.DataModel;
-import com.kivsw.forjoggers.model.Track;
+import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.helper.RxGps;
+import com.kivsw.forjoggers.ui.BasePresenter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -184,7 +185,7 @@ public class MapFragmentPresenter  extends BasePresenter {
         mapFragment.stopFollowingMyLocation();
         mapFragment.showLocation(loc.getLatitude(), loc.getLongitude());
     }
-    void actionAnimateTrack()
+    public void actionAnimateTrack()
     {
         //RxGps.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
         RxGps.setEmulationData(new ArrayList<Location>(getTrackSmoother().getGeoPoints()));

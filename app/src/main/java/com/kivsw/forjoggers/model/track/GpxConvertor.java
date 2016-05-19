@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.model;
+package com.kivsw.forjoggers.model.track;
 
 import android.location.Location;
 

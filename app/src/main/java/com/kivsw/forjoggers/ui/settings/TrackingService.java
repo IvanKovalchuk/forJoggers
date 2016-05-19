@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.ui;
+package com.kivsw.forjoggers.ui.settings;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -18,6 +18,7 @@ import android.support.v4.app.NotificationCompat;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
+import com.kivsw.forjoggers.ui.MainActivity;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
