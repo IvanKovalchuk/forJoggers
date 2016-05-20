@@ -431,18 +431,19 @@ implements
             checkMyLocationVisibility();
 
         String resStr="";
-        if(location.hasSpeed()) {
-            resStr =unitUtils.speedToStr(location.getSpeed());
-        }
-        else
-        if(presenter.getTrackSmoother()!=null &&
-                presenter.getTrackSmoother().getGeoPoints()!=null &&
-                presenter.getTrackSmoother().getGeoPoints().size()>1)
-        {
-            ArrayList<Location> points=presenter.getTrackSmoother().getGeoPoints();
-            Location l=points.get(points.size()-1);
-            if(l.hasSpeed())
-                resStr ="~"+unitUtils.speedToStr(l.getSpeed());
+        if(isGpsAvailable!=null && isGpsAvailable.booleanValue()) {
+            if (location.hasSpeed()) {
+                resStr = unitUtils.speedToStr(location.getSpeed());
+            } else if ( presenter.isTracking() &&
+                        presenter.getTrackSmoother() != null &&
+                        presenter.getTrackSmoother().getGeoPoints() != null &&
+                        presenter.getTrackSmoother().getGeoPoints().size() > 1)
+            {
+                ArrayList<Location> points = presenter.getTrackSmoother().getGeoPoints();
+                Location l = points.get(points.size() - 1);
+                if (l.hasSpeed())
+                    resStr = "~" + unitUtils.speedToStr(l.getSpeed());
+            }
         }
 
         textCurrentSpeedInfo.setText(resStr);

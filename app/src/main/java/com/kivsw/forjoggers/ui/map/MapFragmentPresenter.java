@@ -83,6 +83,8 @@ public class MapFragmentPresenter  extends BasePresenter {
                 setUI(null); // unsubscribes old rx-subscriptions
             mapFragment = aMapFragment;
 
+            mapFragment.setGPSstatus(RxGps.isGPSavailable());
+
             // receives GPS locations
             rxGps= RxGps.getGprsUiObservable(context).subscribe(new Action1<Location>() {
                 @Override
@@ -90,7 +92,7 @@ public class MapFragmentPresenter  extends BasePresenter {
                     if(location==null) return;
 
                     if( mapFragment!=null) {
-                        if(!RxGps.isGPSavailable()) {
+                        if(!RxGps.isGPSavailable()) { // if we received an old (last known)location
                             location.removeSpeed();
                             location.removeBearing();
                         }
@@ -145,7 +147,7 @@ public class MapFragmentPresenter  extends BasePresenter {
                         }
                     });
 
-            mapFragment.setGPSstatus(RxGps.isGPSavailable());
+
             doUpdateFileName();
             doCurrentTrackUpdate(DataModel.getInstance(context).getCurrentTrack());
             doSmoothTrackUpdate(DataModel.getInstance(context).getTrackSmoother());
