@@ -38,11 +38,11 @@ public abstract class TrackSmoother extends Track
         if(track==null) return 0;
         return track.getTrackPointsTime();
     };
+
     @Override
     public long getTrackTime()
     {
-        if(track==null) return 0;
-        return track.getTrackTime();
+        throw  new RuntimeException("TrackSmoother cannot return correct value of getTrackTime()");
     };
 
     @Override

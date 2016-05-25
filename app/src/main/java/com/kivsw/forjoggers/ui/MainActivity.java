@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.kivsw.dialog.FileDialog;
 import com.kivsw.dialog.MessageDialog;
@@ -27,7 +29,9 @@ import java.io.File;
 
 public class MainActivity extends ActionBarActivity
 implements  FileDialog.OnCloseListener,
-            MessageDialog.OnCloseListener
+            MessageDialog.OnCloseListener,
+            View.OnClickListener
+
 {
 
     final public static String TAG="MainActivity";
@@ -38,6 +42,7 @@ implements  FileDialog.OnCloseListener,
     public MapFragment mapFragment=null;
     public AnalysingFragment analysingFragment=null;
     MainActivityPresenter presenter = null;
+    android.support.design.widget.TabLayout tabLayout;
 
     SettingsKeeper settings;
 
@@ -63,6 +68,20 @@ implements  FileDialog.OnCloseListener,
         pager =(ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
         pager.addOnPageChangeListener(new MyOnPageChange());
+
+        tabLayout=(android.support.design.widget.TabLayout)findViewById(R.id.tabLayout);
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                pager.setCurrentItem(tab.getPosition(),true);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) { }
+        });
 
         settings=SettingsKeeper.getInstance(this);
 
@@ -116,6 +135,7 @@ implements  FileDialog.OnCloseListener,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        //super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -124,6 +144,7 @@ implements  FileDialog.OnCloseListener,
     public boolean onPrepareOptionsMenu(Menu menu)
      {
 
+         super.onPrepareOptionsMenu(menu);
          boolean isTracking = presenter.isTracking();
          MenuItem item;//=menu.findItem(R.id.action_show_my_location);
 
@@ -151,6 +172,7 @@ implements  FileDialog.OnCloseListener,
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -203,6 +225,7 @@ implements  FileDialog.OnCloseListener,
         super.onStart();
         presenter.onStartActivity();
         setVolumeControlStream (AudioManager.STREAM_MUSIC );
+
 
     }
     //----------------------------------------------------------
@@ -314,6 +337,16 @@ implements  FileDialog.OnCloseListener,
     @Override
     public void onClickExtra(MessageDialog msg) { }
 
+    //------------------------------------
+    // View.OnClickListener
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+
+        }
+    }
+
     //--------------------------------------------------------------------------
 
     public class MyPagerAdapter extends FragmentPagerAdapter {
@@ -347,12 +380,8 @@ implements  FileDialog.OnCloseListener,
         }
     }
     //--------------------------------------------------------------------------
-//TrackingServiceEventReceiver.OnChangingListener
-    public void onServiceStatusChanged(boolean isRunning)
-    {
-        supportInvalidateOptionsMenu();
-        //mapFragment.onStartStopTrackingService(isRunning);
-    }
+
+
     class MyOnPageChange extends ViewPager.SimpleOnPageChangeListener
     {
         Fragment currentPage =null;
@@ -363,16 +392,22 @@ implements  FileDialog.OnCloseListener,
             if(currentPage !=null && (currentPage instanceof CustomPagerView.IonPageAppear))
                 ((CustomPagerView.IonPageAppear) currentPage).onPageDisappear();
 
+            tabLayout.setScrollPosition(position,0f,true);
             switch(position)
             {
-                case 0:currentPage=settingsFragment;
+                case 0:
+                    currentPage=settingsFragment;
                     break;
-                case 1:currentPage=mapFragment;
+                case 1:
+                    currentPage=mapFragment;
                     break;
-                case 2:currentPage=analysingFragment;
+                case 2:
+                    currentPage=analysingFragment;
                     break;
                 default: currentPage=null;
             };
+
+
 
             if(currentPage !=null && (currentPage instanceof CustomPagerView.IonPageAppear))
                 ((CustomPagerView.IonPageAppear) currentPage).onPageAppear();

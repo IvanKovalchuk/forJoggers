@@ -43,10 +43,11 @@ public class Track {
     public Track clone()
     {
         Track res=new Track();
-        res.timeStart = timeStart;
+        res.assign(this);
+        /*res.timeStart = timeStart;
         res.timeStop = timeStop;
         res.activityType = activityType;
-        res.mGeoPoints = new ArrayList<Location>(mGeoPoints);
+        res.mGeoPoints = new ArrayList<Location>(mGeoPoints);//*/
 
         return res;
 
@@ -57,7 +58,7 @@ public class Track {
         timeStart = track.timeStart;
         timeStop = track.timeStop;
         activityType = track.activityType;
-        mGeoPoints = (ArrayList<Location>)track.mGeoPoints.clone();
+        mGeoPoints = new ArrayList<Location>(track.mGeoPoints);//(ArrayList<Location>)track.mGeoPoints.clone();
         if(onChange!=null)
             onChange.onAddPoint();
     }

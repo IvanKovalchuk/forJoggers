@@ -318,7 +318,7 @@ implements
         str.append("\n");
 
         str.append(getText(R.string.time));
-        str.append(trackSmoother.getTrackTimeStr());
+        str.append(currentTrack.getTrackTimeStr());
         str.append("\n");
 
         String energy = getCalloriesStr(trackSmoother);
