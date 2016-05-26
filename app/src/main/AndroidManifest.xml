@@ -28,7 +28,7 @@
         </activity>
 
         <service
-            android:name=".ui.settings.TrackingService"
+            android:name=".ui.service.TrackingService"
             android:enabled="true"
             android:exported="false">
         </service>

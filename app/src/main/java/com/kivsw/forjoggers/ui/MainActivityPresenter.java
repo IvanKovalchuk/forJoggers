@@ -4,8 +4,9 @@ import android.content.Context;
 
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.model.DataModel;
+import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
-import com.kivsw.forjoggers.ui.settings.TrackingServicePresenter;
+import com.kivsw.forjoggers.ui.service.TrackingServicePresenter;
 
 import rx.Subscription;
 import rx.functions.Action1;
@@ -25,7 +26,7 @@ public class MainActivityPresenter extends BasePresenter {
     MainActivity activity=null;
     boolean isActivityStarted=false;
 
-    Subscription rxTrackingUpdate=null;
+    Subscription rxTrackingUpdate=null, rxCurrentTrackUpdate=null;
 
     private MainActivityPresenter(Context context)
     {
@@ -60,6 +61,14 @@ public class MainActivityPresenter extends BasePresenter {
                     }
                 });
 
+        rxCurrentTrackUpdate=DataModel.getInstance(context).getCurrentTrackObservable()
+                .subscribe(new Action1<Track>() {
+                    @Override
+                    public void call(Track track) {
+                        menuUpdate();
+                    }
+                });
+
         DataModel.getInstance(activity).getUsingCounter().startUsingBy(MainActivity.TAG);
         DataModel.getInstance(activity).onActivityStarted();
 
@@ -71,6 +80,9 @@ public class MainActivityPresenter extends BasePresenter {
 
         if(rxTrackingUpdate!=null) rxTrackingUpdate.unsubscribe();
         rxTrackingUpdate=null;
+
+        if(rxCurrentTrackUpdate!=null) rxCurrentTrackUpdate.unsubscribe();
+        rxCurrentTrackUpdate=null;
     }
     @Override
     public void onSettingsChanged() {

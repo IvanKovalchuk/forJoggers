@@ -115,7 +115,7 @@ public class MapFragmentPresenter  extends BasePresenter {
             if(isTracking())
                 startTrackingUpdating();
 
-            rxFileNameUpdate=DataModel.getInstance(context).getFileNamerObservable()
+            rxFileNameUpdate=DataModel.getInstance(context).getFileNameObservable()
                          .subscribe(new Action1<String>() {
                              @Override
                              public void call(String s) {

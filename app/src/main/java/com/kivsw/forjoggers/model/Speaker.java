@@ -7,7 +7,7 @@ import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.TtsHelper;
 import com.kivsw.forjoggers.model.track.Track;
-import com.kivsw.forjoggers.ui.settings.TrackingServicePresenter;
+import com.kivsw.forjoggers.ui.service.TrackingServicePresenter;
 
 import java.util.LinkedList;
 import java.util.Locale;
@@ -144,16 +144,18 @@ public class Speaker {
                     break;
                 case STOP: {
                     Track t = DataModel.getInstance(context).getTrackSmoother();
+                    long time=DataModel.getInstance(context).getTrackingTime();
                     if (t != null)
-                        doSpeakStop(t.getTrackDistance(), t.getTrackTime());
+                        doSpeakStop(t.getTrackDistance(), time);
                     else
                         doSpeakStop(0, 0);
                     }
                     break;
                 case TRACKSTATE: {
                     Track t=DataModel.getInstance(context).getTrackSmoother();
+                    long time=DataModel.getInstance(context).getTrackingTime();
                     if(t!=null)
-                       doSpeakTrack(t.getTrackDistance(), t.getTrackTime());
+                       doSpeakTrack(t.getTrackDistance(), time);
                     }
                     break;
             }

@@ -13,7 +13,7 @@ import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.model.track.TrackSmoother;
 import com.kivsw.forjoggers.model.track.TrackSmootherByPolynom;
 import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
-import com.kivsw.forjoggers.ui.settings.TrackingServicePresenter;
+import com.kivsw.forjoggers.ui.service.TrackingServicePresenter;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -433,7 +433,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
             nextDistanseToSpeak+=settings.getDistanceSpeaking().getDistanceMeters();
         };
 
-        if(settings.getIsTimeSpeaking() && (nextTimeTospeak<=(trackSmoother.getTrackTime()/1000) ))
+        if(settings.getIsTimeSpeaking() && (nextTimeTospeak<=(getTrackingTime()/1000) ))
         {
             speaker.speakTrack();
             nextTimeTospeak += settings.getTimeSpeaking().getTimeSeconds();
@@ -485,7 +485,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
      *
      */
 
-    public Observable<String> getFileNamerObservable()
+    public Observable<String> getFileNameObservable()
     {
         return currentTrack.getFileNameObservable();
     }

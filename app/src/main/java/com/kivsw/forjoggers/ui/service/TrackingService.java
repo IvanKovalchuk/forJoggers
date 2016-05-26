@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.ui.settings;
+package com.kivsw.forjoggers.ui.service;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
+import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.helper.UsingCounter;
 import com.kivsw.forjoggers.ui.MainActivity;
 
@@ -41,6 +42,7 @@ public class TrackingService extends Service {
     SettingsKeeper settings=null;
     TrackingServicePresenter presenter =null;
     MyHandler mHandler;
+    UnitUtils unitUtils = null;
 
 
     public final static String TRACKING="tracking", BACKGROUND="background", // processes that may keep this service working
@@ -80,6 +82,7 @@ public class TrackingService extends Service {
         super();
         settings = SettingsKeeper.getInstance(this);
         mHandler = new MyHandler(this);
+        unitUtils = new UnitUtils(this);
     }
 
     @Nullable
@@ -226,13 +229,23 @@ public class TrackingService extends Service {
         mBuilder.setSmallIcon(R.drawable.runner_ltl);
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         mBuilder.setContentTitle(this.getText(R.string.app_name));
+
         long workingTime= presenter.getTrackingTime();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         sdf.setTimeZone(new SimpleTimeZone(0, ""));
         sdf.format(new Date(workingTime));
-        mBuilder.setContentText(sdf.format(new Date(workingTime)));
-        mBuilder.setContentIntent(createNotificationIntent());
+        StringBuilder str=new StringBuilder();
+        str.append(sdf.format(new Date(workingTime)));
+        if(presenter.hasTrackData())
+        {
+            double d=presenter.getTrackSmoother().getTrackDistance();
+            str.append("\t");
+            str.append(unitUtils.distanceToStr(d));
+        }
 
+
+        mBuilder.setContentText(str);
+        mBuilder.setContentIntent(createNotificationIntent());
         addNotificationAction(mBuilder,getText(R.string.Stop).toString(), ACTION_NOTIFICATION_STOP, R.drawable.man );
 
         return mBuilder.build();

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -70,18 +69,24 @@ implements  FileDialog.OnCloseListener,
         pager.addOnPageChangeListener(new MyOnPageChange());
 
         tabLayout=(android.support.design.widget.TabLayout)findViewById(R.id.tabLayout);
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        tabLayout.setupWithViewPager(pager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.settings);
+        tabLayout.getTabAt(1).setIcon(R.drawable.world_map_b);
+        tabLayout.getTabAt(2).setIcon(R.drawable.line_chart);
+       /* tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 pager.setCurrentItem(tab.getPosition(),true);
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onTabUnselected(TabLayout.Tab tab) { }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) { }
-        });
+            public void onTabReselected(TabLayout.Tab tab) {
+                pager.setCurrentItem(tab.getPosition(),true);
+            }
+        });//*/
 
         settings=SettingsKeeper.getInstance(this);
 

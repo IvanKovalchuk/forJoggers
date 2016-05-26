@@ -1,4 +1,4 @@
-package com.kivsw.forjoggers.ui.settings;
+package com.kivsw.forjoggers.ui.service;
 
 import android.content.Context;
 
