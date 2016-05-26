@@ -165,10 +165,8 @@ public class DataModel implements UsingCounter.IUsingChanged{
         .map(new Func1<Track, TrackSmoother>(){ // creates a smoother
             @Override
             public TrackSmoother call(Track track) {
-                //TrackSmoother r = new TrackSmootherByPolynom(currentTrack);
-                //TrackSmoother r =new TrackSmootherByLine(currentTrack);
-                //TrackSmoother r =new TrackSmootherByCombining(currentTrack);
-                TrackSmoother r =TrackSmootherFactory.getSmoother(TrackSmootherFactory.COMBINED, currentTrack);
+                TrackSmoother r =TrackSmootherFactory
+                        .getSmoother(TrackSmootherFactory.COMBINED, currentTrack);
                 isTrackSmoothing=true;
                 return r;
             }
