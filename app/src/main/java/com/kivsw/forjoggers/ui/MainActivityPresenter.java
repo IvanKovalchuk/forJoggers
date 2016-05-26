@@ -71,6 +71,7 @@ public class MainActivityPresenter extends BasePresenter {
 
         DataModel.getInstance(activity).getUsingCounter().startUsingBy(MainActivity.TAG);
         DataModel.getInstance(activity).onActivityStarted();
+        menuUpdate();
 
     }
     public void onStopActivity()

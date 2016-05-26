@@ -236,7 +236,7 @@ public class TrackingService extends Service {
         sdf.format(new Date(workingTime));
         StringBuilder str=new StringBuilder();
         str.append(sdf.format(new Date(workingTime)));
-        if(presenter.hasTrackData())
+        if(presenter.hasTrackData() && presenter.getTrackSmoother()!=null)
         {
             double d=presenter.getTrackSmoother().getTrackDistance();
             str.append("\t");

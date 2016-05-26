@@ -11,7 +11,7 @@ import com.kivsw.forjoggers.helper.UsingCounter;
 import com.kivsw.forjoggers.model.track.CurrentTrack;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.model.track.TrackSmoother;
-import com.kivsw.forjoggers.model.track.TrackSmootherByPolynom;
+import com.kivsw.forjoggers.model.track.TrackSmootherFactory;
 import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
 import com.kivsw.forjoggers.ui.service.TrackingServicePresenter;
 
@@ -165,7 +165,10 @@ public class DataModel implements UsingCounter.IUsingChanged{
         .map(new Func1<Track, TrackSmoother>(){ // creates a smoother
             @Override
             public TrackSmoother call(Track track) {
-                TrackSmoother r = new TrackSmootherByPolynom(currentTrack.clone());//new TrackSmootherByLine(currentTrack);
+                //TrackSmoother r = new TrackSmootherByPolynom(currentTrack);
+                //TrackSmoother r =new TrackSmootherByLine(currentTrack);
+                //TrackSmoother r =new TrackSmootherByCombining(currentTrack);
+                TrackSmoother r =TrackSmootherFactory.getSmoother(TrackSmootherFactory.COMBINED, currentTrack);
                 isTrackSmoothing=true;
                 return r;
             }
@@ -442,7 +445,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
     ///---------------------------------------------------------------------------
     ///--------------------------------------------------------------------------
-    // MODEL OBSERVABLES
+    // MODEL'S OBSERVABLES
     /**
      *  return observable for the current track
      */

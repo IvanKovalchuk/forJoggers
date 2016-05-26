@@ -13,7 +13,7 @@ public abstract class TrackSmoother extends Track
     {
         super();
         mGeoPoints=null;
-        this.track=track;
+        this.track=track.clone();
         //track.setOnChange(this);
     };
 

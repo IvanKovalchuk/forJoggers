@@ -14,12 +14,13 @@ public class TrackSmootherByLine extends TrackSmoother {
 
     //protected ArrayList<Location> mGeoPoints=null;
     iApproximator latApproximator=null, lngApproximator=null;
-    protected int deltaT, deltaDistance;
+    protected int deltaT,   // milliseconds
+                 deltaDistance; // meters
 
-    TrackSmootherByLine(Track track)
+    public TrackSmootherByLine(Track track)
     {
         super(track);
-        deltaT=1200000; deltaDistance=100;
+        deltaT=20000; deltaDistance=600;
     };
 
     protected void createApproximators()
@@ -162,6 +163,36 @@ public class TrackSmootherByLine extends TrackSmoother {
 
 
         return original.get(ind);
+
+    }
+
+    //--------------------------------------------------------------------------
+    void thinOutGeoPoints()
+    { // thin out points
+        if(mGeoPoints.size()<5) return;
+        ArrayList<Location> origin = track.getGeoPoints();
+        int s=origin.size();
+
+        ArrayList<Location> result=new ArrayList<Location>(s);
+
+        result.add(mGeoPoints.get(0));
+        Location lastLoc=mGeoPoints.get(0);
+        final int maxDistance=0, maxDeltaT=deltaT/4;
+        for(int i=1; i<s-1; i++)
+        {
+            Location loc=mGeoPoints.get(i);
+            double turn = turn(lastLoc.getBearing(), loc.getBearing());
+            long time=(loc.getTime()-lastLoc.getTime());
+
+            if((lastLoc.distanceTo(loc)>maxDistance) || (loc.getTime()-lastLoc.getTime()>2) || (turn>20) || time>maxDeltaT)
+            {
+                lastLoc=loc;
+                result.add(lastLoc);
+            }
+        }
+        result.add(mGeoPoints.get(s-1));
+
+        mGeoPoints = result;
 
     }
 
