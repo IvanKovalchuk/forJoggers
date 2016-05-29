@@ -20,7 +20,7 @@ public class TrackSmootherByCombining extends TrackSmootherByLine {
     public TrackSmootherByCombining(Track track)
     {
         super(track);
-        deltaT=15000; deltaDistance=600;
+        deltaT=15000; deltaDistance=50;//600;
 
         latApproximator2 = new PolinomApproximator(2);
         lngApproximator2 = new PolinomApproximator(2);
@@ -44,11 +44,11 @@ public class TrackSmootherByCombining extends TrackSmootherByLine {
 
         latApproximator=latApproximator1;
         lngApproximator=lngApproximator1;
-        ArrayList<Location> linear = doSmooth(track.getGeoPoints(), 0,s,  0,s, deltaT,deltaDistance);
+        ArrayList<Location> linear = doSmooth(track.getGeoPoints(), 0,s,  0,s);
 
         latApproximator=latApproximator2;
         lngApproximator=lngApproximator2;
-        ArrayList<Location> square = doSmooth(track.getGeoPoints(), 0,s,  0,s, deltaT,deltaDistance);
+        ArrayList<Location> square = doSmooth(track.getGeoPoints(), 0,s,  0,s);
 
         mGeoPoints = combine(linear, square);
 

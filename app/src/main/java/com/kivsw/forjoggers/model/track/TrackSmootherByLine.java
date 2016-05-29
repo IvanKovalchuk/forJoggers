@@ -60,7 +60,7 @@ public class TrackSmootherByLine extends TrackSmoother {
     {
         if(track==null) return;
         int s=track.getGeoPoints().size();
-        mGeoPoints = doSmooth(track.getGeoPoints(), 0,s,  0,s, deltaT,deltaDistance);
+        mGeoPoints = doSmooth(track.getGeoPoints(), 0,s,  0,s);
     }
 
     /**
@@ -72,7 +72,7 @@ public class TrackSmootherByLine extends TrackSmoother {
      * @param stop  the last+1 item to be smoothed
      * @return an array of smoothed locations from (start) to (stop-1)
      */
-    ArrayList<Location> doSmooth(ArrayList<Location> original, int begin, int end, int start, int stop, int deltaT, int deltaDistance)
+    ArrayList<Location> doSmooth(ArrayList<Location> original, int begin, int end, int start, int stop)
     {
         createApproximators();
         if(begin<0) begin=0;
@@ -90,7 +90,8 @@ public class TrackSmootherByLine extends TrackSmoother {
             // looks for the first point of the interval
             while (avB < i) {
                 Location l = original.get(avB);
-                if ((l.getTime() > Tmin) && (deltaDistance > loc.distanceTo(l))) //Track.distance(l,loc)
+                //if ((l.getTime() > Tmin) && (deltaDistance > loc.distanceTo(l)))
+               if(nearEnough(loc,l))
                     break;
                 avB++;
             };
@@ -98,7 +99,8 @@ public class TrackSmootherByLine extends TrackSmoother {
             // looks for the last point of the interval
             while (avE < end) {
                 Location l = original.get(avE);
-                if ((l.getTime() > Tmax) || (deltaDistance < loc.distanceTo(l))) //Track.distance(l,loc)
+                // if ((l.getTime() > Tmax) || (deltaDistance < loc.distanceTo(l)))
+                if(!nearEnough(loc,l))
                     break;
                 avE++;
             };
@@ -113,6 +115,15 @@ public class TrackSmootherByLine extends TrackSmoother {
 
     };
 
+    boolean nearEnough(Location origin, Location neighbour)
+    {
+        long dT=Math.abs(origin.getTime()-neighbour.getTime());
+        double dd=origin.distanceTo(neighbour);
+
+        // return (dT<=deltaT && dd<=deltaDistance);
+        return ( (0.2*dT/(double)deltaT + dd/deltaDistance) < 1.5);
+
+    }
 
     /** interpolates interval [avB, avE) with a line
      *  and return the approximated value for (ind)
