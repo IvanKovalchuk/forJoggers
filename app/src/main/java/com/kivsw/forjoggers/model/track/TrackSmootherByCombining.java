@@ -9,7 +9,7 @@ import com.kivsw.forjoggers.model.math.iApproximator;
 import java.util.ArrayList;
 
 /**
- * This smoother use linear interpolation where no turns
+ * This smoother use linear interpolation where is no turn and square interpolation where is a turn
  */
 public class TrackSmootherByCombining extends TrackSmootherByLine {
 
@@ -20,7 +20,7 @@ public class TrackSmootherByCombining extends TrackSmootherByLine {
     public TrackSmootherByCombining(Track track)
     {
         super(track);
-        deltaT=15000; deltaDistance=50;//600;
+       // deltaT=15000; deltaDistance=40;//600;
 
         latApproximator2 = new PolinomApproximator(2);
         lngApproximator2 = new PolinomApproximator(2);
@@ -106,7 +106,7 @@ public class TrackSmootherByCombining extends TrackSmootherByLine {
         for(int i=1; i<res.length;i++) {
             double a=Track.turn(geoPoints.get(i-1).getBearing(), geoPoints.get(i).getBearing());
 
-            if(a>30) // if we have a turn
+            if(a>12) // if we have a turn
             {
                 setCoefficient(res, geoPoints,i);
             }

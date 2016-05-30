@@ -166,7 +166,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
             @Override
             public TrackSmoother call(Track track) {
                 TrackSmoother r =TrackSmootherFactory
-                        .getSmoother(TrackSmootherFactory.COMBINED, currentTrack);
+                        .getSmoother(TrackSmootherFactory.SQUARE, currentTrack);
                 isTrackSmoothing=true;
                 return r;
             }

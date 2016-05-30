@@ -20,7 +20,8 @@ public class TrackSmootherByLine extends TrackSmoother {
     public TrackSmootherByLine(Track track)
     {
         super(track);
-        deltaT=20000; deltaDistance=600;
+        //deltaT=20000; deltaDistance=600;
+        deltaT=15000; deltaDistance=40;
     };
 
     protected void createApproximators()
