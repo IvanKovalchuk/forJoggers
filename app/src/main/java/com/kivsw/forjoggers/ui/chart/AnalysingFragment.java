@@ -31,8 +31,9 @@ import java.util.Locale;
  * A simple {@link Fragment} subclass.
  */
 public class AnalysingFragment extends Fragment
-        implements AdapterView.OnItemSelectedListener,
-        CustomPagerView.IonPageAppear
+        implements AnalysingFragmentContract.IView,
+             AdapterView.OnItemSelectedListener,
+             CustomPagerView.IonPageAppear
 {
 
     GraphView graph;

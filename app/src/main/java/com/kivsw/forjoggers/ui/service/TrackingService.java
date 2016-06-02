@@ -30,7 +30,9 @@ import java.util.SimpleTimeZone;
  * This service works when the application is tracking.
  * it does not have presenter because it's too simple
  */
-public class TrackingService extends Service {
+public class TrackingService extends Service
+    implements TrackingServiceContract.IView
+{
     public static final String TAG="TrackingService";
     public static final String ACTION_START ="com.kivsw.forjoggers.ACTION_START",
                         ACTION_STOP ="com.kivsw.forjoggers.ACTION_STOP",
@@ -40,7 +42,7 @@ public class TrackingService extends Service {
     //------------------------------------------------
     boolean isWorking=false;
     SettingsKeeper settings=null;
-    TrackingServicePresenter presenter =null;
+    TrackingServiceContract.IPresenter IPresenter =null;
     MyHandler mHandler;
     UnitUtils unitUtils = null;
 
@@ -93,14 +95,14 @@ public class TrackingService extends Service {
 
     @Override
     public void onCreate() {
-        presenter = TrackingServicePresenter.getInstance(this);
-        presenter.setService(this);
+        IPresenter = TrackingServicePresenter.getInstance(this);
+        IPresenter.setService(this);
         usingCounter  = new UsingCounter<String>(null);
     }
     @Override
     public void onDestroy() {
         doStopAll();
-        presenter.setService(null);
+        IPresenter.setService(null);
         mHandler.removeUpdateNotification();
     }
 
@@ -122,10 +124,10 @@ public class TrackingService extends Service {
                 break;
 
             case ACTION_NOTIFICATION_EXIT:
-                presenter.action_exit(); // accomplishes the notification's action "exit"
+                IPresenter.action_exit(); // accomplishes the notification's action "exit"
                 break;
             case ACTION_NOTIFICATION_STOP: // accomplishes the notification's action "stop tracking"
-                presenter.action_stopTracking();
+                IPresenter.action_stopTracking();
                 break;
         }
 
@@ -230,15 +232,15 @@ public class TrackingService extends Service {
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         mBuilder.setContentTitle(this.getText(R.string.app_name));
 
-        long workingTime= presenter.getTrackingTime();
+        long workingTime= IPresenter.getTrackingTime();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         sdf.setTimeZone(new SimpleTimeZone(0, ""));
         sdf.format(new Date(workingTime));
         StringBuilder str=new StringBuilder();
         str.append(sdf.format(new Date(workingTime)));
-        if(presenter.hasTrackData() && presenter.getTrackSmoother()!=null)
+        if(IPresenter.hasTrackData() && IPresenter.getTrackSmoother()!=null)
         {
-            double d=presenter.getTrackSmoother().getTrackDistance();
+            double d= IPresenter.getTrackSmoother().getTrackDistance();
             str.append("\t");
             str.append(unitUtils.distanceToStr(d));
         }
@@ -328,7 +330,7 @@ public class TrackingService extends Service {
             TrackingService s=service.get();
             if(s==null) return;
 
-            long t=service.get().presenter.leftToNextSecond();
+            long t=service.get().IPresenter.leftToNextSecond();
             sendEmptyMessageDelayed(UPDATE_NOTOFICATION, t);
         }
 

@@ -39,11 +39,12 @@ import java.util.Locale;
 
 
 
-public class MapFragment extends Fragment
-implements
-        CustomPagerView.IonPageAppear, View.OnClickListener,
-        MessageDialog.OnCloseListener {
-
+public class MapFragment
+        extends Fragment
+        implements MapFragmentContract.IView,
+            CustomPagerView.IonPageAppear, View.OnClickListener,
+            MessageDialog.OnCloseListener
+{
     private MapViewEnvelope mapView = null;
 
     private TextView textTrackInfo,textCurrentSpeedInfo;
@@ -64,7 +65,7 @@ implements
     UnitUtils unitUtils = null;
 
     private CurrentLocationOverlay myLocationoverlay;
-    MapFragmentPresenter presenter;
+    MapFragmentContract.IPresenter IPresenter;
 
 
     public MapFragment() {
@@ -148,7 +149,7 @@ implements
 
         }
 
-        presenter = MapFragmentPresenter.getInstance(getActivity());
+        IPresenter = MapFragmentIPresenter.getInstance(getActivity());
 
         if(settings.getReturnToMyLocation())
             startFollowingMyLocation();
@@ -175,7 +176,7 @@ implements
     public void onResume() {
         super.onResume();
 
-        presenter.updateTrackingStatus();
+        IPresenter.updateTrackingStatus();
 
     }
 
@@ -187,13 +188,13 @@ implements
     @Override
     public void onStart() {
         super.onStart();
-        presenter.setUI(this);
+        IPresenter.setUI(this);
 
     }
 
     @Override
     public void onStop() {
-        presenter.setUI(null);
+        IPresenter.setUI(null);
         super.onStop();
         //mHandler.deleteAllMessages();
     }
@@ -215,7 +216,7 @@ implements
      * check if mylocation is on the screen and correct visible bounds
      */
     void checkMyLocationVisibility() {
-        if (settings.getReturnToMyLocation() || presenter.isTracking())
+        if (settings.getReturnToMyLocation() || IPresenter.isTracking())
             showMyLocation();
     }
 
@@ -296,7 +297,7 @@ implements
         }
 
         if((trackSmoother==null) ||
-           (!presenter.isTracking() && trackSmoother.getGeoPoints().size()<2)    )
+           (!IPresenter.isTracking() && trackSmoother.getGeoPoints().size()<2)    )
         {
             textTrackInfo.setText("");
             return;
@@ -407,7 +408,7 @@ implements
     public void updateFileName()
     {
 
-        String fn= presenter.getCurrentTrack().getFileName();
+        String fn= IPresenter.getCurrentTrack().getFileName();
         if(fn!=null && !fn.isEmpty()) {
             File file = new File(fn);
             fn=file.getName();
@@ -434,12 +435,12 @@ implements
         if(isGpsAvailable!=null && isGpsAvailable.booleanValue()) {
             if (location.hasSpeed()) {
                 resStr = unitUtils.speedToStr(location.getSpeed());
-            } else if ( presenter.isTracking() &&
-                        presenter.getTrackSmoother() != null &&
-                        presenter.getTrackSmoother().getGeoPoints() != null &&
-                        presenter.getTrackSmoother().getGeoPoints().size() > 1)
+            } else if ( IPresenter.isTracking() &&
+                        IPresenter.getTrackSmoother() != null &&
+                        IPresenter.getTrackSmoother().getGeoPoints() != null &&
+                        IPresenter.getTrackSmoother().getGeoPoints().size() > 1)
             {
-                ArrayList<Location> points = presenter.getTrackSmoother().getGeoPoints();
+                ArrayList<Location> points = IPresenter.getTrackSmoother().getGeoPoints();
                 Location l = points.get(points.size() - 1);
                 if (l.hasSpeed())
                     resStr = "~" + unitUtils.speedToStr(l.getSpeed());
@@ -452,7 +453,7 @@ implements
     //----------------------------------------------
 
     public void onSettingsChanged() {
-        updateTrackInfo(presenter.getTrackSmoother(), presenter.getCurrentTrack());
+        updateTrackInfo(IPresenter.getTrackSmoother(), IPresenter.getCurrentTrack());
     }
     //----------------------------------------------
     // CustomPagerView.IonPageAppear
@@ -473,11 +474,11 @@ implements
         switch(v.getId())
         {
             case R.id.buttonStart: {
-                presenter.onStartClick();
+                IPresenter.onStartClick();
             }
             break;
             case R.id.buttonStop:
-                presenter.onStopClick();
+                IPresenter.onStopClick();
                 break;
 
             case R.id.myLocationButton:
@@ -516,16 +517,16 @@ public void showMessageDialog(int id, String caption, String message)
 
     @Override
     public void onClickOk(MessageDialog msg) {
-        presenter.onMessageBoxClose(msg.getDlgId(), true);
+        IPresenter.onMessageBoxClose(msg.getDlgId(), true);
     }
 
     @Override
     public void onClickCancel(MessageDialog msg)
-    { presenter.onMessageBoxClose(msg.getDlgId(), false); }
+    { IPresenter.onMessageBoxClose(msg.getDlgId(), false); }
 
     @Override
     public void onClickExtra(MessageDialog msg)
-    { presenter.onMessageBoxClose(msg.getDlgId(), false); }
+    { IPresenter.onMessageBoxClose(msg.getDlgId(), false); }
     //-----------------------------------------------------------
 
 

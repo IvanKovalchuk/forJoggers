@@ -29,7 +29,8 @@ import java.io.File;
 public class MainActivity extends ActionBarActivity
 implements  FileDialog.OnCloseListener,
             MessageDialog.OnCloseListener,
-            View.OnClickListener
+            View.OnClickListener,
+        MainActivityContract.IView
 
 {
 
@@ -40,7 +41,7 @@ implements  FileDialog.OnCloseListener,
     public SettingsFragment settingsFragment=null;
     public MapFragment mapFragment=null;
     public AnalysingFragment analysingFragment=null;
-    MainActivityPresenter presenter = null;
+    MainActivityContract.IPresenter IPresenter = null;
     android.support.design.widget.TabLayout tabLayout;
 
     SettingsKeeper settings;
@@ -61,6 +62,7 @@ implements  FileDialog.OnCloseListener,
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        initStrictMode();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -99,8 +101,8 @@ implements  FileDialog.OnCloseListener,
            pager.setCurrentItem(1);
        }
 
-        presenter=MainActivityPresenter.getInstance(this);
-        presenter.onCreateActivity(this);
+        IPresenter = MainActivityIPresenter.getInstance(this);
+        IPresenter.onCreateActivity(this);
 
         onNewIntent(getIntent());
     }
@@ -123,7 +125,7 @@ implements  FileDialog.OnCloseListener,
     @Override
     protected void onDestroy()
     {
-        presenter.onDestroyActivity();
+        IPresenter.onDestroyActivity();
         super.onDestroy();
 
     }
@@ -150,7 +152,7 @@ implements  FileDialog.OnCloseListener,
      {
 
          super.onPrepareOptionsMenu(menu);
-         boolean isTracking = presenter.isTracking();
+         boolean isTracking = IPresenter.isTracking();
          MenuItem item;//=menu.findItem(R.id.action_show_my_location);
 
          item=menu.findItem(R.id.action_load_track);
@@ -159,7 +161,7 @@ implements  FileDialog.OnCloseListener,
          item=menu.findItem(R.id.action_save_track);
          item.setEnabled(!isTracking);
 
-         boolean hasTrackData = presenter.hasTrackData();
+         boolean hasTrackData = IPresenter.hasTrackData();
          item=menu.findItem(R.id.action_show_my_track);
          item.setEnabled(hasTrackData);
 
@@ -167,7 +169,7 @@ implements  FileDialog.OnCloseListener,
          item.setVisible(/*hasTrackData &&*/ !isTracking && BuildConfig.DEBUG);
 
          item=menu.findItem(R.id.action_quit);
-         item.setVisible(settings.getKeepBackGround() && !presenter.isTracking());
+         item.setVisible(settings.getKeepBackGround() && !IPresenter.isTracking());
 
          return super.onPrepareOptionsMenu(menu);
      }
@@ -184,13 +186,13 @@ implements  FileDialog.OnCloseListener,
         switch(id) {
 
             case R.id.action_save_track:
-                if(!presenter.isTracking())
+                if(!IPresenter.isTracking())
                    saveCurrentTrack();
                 return true;
 
             case R.id.action_load_track:
-                if(!presenter.isTracking() ) {
-                    if (presenter.trackNeedToBeSaved()) {
+                if(!IPresenter.isTracking() ) {
+                    if (IPresenter.trackNeedToBeSaved()) {
                         MessageDialog.newInstance(TRACK_MAY_BE_LOST_LOAD_FILE,
                                 getText(R.string.Warning).toString(),
                                 getText(R.string.track_may_be_lost).toString(),
@@ -204,7 +206,7 @@ implements  FileDialog.OnCloseListener,
 
 
             case R.id.action_show_my_track:
-                 presenter.actionShowCurrentTrack();
+                 IPresenter.actionShowCurrentTrack();
                 return true;
                 /*ArrayList<Location> points=CurrentTrack.getInstance(this).getGeoPoints();
                 if(points!=null && points.size()>0)
@@ -212,12 +214,12 @@ implements  FileDialog.OnCloseListener,
                 return true;*/
 
             case R.id.action_emulate_my_track:
-                presenter.actionAnimateTrack();
+                IPresenter.actionAnimateTrack();
                 //mapFragment.animateTrack();
                 break;
 
             case R.id.action_quit:
-                presenter.actionExit();
+                IPresenter.actionExit();
                 break;
         }
 
@@ -228,7 +230,7 @@ implements  FileDialog.OnCloseListener,
     protected void onStart()
     {
         super.onStart();
-        presenter.onStartActivity();
+        IPresenter.onStartActivity();
         setVolumeControlStream (AudioManager.STREAM_MUSIC );
 
 
@@ -237,7 +239,7 @@ implements  FileDialog.OnCloseListener,
     @Override
     protected void onStop()
     {
-        presenter.onStopActivity();
+        IPresenter.onStopActivity();
         super.onStop();
 
     }
@@ -251,7 +253,26 @@ implements  FileDialog.OnCloseListener,
             pager.setCurrentItem(1,true);
     }
 
+    private void initStrictMode()
+    {
+      /*  if (!BuildConfig.DEBUG) return;
 
+            // Tell Android what thread issues you want to detect and what to do when found.
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()    // or use .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .build());
+            // Tell Android what VM issues you want to detect and what to do when found.
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()       // Log the problem
+                    .penaltyDeath()     // Then kill the app
+                    .build());*/
+
+    };
 
     private void saveCurrentTrack()
     {
@@ -292,7 +313,7 @@ implements  FileDialog.OnCloseListener,
             case 1:
                 if(!fileName.matches(".*\\.gpx$"))
                     fileName=fileName+".gpx";
-                success=presenter.actionSaveTrack(fileName);//mapFragment.saveTrackToFile(fileName);
+                success= IPresenter.actionSaveTrack(fileName);//mapFragment.saveTrackToFile(fileName);
                 if(!success)
                 {
                     String msg=String.format(getText(R.string.cannot_save_file).toString(),fileName);
@@ -301,7 +322,7 @@ implements  FileDialog.OnCloseListener,
                 }
                 break;
             case 2:
-                success=presenter.actionLoadTrack(fileName);//mapFragment.loadTrackFromFile(fileName);
+                success= IPresenter.actionLoadTrack(fileName);//mapFragment.loadTrackFromFile(fileName);
                 if(!success)
                 {
                     String msg=String.format(getText(R.string.cannot_load_file).toString(),fileName);

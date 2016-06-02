@@ -12,7 +12,7 @@ import com.kivsw.forjoggers.model.track.CurrentTrack;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.model.track.TrackSmoother;
 import com.kivsw.forjoggers.model.track.TrackSmootherFactory;
-import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
+import com.kivsw.forjoggers.ui.map.MapFragmentIPresenter;
 import com.kivsw.forjoggers.ui.service.TrackingServicePresenter;
 
 import java.io.File;
@@ -33,7 +33,9 @@ import rx.subjects.Subject;
  * This is the main module of the data model.
  * it controls all the data
  */
-public class DataModel implements UsingCounter.IUsingChanged{
+public class DataModel
+        implements IDataModel, UsingCounter.IUsingChanged
+{
 
     static DataModel dataModel=null;
     static public  DataModel getInstance(Context context)
@@ -75,7 +77,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
         loadLastData();
 
     };
-    public void release()
+    private void release()
     {
         RxGps.release();
         if(speaker!=null)
@@ -95,14 +97,16 @@ public class DataModel implements UsingCounter.IUsingChanged{
               release();
     }
     //------------------------------------------------------------------
+    @Override
     public UsingCounter getUsingCounter()
     {
         return usingCounter;
     }
-    //------------------------------------------------------------------
+    @Override
     public TrackSmoother getTrackSmoother() {
         return trackSmoother;
     };
+    @Override
     public CurrentTrack getCurrentTrack() {
         return currentTrack;
     };
@@ -120,6 +124,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
              loadTrack(fn);
 
     }
+    @Override
     public long getTrackingTime()
     {
         if(!isTracking) return 0;
@@ -195,29 +200,6 @@ public class DataModel implements UsingCounter.IUsingChanged{
 
     };
 
-    /**
-     * informs the View about new data in the current track
-
-    private void initCurrentTrackUpdating()
-    {
-        currentTrack.getObservable()
-                .subscribe(
-                    new Observer() {
-                        @Override
-                        public void onCompleted() {}
-
-                        @Override
-                        public void onError(Throwable e) {
-                            MapFragmentPresenter.getInstance(DataModel.this.context).doUpdateFileName();
-                            MainActivityPresenter.getInstance(DataModel.this.context).showError(e.getMessage());
-                        }
-
-                        @Override
-                        public void onNext(Object o) {
-                            doUpdateCurrentTrackView();
-                        }
-                    });
-    }*/
     //------------------------------------------------------------------
     private String getTempFileName()
     {
@@ -380,7 +362,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
                     if(aFileName.equals(getTempFileName()))
                         currentTrack.setFileName("");
 
-                    MapFragmentPresenter.getInstance(context).actionShowCurrentTrack();
+                    MapFragmentIPresenter.getInstance(context).actionShowCurrentTrack();
                     settings.setCurrentFileName(currentTrack.getFileName());
                 }
                 else
@@ -473,7 +455,7 @@ public class DataModel implements UsingCounter.IUsingChanged{
         return errorMessageObservable;
     }
     /**
-     * observable for an error message
+     * observable for start/stop events
      */
     PublishSubject<Boolean> startStopObservable=null;
     public Observable<Boolean> getStartStopObservable()
@@ -483,30 +465,13 @@ public class DataModel implements UsingCounter.IUsingChanged{
         return startStopObservable;
     }
     /**
-     *
+     * this observable emits an event when the fileName has been changed
      */
-
     public Observable<String> getFileNameObservable()
     {
         return currentTrack.getFileNameObservable();
     }
 
-   /*
-    protected void doUpdateCurrentTrackView()
-    {
-        MapFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
-
-    }
-    protected void doUpdateCurrentSmoothTrackView()
-    {
-        MapFragmentPresenter.getInstance(context).doSmoothTrackUpdate(trackSmoother);
-        AnalysingFragmentPresenter.getInstance(context).onCurrentTrackUpdate(currentTrack);
-    }
-    protected void doUpdateFileNameView()
-    {
-        MapFragmentPresenter.getInstance(context).doUpdateFileName();
-        MainActivityPresenter.getInstance(context).menuUpdate();
-    }*/
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     // MODEL OUT INTERFACE

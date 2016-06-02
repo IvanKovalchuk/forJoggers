@@ -3,9 +3,8 @@ package com.kivsw.forjoggers.ui;
 import android.content.Context;
 
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.model.DataModel;
 import com.kivsw.forjoggers.model.track.Track;
-import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
+import com.kivsw.forjoggers.ui.map.MapFragmentIPresenter;
 import com.kivsw.forjoggers.ui.service.TrackingServicePresenter;
 
 import rx.Subscription;
@@ -14,12 +13,15 @@ import rx.functions.Action1;
 /**
  * Created by ivan on 4/27/16.
  */
-public class MainActivityPresenter extends BasePresenter {
-    static private MainActivityPresenter singletone=null;
-    static public MainActivityPresenter getInstance(Context context)
+public class MainActivityIPresenter
+        extends BasePresenter
+        implements MainActivityContract.IPresenter
+{
+    static private MainActivityIPresenter singletone=null;
+    static public MainActivityIPresenter getInstance(Context context)
     {
         if(singletone==null)
-            singletone = new MainActivityPresenter(context.getApplicationContext());
+            singletone = new MainActivityIPresenter(context.getApplicationContext());
         return singletone;
     };
 
@@ -28,11 +30,11 @@ public class MainActivityPresenter extends BasePresenter {
 
     Subscription rxTrackingUpdate=null, rxCurrentTrackUpdate=null;
 
-    private MainActivityPresenter(Context context)
+    private MainActivityIPresenter(Context context)
     {
         super(context);
 
-        DataModel.getInstance(context).getErrorMessageObservable()
+        getDataModel().getErrorMessageObservable()
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
@@ -53,7 +55,7 @@ public class MainActivityPresenter extends BasePresenter {
     public void onStartActivity()
     {
         isActivityStarted=true;
-        rxTrackingUpdate=DataModel.getInstance(activity).getStartStopObservable()
+        rxTrackingUpdate=getDataModel().getStartStopObservable()
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean aBoolean) {
@@ -61,7 +63,7 @@ public class MainActivityPresenter extends BasePresenter {
                     }
                 });
 
-        rxCurrentTrackUpdate=DataModel.getInstance(context).getCurrentTrackObservable()
+        rxCurrentTrackUpdate=getDataModel().getCurrentTrackObservable()
                 .subscribe(new Action1<Track>() {
                     @Override
                     public void call(Track track) {
@@ -69,15 +71,15 @@ public class MainActivityPresenter extends BasePresenter {
                     }
                 });
 
-        DataModel.getInstance(activity).getUsingCounter().startUsingBy(MainActivity.TAG);
-        DataModel.getInstance(activity).onActivityStarted();
+        getDataModel().getUsingCounter().startUsingBy(MainActivity.TAG);
+        getDataModel().onActivityStarted();
         menuUpdate();
 
     }
     public void onStopActivity()
     {
         isActivityStarted=false;
-        DataModel.getInstance(activity).getUsingCounter().stopUsingBy(MainActivity.TAG);
+        getDataModel().getUsingCounter().stopUsingBy(MainActivity.TAG);
 
         if(rxTrackingUpdate!=null) rxTrackingUpdate.unsubscribe();
         rxTrackingUpdate=null;
@@ -90,26 +92,30 @@ public class MainActivityPresenter extends BasePresenter {
 
     }
     ///---------------------------------------------------
-    boolean actionSaveTrack(String fileName)
+    @Override
+    public boolean actionSaveTrack(String fileName)
     {
-        return DataModel.getInstance(context).saveTrack(fileName);
+        return getDataModel().saveTrack(fileName);
 
     };
-    boolean actionLoadTrack(String fileName)
+    @Override
+    public boolean actionLoadTrack(String fileName)
     {
-        return DataModel.getInstance(context).loadTrack(fileName);
+        return getDataModel().loadTrack(fileName);
     };
 
-    void actionShowCurrentTrack()
+    @Override
+    public  void actionShowCurrentTrack()
     {
         if(!hasTrackData()) return;
-        MapFragmentPresenter.getInstance(context).actionShowCurrentTrack();
+        MapFragmentIPresenter.getInstance(context).actionShowCurrentTrack();
 
     };
-    void actionAnimateTrack()
+    @Override
+    public void actionAnimateTrack()
     {
         if(!hasTrackData()) return;
-        MapFragmentPresenter.getInstance(context).actionAnimateTrack();
+        MapFragmentIPresenter.getInstance(context).actionAnimateTrack();
     };
     public void actionExit()
     {

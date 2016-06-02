@@ -2,6 +2,7 @@ package com.kivsw.forjoggers.ui;
 
 import android.content.Context;
 
+import com.kivsw.forjoggers.model.IDataModel;
 import com.kivsw.forjoggers.model.track.CurrentTrack;
 import com.kivsw.forjoggers.model.DataModel;
 import com.kivsw.forjoggers.model.track.TrackSmoother;
@@ -9,37 +10,49 @@ import com.kivsw.forjoggers.model.track.TrackSmoother;
 /**
  * Created by ivan on 4/27/16.
  */
-public abstract class BasePresenter {
+public abstract class BasePresenter
+implements IBasePresenter {
     protected Context context;
     public BasePresenter(Context context)
     {
         this.context = context.getApplicationContext();
     }
 
+    @Override
     public boolean isTracking()
     {
-        return DataModel.getInstance(context).isTracking();
+        return getDataModel().isTracking();
     }
+    @Override
     public long getTrackingTime()
     {
-        return DataModel.getInstance(context).getTrackingTime();
+        return getDataModel().getTrackingTime();
     }
+    @Override
     public boolean hasTrackData()
     {
-        return DataModel.getInstance(context).hasTrackData();
+        return getDataModel().hasTrackData();
     }
+    @Override
     public boolean trackNeedToBeSaved()
     {
-        return DataModel.getInstance(context).getCurrentTrack().needToBeSaved();
+        return getDataModel().getCurrentTrack().needToBeSaved();
     }
+    @Override
     public CurrentTrack getCurrentTrack()
     {
-        return DataModel.getInstance(context).getCurrentTrack();
+        return getDataModel().getCurrentTrack();
     }
+    @Override
     public TrackSmoother getTrackSmoother()
     {
-        return DataModel.getInstance(context).getTrackSmoother();
+        return getDataModel().getTrackSmoother();
     }
+
+    protected IDataModel getDataModel()
+    {
+        return DataModel.getInstance(context);
+    };
 
     abstract public void onSettingsChanged();
 }

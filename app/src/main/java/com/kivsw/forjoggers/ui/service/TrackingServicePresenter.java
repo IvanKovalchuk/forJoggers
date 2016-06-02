@@ -2,9 +2,8 @@ package com.kivsw.forjoggers.ui.service;
 
 import android.content.Context;
 
-import com.kivsw.forjoggers.model.DataModel;
 import com.kivsw.forjoggers.ui.BasePresenter;
-import com.kivsw.forjoggers.ui.MainActivityPresenter;
+import com.kivsw.forjoggers.ui.MainActivityIPresenter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +14,10 @@ import rx.functions.Action1;
 /**
  * This is the presenter for the service's UI
  */
-public class TrackingServicePresenter extends BasePresenter {
+public class TrackingServicePresenter
+        extends BasePresenter
+implements TrackingServiceContract.IPresenter
+{
 
     static private TrackingServicePresenter singletone=null;
     static public TrackingServicePresenter getInstance(Context context)
@@ -34,14 +36,15 @@ public class TrackingServicePresenter extends BasePresenter {
     }
 
     //-------------------------------------------------
-    void setService(TrackingService service) {
+    @Override
+    public void setService(TrackingService service) {
         if (service == null)
         {
-            DataModel.getInstance(context).getUsingCounter().stopUsingBy(TrackingService.TAG);
+            getDataModel().getUsingCounter().stopUsingBy(TrackingService.TAG);
         }
         else
         {
-            DataModel.getInstance(context).getUsingCounter().startUsingBy(TrackingService.TAG);
+            getDataModel().getUsingCounter().startUsingBy(TrackingService.TAG);
         }
         this.service=service;
     }
@@ -54,9 +57,10 @@ public class TrackingServicePresenter extends BasePresenter {
     //-------------------------------------------------
     // returns the time (milliseconds) to the next second,
     // the moment to update the notification
+    @Override
     public long leftToNextSecond()
     {
-        long workingTime= DataModel.getInstance(context).getTrackingTime();
+        long workingTime= getDataModel().getTrackingTime();
         long t=1000-workingTime%1000;
         return t;
     }
@@ -65,22 +69,25 @@ public class TrackingServicePresenter extends BasePresenter {
     /**
      * accomplishes the notification's action "exit"
      */
-    void action_exit()
+    @Override
+    public void action_exit()
     {
-        MainActivityPresenter.getInstance(context).actionExit();
+        MainActivityIPresenter.getInstance(context).actionExit();
     };
 
     /**
      *  accomplishes the notification's action "stop tracking"
      */
-    void action_stopTracking()
+    @Override
+    public void action_stopTracking()
     {
-        DataModel.getInstance(context).stopTracking();
+        getDataModel().stopTracking();
     };
     //-------------------------------------------------
     /**
      * inform service that tracking has been started
      */
+    @Override
     public void startTracking()
     {
         TrackingService.start(context, TrackingService.TRACKING);
@@ -89,7 +96,7 @@ public class TrackingServicePresenter extends BasePresenter {
     /**
      * inform service that tracking has been stopped
      */
-
+    @Override
     public void endTracking()
     {
         TrackingService.stop(context, TrackingService.TRACKING);
@@ -99,6 +106,7 @@ public class TrackingServicePresenter extends BasePresenter {
     /**
      * inform service that the file saving process  has been started
      */
+    @Override
     public void startSaving()
     {
         TrackingService.start(context,TrackingService.SAVING);
@@ -106,6 +114,7 @@ public class TrackingServicePresenter extends BasePresenter {
     /**
      * inform service that the file saving process has been stopped
      */
+    @Override
     public void endSaving()
     {
         TrackingService.stop(context, TrackingService.SAVING);
@@ -116,6 +125,7 @@ public class TrackingServicePresenter extends BasePresenter {
     /**
      * inform service that the background working has been started
      */
+    @Override
     public void startBackground()
     {
         TrackingService.start(context,TrackingService.BACKGROUND);
@@ -123,6 +133,7 @@ public class TrackingServicePresenter extends BasePresenter {
     /**
      * inform service that the background working  has been stopped
      */
+    @Override
     public void endBackground()
     {
         TrackingService.stop(context, TrackingService.BACKGROUND);
@@ -133,6 +144,7 @@ public class TrackingServicePresenter extends BasePresenter {
      * inform service that the background working has been started
      */
     Subscription speakingWachdogTimer=null;
+    @Override
     public void startTTSspeaking()
     {
         if(speakingWachdogTimer!=null)
@@ -151,6 +163,7 @@ public class TrackingServicePresenter extends BasePresenter {
     /**
      * inform service that the background working  has been stopped
      */
+    @Override
     public void endTTSspeaking()
     {
         if(speakingWachdogTimer!=null)

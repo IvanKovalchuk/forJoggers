@@ -4,9 +4,8 @@ import android.content.Context;
 import android.location.Location;
 
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.model.DataModel;
-import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.helper.RxGps;
+import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.ui.BasePresenter;
 
 import java.lang.ref.WeakReference;
@@ -22,14 +21,17 @@ import rx.functions.Action1;
  * Created by ivan on 4/22/16.
  */
 
-public class MapFragmentPresenter  extends BasePresenter {
+public class MapFragmentIPresenter
+        extends BasePresenter
+    implements MapFragmentContract.IPresenter
+{
 
-    static private MapFragmentPresenter singletone=null;
+    static private MapFragmentIPresenter singletone=null;
 
-    static public MapFragmentPresenter getInstance(Context context)
+    static public MapFragmentIPresenter getInstance(Context context)
     {
         if(singletone==null)
-            singletone = new MapFragmentPresenter(context.getApplicationContext());
+            singletone = new MapFragmentIPresenter(context.getApplicationContext());
         return singletone;
     };
 
@@ -41,12 +43,13 @@ public class MapFragmentPresenter  extends BasePresenter {
 
     final static int  WARNINGS_AND_START_SERVICE_MESSAGE_ID=0;
 
-    private MapFragmentPresenter(Context context) {
+    private MapFragmentIPresenter(Context context) {
         super(context);
     }
 
 
-    void setUI(MapFragment aMapFragment)
+    @Override
+    public void setUI(MapFragment aMapFragment)
     {
         if(aMapFragment==null)
         {
@@ -115,7 +118,7 @@ public class MapFragmentPresenter  extends BasePresenter {
             if(isTracking())
                 startTrackingUpdating();
 
-            rxFileNameUpdate=DataModel.getInstance(context).getFileNameObservable()
+            rxFileNameUpdate=getDataModel().getFileNameObservable()
                          .subscribe(new Action1<String>() {
                              @Override
                              public void call(String s) {
@@ -123,7 +126,7 @@ public class MapFragmentPresenter  extends BasePresenter {
                              }
                          });
 
-            rxCurrentTrackUpdate=DataModel.getInstance(context).getCurrentTrackObservable()
+            rxCurrentTrackUpdate=getDataModel().getCurrentTrackObservable()
                         .subscribe(new Action1<Track>() {
                                 @Override
                                 public void call(Track track) {
@@ -131,7 +134,7 @@ public class MapFragmentPresenter  extends BasePresenter {
                                 }
                             });
 
-            rxTrackSmotherUpdate=DataModel.getInstance(context).getTrackSmootherObservable()
+            rxTrackSmotherUpdate=getDataModel().getTrackSmootherObservable()
                         .subscribe(new Action1<Track>() {
                             @Override
                             public void call(Track track) {
@@ -139,7 +142,7 @@ public class MapFragmentPresenter  extends BasePresenter {
                             }
                         });
 
-            rxTrackingUpdate=DataModel.getInstance(context).getStartStopObservable()
+            rxTrackingUpdate=getDataModel().getStartStopObservable()
                     .subscribe(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean isTracking) {
@@ -149,8 +152,8 @@ public class MapFragmentPresenter  extends BasePresenter {
 
 
             doUpdateFileName();
-            doCurrentTrackUpdate(DataModel.getInstance(context).getCurrentTrack());
-            doSmoothTrackUpdate(DataModel.getInstance(context).getTrackSmoother());
+            doCurrentTrackUpdate(getDataModel().getCurrentTrack());
+            doSmoothTrackUpdate(getDataModel().getTrackSmoother());
 
         }
 
@@ -184,29 +187,32 @@ public class MapFragmentPresenter  extends BasePresenter {
         if(rxTrackInfoUpdate!=null)   rxTrackInfoUpdate.unsubscribe();
         rxTrackInfoUpdate=null;
     }
+    @Override
     public void actionShowCurrentTrack()
     {
         if(!hasTrackData()) return;
         if(mapFragment==null) return;
-        Location loc= DataModel.getInstance(context).getCurrentTrack().getGeoPoints().get(0);
+        Location loc= getDataModel().getCurrentTrack().getGeoPoints().get(0);
         mapFragment.stopFollowingMyLocation();
         mapFragment.showLocation(loc.getLatitude(), loc.getLongitude());
     }
+    @Override
     public void actionAnimateTrack()
     {
-        //RxGps.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
-        RxGps.setEmulationData(new ArrayList<Location>(getTrackSmoother().getGeoPoints()));
+        RxGps.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
+        //RxGps.setEmulationData(new ArrayList<Location>(getTrackSmoother().getGeoPoints()));
     }
     //----------------------------------------------------------
 
     /**
      *  shows the stop button or the start button
      */
+
     public void updateTrackingStatus()
     {
         if(mapFragment==null) return;
 
-        if(DataModel.getInstance(context).isTracking())
+        if(getDataModel().isTracking())
             mapFragment.showStopButton();
         else
             mapFragment.showStartButton();
@@ -223,7 +229,7 @@ public class MapFragmentPresenter  extends BasePresenter {
         if(!getGPSstatus())
             problems.append(context.getText(R.string.GPS_has_not_found_location));
 
-        if(DataModel.getInstance(context).getCurrentTrack().needToBeSaved())
+        if(getDataModel().getCurrentTrack().needToBeSaved())
             problems.append(context.getText(R.string.track_may_be_lost));
 
         if(problems.length()>0) {
@@ -240,11 +246,18 @@ public class MapFragmentPresenter  extends BasePresenter {
     /**
      * Stops recording the current track
      */
+    @Override
     public void onStopClick()
     {
          doStop();
     };
-    //--------------------------------------------------------------------
+    @Override
+    public void onSettingsChanged() {
+        if(mapFragment==null) return;
+        mapFragment.onSettingsChanged();
+    }
+
+    @Override
     public void onMessageBoxClose(int messageId, boolean OkButton)
     {
          if(OkButton && messageId==WARNINGS_AND_START_SERVICE_MESSAGE_ID)
@@ -256,15 +269,15 @@ public class MapFragmentPresenter  extends BasePresenter {
     protected void doStart()
     {
         mapFragment.showStopButton();
-        DataModel.getInstance(context).startTracking();
+        getDataModel().startTracking();
         startTrackingUpdating();
 
     }
     protected void doStop()
     {
-        DataModel.getInstance(context).stopTracking();
+        getDataModel().stopTracking();
     }
-    public void doAfterStartStopTracking(boolean isTracking)
+    private void doAfterStartStopTracking(boolean isTracking)
     {
         if(mapFragment!=null) {
             if(isTracking) mapFragment.showStopButton();
@@ -292,10 +305,10 @@ public class MapFragmentPresenter  extends BasePresenter {
         }
          if(mapFragment==null) return;
           mapFragment.putCurrentTrackOnMap(track);
-          //mapFragment.updateTrackInfo(DataModel.getInstance(context).getCurrentTrack(), DataModel.getInstance(context).getTrackSmoother());
+          //mapFragment.updateTrackInfo(getDataModel().getCurrentTrack(), DataModel.getInstance(context).getTrackSmoother());
     }
 
-    public void doUpdateFileName()
+    private void doUpdateFileName()
     {
         if(Thread.currentThread().getId()!=1)
         {
@@ -309,7 +322,7 @@ public class MapFragmentPresenter  extends BasePresenter {
      * Method is invoked when smoothTrack is ready
      * @param track
      */
-    public void doSmoothTrackUpdate(Track track)
+    private void doSmoothTrackUpdate(Track track)
     {
         if(Thread.currentThread().getId()!=1)
         {
@@ -317,12 +330,8 @@ public class MapFragmentPresenter  extends BasePresenter {
         }
         if(mapFragment==null) return;
         mapFragment.putSmoothTrackOnMap(track);
-        mapFragment.updateTrackInfo(DataModel.getInstance(context).getTrackSmoother(),DataModel.getInstance(context).getCurrentTrack());
+        mapFragment.updateTrackInfo(getDataModel().getTrackSmoother(),getDataModel().getCurrentTrack());
     }
 
-    @Override
-    public void onSettingsChanged() {
-        if(mapFragment==null) return;
-        mapFragment.onSettingsChanged();
-    }
+
 }

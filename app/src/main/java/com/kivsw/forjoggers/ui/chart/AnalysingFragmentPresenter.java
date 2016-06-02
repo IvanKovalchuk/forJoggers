@@ -2,7 +2,6 @@ package com.kivsw.forjoggers.ui.chart;
 
 import android.content.Context;
 
-import com.kivsw.forjoggers.model.DataModel;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.ui.BasePresenter;
 
@@ -12,7 +11,11 @@ import rx.functions.Action1;
 /**
  * Created by ivan on 01.05.2016.
  */
-public class AnalysingFragmentPresenter extends BasePresenter {
+public class AnalysingFragmentPresenter
+        extends BasePresenter
+        implements AnalysingFragmentContract.IPresenter
+
+{
     static private AnalysingFragmentPresenter singletone=null;
 
     static public AnalysingFragmentPresenter getInstance(Context context)
@@ -31,7 +34,8 @@ public class AnalysingFragmentPresenter extends BasePresenter {
     }
 
     Subscription subscription=null;
-    void setUI(AnalysingFragment fragment) {
+    @Override
+    public void setUI(AnalysingFragment fragment) {
         if (fragment == null)
         {
             if(subscription!=null)
@@ -41,7 +45,7 @@ public class AnalysingFragmentPresenter extends BasePresenter {
         {
             // subscribe when currentTrack is changed
             subscription=
-                 DataModel.getInstance(context).getTrackSmootherObservable()
+                    getDataModel().getTrackSmootherObservable()
                     .subscribe(new Action1<Track>() {
                         @Override
                         public void call(Track track) {
