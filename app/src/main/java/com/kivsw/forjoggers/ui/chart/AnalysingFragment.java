@@ -2,6 +2,8 @@ package com.kivsw.forjoggers.ui.chart;
 
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,13 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.LabelFormatter;
-import com.jjoe64.graphview.Viewport;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
@@ -24,6 +22,15 @@ import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.ui.CustomPagerView;
 import com.kivsw.forjoggers.ui.MainActivity;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.PointStyle;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.model.XYSeries;
+import org.achartengine.model.XYValueSeries;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
 
 import java.util.Locale;
 
@@ -36,10 +43,16 @@ public class AnalysingFragment extends Fragment
              CustomPagerView.IonPageAppear
 {
 
-    GraphView graph;
-    MyLabelFormatter myFormatter;
+    LinearLayout layout;
+    GraphicalView mChart;
+    XYSeries lineData;
+    XYSeriesRenderer mRenderer;
+    XYMultipleSeriesRenderer multiRenderer;
+
+    //MyLabelFormatter myFormatter;
     UnitUtils unitUtils;
-    LineGraphSeries<DataPoint> series;
+    //LineGraphSeries<DataPoint> series;
+
     Spinner graphSpiner;
     ArrayAdapter<CharSequence> spinnerAdpter;
     AnalysingFragmentPresenter presenter;
@@ -59,15 +72,8 @@ public class AnalysingFragment extends Fragment
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_analysing, container, false);
 
-        graph =(GraphView)rootView.findViewById(R.id.graph);
-        series = new LineGraphSeries<DataPoint>();
-        graph.addSeries(series);
-        String t[]=getActivity().getResources().getStringArray(R.array.time_short_unit);
-        graph.getGridLabelRenderer().setHorizontalAxisTitle(t[0]);
-        myFormatter = new MyLabelFormatter();
-        graph.getGridLabelRenderer().setLabelFormatter(myFormatter);
-        //graph.getViewport().setScalable(true);
-        //graph.getViewport().setScrollable(true);
+        layout =(LinearLayout)rootView.findViewById(R.id.layout);
+        initChart();
 
         graphSpiner=(Spinner)rootView.findViewById(R.id.spinner);
 
@@ -84,6 +90,60 @@ public class AnalysingFragment extends Fragment
         presenter = AnalysingFragmentPresenter.getInstance(getActivity());
 
         return rootView;
+    }
+
+    void initChart()
+    {
+        //http://stackoverflow.com/questions/9904457/how-to-set-value-in-x-axis-label-in-achartengine
+        //http://stackoverflow.com/questions/12959969/achartengine-zoom-and-black-border
+        lineData=new XYSeries("");
+        mRenderer =new XYSeriesRenderer();
+        mRenderer.setLineWidth(3);
+        mRenderer.setColor(Color.BLUE);
+// Include low and max value
+        mRenderer.setDisplayBoundingPoints(true);
+// we add point markers
+        mRenderer.setPointStyle(PointStyle.POINT);
+        //mRenderer.setPointStrokeWidth(3);
+
+
+        // creates the chart
+        XYMultipleSeriesDataset dataset=new XYMultipleSeriesDataset();
+        dataset.addSeries(lineData);
+        multiRenderer=new XYMultipleSeriesRenderer();
+
+        multiRenderer.setAxisTitleTextSize(12);
+        multiRenderer.setChartTitleTextSize(12);
+        multiRenderer.setLabelsTextSize(10);
+        multiRenderer.setLegendTextSize(12);
+        multiRenderer.setPointSize(5f);
+
+        multiRenderer.setApplyBackgroundColor(true);
+        multiRenderer.setBackgroundColor(Color.parseColor("#F5F5F5"));
+        multiRenderer.setMarginsColor(Color.parseColor("#F5F5F5"));
+
+        //multiRenderer.setChartTitle("Weight / Temperature");
+   //     multiRenderer.setXLabels(20);
+       // multiRenderer.setXTitle(sdFormatter.format(currentDate));
+
+        multiRenderer.setXLabelsAlign(Paint.Align.CENTER);
+
+        //multiRenderer.setYLabels(10);
+
+        multiRenderer.setAxesColor(Color.LTGRAY);
+        multiRenderer.setLabelsColor(Color.parseColor("#5f5f5f"));
+        multiRenderer.setShowGrid(true);
+        multiRenderer.setGridColor(Color.GRAY);
+
+        multiRenderer.setShowLegend(false);
+        multiRenderer.setZoomButtonsVisible(true);
+
+        multiRenderer.addSeriesRenderer(mRenderer);
+        mChart = ChartFactory.getLineChartView(getActivity(),dataset , multiRenderer);
+
+        // add the chart to the layout
+        layout.addView(mChart,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
     }
 
     @Override
@@ -143,8 +203,10 @@ public class AnalysingFragment extends Fragment
             curentTrack = (Track)curentTrack.getOnChange();
         };
 
+        lineData.clear();
+
         if(curentTrack.getGeoPoints().size()>0) {
-            DataPoint data[]=new DataPoint[curentTrack.getGeoPoints().size()];
+            //DataPoint data[]=new DataPoint[curentTrack.getGeoPoints().size()];
             long t0 = curentTrack.getGeoPoints().get(0).getTime();
             int i=0;
             Location prevLoc=null;
@@ -178,41 +240,41 @@ public class AnalysingFragment extends Fragment
                         break;
                 }
                 lastX=(loc.getTime()-t0)/1000;
-                data[i++]=new DataPoint(lastX, y);
+               //data[i++]=new DataPoint(lastX, y);
+                lineData.add(lastX, y);
                 prevLoc = loc;
             };
             switch(num)
             {
                 case 0:
-                case 1:myFormatter.yFormat="%.4f";
-                       graph.getGridLabelRenderer().setVerticalAxisTitle(getText(R.string.degree).toString());
+                case 1://myFormatter.yFormat="%.4f";
+                       //graph.getGridLabelRenderer().setVerticalAxisTitle(getText(R.string.degree).toString());
+                       multiRenderer.setYTitle(getText(R.string.degree).toString());
                        break;
                 case 3:
-                case 4:myFormatter.yFormat="%.0f";
-                       graph.getGridLabelRenderer().setVerticalAxisTitle(getText(R.string.degree).toString());
+                case 4://myFormatter.yFormat="%.0f";
+                       //graph.getGridLabelRenderer().setVerticalAxisTitle(getText(R.string.degree).toString());
+                       multiRenderer.setYTitle(getText(R.string.degree).toString());
                        break;
                 case 2:
-                       myFormatter.yFormat="%.1f";
-                       graph.getGridLabelRenderer().setVerticalAxisTitle(unitUtils.speedUnit(false));
+                      // myFormatter.yFormat="%.1f";
+                       //graph.getGridLabelRenderer().setVerticalAxisTitle(unitUtils.speedUnit(false));
+                       multiRenderer.setYTitle(unitUtils.speedUnit(false));
                        break;
             }
 
-            //graph.getViewport().setXAxisBoundsManual(false);
-            //graph.getViewport().setYAxisBoundsManual(false);
-            graph.getGridLabelRenderer().setLabelVerticalWidth(null);
+            multiRenderer.setXAxisMin(0,0);
+            multiRenderer.setXAxisMax(lastX*1.05,0);
+
+            multiRenderer.setYAxisMin(lineData.getMinY(),0);
+            multiRenderer.setYAxisMax(lineData.getMaxY(),0);
+
+         /*   graph.getGridLabelRenderer().setLabelVerticalWidth(null);
             graph.getViewport().setXAxisBoundsManual(true);
             graph.getViewport().setMinX(0);
-            graph.getViewport().setMaxX(lastX*1.1+1);
-           // graph.getGridLabelRenderer().invalidate(false,false);
+            graph.getViewport().setMaxX(lastX*1.1+1);*/
 
-            try {
-                series.resetData(data);
-            }catch(Exception e)
-            {
-                MessageDialog.newInstance(getText(R.string.Error).toString(), e.toString())
-                        .show(getFragmentManager(),"");
-            }
-            //graph.getViewport().setScalable(true);
+            mChart.invalidate();
         }
 
 
@@ -240,7 +302,7 @@ public class AnalysingFragment extends Fragment
     }
 
     //------------------------------------------------
-    class MyLabelFormatter implements LabelFormatter {
+ /*   class MyLabelFormatter implements LabelFormatter {
         Viewport viewport=null;
         String xFormat="%.0f", yFormat="%.3f";
 
@@ -255,5 +317,5 @@ public class AnalysingFragment extends Fragment
     {
         this.viewport = viewport;
     };
-}
+}*/
 }
