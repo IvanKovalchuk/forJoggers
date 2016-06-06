@@ -15,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import com.kivsw.dialog.MessageDialog;
 import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.UnitUtils;
@@ -28,11 +27,10 @@ import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
-import org.achartengine.model.XYValueSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
-import java.util.Locale;
+import java.text.DecimalFormat;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -112,10 +110,10 @@ public class AnalysingFragment extends Fragment
         dataset.addSeries(lineData);
         multiRenderer=new XYMultipleSeriesRenderer();
 
-        multiRenderer.setAxisTitleTextSize(12);
-        multiRenderer.setChartTitleTextSize(12);
-        multiRenderer.setLabelsTextSize(10);
-        multiRenderer.setLegendTextSize(12);
+        multiRenderer.setAxisTitleTextSize(20);
+        multiRenderer.setChartTitleTextSize(20);
+        multiRenderer.setLabelsTextSize(20);
+        multiRenderer.setLegendTextSize(24);
         multiRenderer.setPointSize(5f);
 
         multiRenderer.setApplyBackgroundColor(true);
@@ -130,8 +128,11 @@ public class AnalysingFragment extends Fragment
 
         //multiRenderer.setYLabels(10);
 
+
         multiRenderer.setAxesColor(Color.LTGRAY);
-        multiRenderer.setLabelsColor(Color.parseColor("#5f5f5f"));
+        multiRenderer.setLabelsColor(Color.DKGRAY);
+        multiRenderer.setYLabelsColor(0,Color.DKGRAY);
+        multiRenderer.setXLabelsColor(Color.DKGRAY);
         multiRenderer.setShowGrid(true);
         multiRenderer.setGridColor(Color.GRAY);
 
@@ -244,37 +245,51 @@ public class AnalysingFragment extends Fragment
                 lineData.add(lastX, y);
                 prevLoc = loc;
             };
+
+
+            DecimalFormat nf=new DecimalFormat();
+
             switch(num)
             {
                 case 0:
                 case 1://myFormatter.yFormat="%.4f";
                        //graph.getGridLabelRenderer().setVerticalAxisTitle(getText(R.string.degree).toString());
+                        nf.setMaximumFractionDigits(4);
                        multiRenderer.setYTitle(getText(R.string.degree).toString());
                        break;
                 case 3:
                 case 4://myFormatter.yFormat="%.0f";
                        //graph.getGridLabelRenderer().setVerticalAxisTitle(getText(R.string.degree).toString());
                        multiRenderer.setYTitle(getText(R.string.degree).toString());
+                       nf.setMaximumFractionDigits(0);
                        break;
                 case 2:
                       // myFormatter.yFormat="%.1f";
                        //graph.getGridLabelRenderer().setVerticalAxisTitle(unitUtils.speedUnit(false));
                        multiRenderer.setYTitle(unitUtils.speedUnit(false));
+                       nf.setMaximumFractionDigits(1);
                        break;
             }
+            multiRenderer.setYLabelFormat(nf,0);
 
-            multiRenderer.setXAxisMin(0,0);
+            double minX=-lastX*0.05-1, maxX=lastX*1.05+1,
+                   minY=lineData.getMinY()-0.0001, maxY=lineData.getMaxY()+0.0001;
+
+            multiRenderer.setInitialRange(new double[] {minX, maxX, minY, maxY});
+            mChart.zoomReset(); // it also do repaint
+
+        /*    multiRenderer.setXAxisMin(0,0);
             multiRenderer.setXAxisMax(lastX*1.05,0);
 
-            multiRenderer.setYAxisMin(lineData.getMinY(),0);
-            multiRenderer.setYAxisMax(lineData.getMaxY(),0);
+            multiRenderer.setYAxisMin(,0);
+            multiRenderer.setYAxisMax(,0);*/
 
          /*   graph.getGridLabelRenderer().setLabelVerticalWidth(null);
             graph.getViewport().setXAxisBoundsManual(true);
             graph.getViewport().setMinX(0);
             graph.getViewport().setMaxX(lastX*1.1+1);*/
 
-            mChart.invalidate();
+            //mChart.invalidate();
         }
 
 
