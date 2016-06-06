@@ -22,7 +22,6 @@ import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.ui.CustomPagerView;
 import com.kivsw.forjoggers.ui.MainActivity;
 
-import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
 import org.achartengine.model.XYMultipleSeriesDataset;
@@ -140,7 +139,9 @@ public class AnalysingFragment extends Fragment
         multiRenderer.setZoomButtonsVisible(true);
 
         multiRenderer.addSeriesRenderer(mRenderer);
-        mChart = ChartFactory.getLineChartView(getActivity(),dataset , multiRenderer);
+        //mChart = ChartFactory.getLineChartView(getActivity(),dataset , multiRenderer);
+       // mChart = ChartFactory.getTimeChartView(getActivity(),dataset , multiRenderer,"HH:mm:ss");//"HH:mm:ss"
+        mChart =  new GraphicalView(getActivity(), new TimeChart(dataset , multiRenderer));
 
         // add the chart to the layout
         layout.addView(mChart,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -207,11 +208,10 @@ public class AnalysingFragment extends Fragment
         lineData.clear();
 
         if(curentTrack.getGeoPoints().size()>0) {
-            //DataPoint data[]=new DataPoint[curentTrack.getGeoPoints().size()];
             long t0 = curentTrack.getGeoPoints().get(0).getTime();
-            int i=0;
+
             Location prevLoc=null;
-            double prev=0, add=0, lastX=1;
+            double prev=0, add=0, t_i=1;
             for(Location loc:curentTrack.getGeoPoints())
             {
 
@@ -240,9 +240,9 @@ public class AnalysingFragment extends Fragment
                                 y=Track.turn(prevLoc.getBearing(),loc.getBearing());
                         break;
                 }
-                lastX=(loc.getTime()-t0)/1000;
+                t_i=(loc.getTime()-t0);
                //data[i++]=new DataPoint(lastX, y);
-                lineData.add(lastX, y);
+                lineData.add(t_i, y);
                 prevLoc = loc;
             };
 
@@ -272,7 +272,7 @@ public class AnalysingFragment extends Fragment
             }
             multiRenderer.setYLabelFormat(nf,0);
 
-            double minX=-lastX*0.05-1, maxX=lastX*1.05+1,
+            double minX=lineData.getMinX()-1000, maxX=lineData.getMaxX()+1000,
                    minY=lineData.getMinY()-0.0001, maxY=lineData.getMaxY()+0.0001;
 
             multiRenderer.setInitialRange(new double[] {minX, maxX, minY, maxY});

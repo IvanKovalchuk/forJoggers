@@ -5,7 +5,7 @@ import android.location.Location;
 import android.os.SystemClock;
 
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.helper.RxGps;
+import com.kivsw.forjoggers.helper.RxGpsLocation;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.helper.UsingCounter;
 import com.kivsw.forjoggers.model.track.CurrentTrack;
@@ -79,7 +79,7 @@ public class DataModel
     };
     private void release()
     {
-        RxGps.release();
+        RxGpsLocation.release();
         if(speaker!=null)
             speaker.release();
         speaker=null;
@@ -239,7 +239,7 @@ public class DataModel
 
             }
         };
-        RxGps.getGprsObservable(context) // starts forming a new current track
+        RxGpsLocation.getGprsObservable(context) // starts forming a new current track
                 .filter(new Func1<Location, Boolean>() {
                     @Override
                     public Boolean call(Location location) {

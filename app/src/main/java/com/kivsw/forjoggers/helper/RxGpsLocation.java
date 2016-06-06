@@ -20,7 +20,7 @@ import rx.subjects.PublishSubject;
  * create an observable for GPS
  *
  */
-public class RxGps {
+public class RxGpsLocation {
 
     static Observable<Location> coreGpsObservable =null;
     static RxGPSLocationListener gpsListener=null;

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.location.Location;
 
 import com.kivsw.forjoggers.R;
-import com.kivsw.forjoggers.helper.RxGps;
+import com.kivsw.forjoggers.helper.RxGpsLocation;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.ui.BasePresenter;
 
@@ -86,16 +86,16 @@ public class MapFragmentIPresenter
                 setUI(null); // unsubscribes old rx-subscriptions
             mapFragment = aMapFragment;
 
-            mapFragment.setGPSstatus(RxGps.isGPSavailable());
+            mapFragment.setGPSstatus(RxGpsLocation.isGPSavailable());
 
             // receives GPS locations
-            rxGps= RxGps.getGprsUiObservable(context).subscribe(new Action1<Location>() {
+            rxGps= RxGpsLocation.getGprsUiObservable(context).subscribe(new Action1<Location>() {
                 @Override
                 public void call(Location location) {
                     if(location==null) return;
 
                     if( mapFragment!=null) {
-                        if(!RxGps.isGPSavailable()) { // if we received an old (last known)location
+                        if(!RxGpsLocation.isGPSavailable()) { // if we received an old (last known)location
                             location.removeSpeed();
                             location.removeBearing();
                         }
@@ -199,7 +199,7 @@ public class MapFragmentIPresenter
     @Override
     public void actionAnimateTrack()
     {
-        RxGps.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
+        RxGpsLocation.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
         //RxGps.setEmulationData(new ArrayList<Location>(getTrackSmoother().getGeoPoints()));
     }
     //----------------------------------------------------------
@@ -290,7 +290,7 @@ public class MapFragmentIPresenter
 
     public boolean getGPSstatus()
     {
-        return RxGps.isGPSavailable();
+        return RxGpsLocation.isGPSavailable();
     }
 
     /**
