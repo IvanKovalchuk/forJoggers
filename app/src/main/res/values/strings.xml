@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">ForJoggers</string>
 
-    <string name="gps_unreachable">GPS is unreachable</string>
-    <string name="gps_disable">GPS is disable</string>
     <string name="Start">Start</string>
     <string name="Stop">Stop</string>
 
@@ -25,6 +23,9 @@
     </string-array>
     <string name="degree">degree</string>
 
+
+    <string name="gps_unreachable">GPS is unreachable&lt;br/> &lt;br/></string>
+    <string name="gps_disable">GPS is disable&lt;br/> &lt;br/></string>
     <string name="track_may_be_lost">The current track has not been saved. Its data will be lost.&lt;br/> &lt;br/> </string>
     <string name="GPS_has_not_found_location">GPS hasn\'t found your location yet.&lt;br/> &lt;br/></string>
     <string name="Continue">Continue?</string>

@@ -6,8 +6,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 
-import com.kivsw.forjoggers.R;
-
 import java.util.List;
 
 /**
@@ -83,7 +81,7 @@ public class GPSLocationListener implements android.location.LocationListener{
     // return 0 if we may use GPRS or/and NETWORK_PROVIDER
     //    1 - if gps-provider is turned off
     //    2 - if the device has no GPS service
-    public static int estimateServiceStatus(Context context, StringBuilder msg)
+    public static int estimateServiceStatus(Context context)
     {
         LocationManager locationManager = (LocationManager)
                 context.getSystemService(Context.LOCATION_SERVICE);
@@ -91,38 +89,18 @@ public class GPSLocationListener implements android.location.LocationListener{
         List<String> providers =locationManager.getAllProviders();
         boolean isGPS=false;
         if(providers!=null)
-        {
             isGPS= providers.indexOf(LocationManager.GPS_PROVIDER)>=0;
-            //isNetwork =  providers.indexOf(LocationManager.NETWORK_PROVIDER)>=0;
-        };
 
-        if(isGPS==false/* &&  isNetwork==false*/)
-        {
-            msg.append(context.getText(R.string.gps_unreachable));
+        if(isGPS==false)
             return 2;
-        };
 
-        if(!getGpsStatus( context, locationManager ))
-        {
-            msg.append(context.getText(R.string.gps_disable));
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             return 1;
-        };
 
         return 0;
 
     }
 
-
-    //-------------------------------------------------
-    /**
-     *  Method to Check GPS is enable or disable
-     * */
-    private static boolean getGpsStatus(Context context,LocationManager locationManager )
-    {
-        boolean e1=locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER),
-                e2=locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        return e1 || e2;
-    }
     //----------------------------------------
     public Location getLastknownLocation()
     {

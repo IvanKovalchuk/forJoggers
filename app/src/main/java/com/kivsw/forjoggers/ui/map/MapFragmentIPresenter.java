@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 
 import com.kivsw.forjoggers.R;
+import com.kivsw.forjoggers.helper.GPSLocationListener;
 import com.kivsw.forjoggers.helper.RxGpsLocation;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.ui.BasePresenter;
@@ -86,7 +87,7 @@ public class MapFragmentIPresenter
                 setUI(null); // unsubscribes old rx-subscriptions
             mapFragment = aMapFragment;
 
-            mapFragment.setGPSstatus(RxGpsLocation.isGPSavailable());
+            mapFragment.setGPSstatus(RxGpsLocation.isGpsLocationAvailable());
 
             // receives GPS locations
             rxGps= RxGpsLocation.getGprsUiObservable(context).subscribe(new Action1<Location>() {
@@ -95,7 +96,7 @@ public class MapFragmentIPresenter
                     if(location==null) return;
 
                     if( mapFragment!=null) {
-                        if(!RxGpsLocation.isGPSavailable()) { // if we received an old (last known)location
+                        if(!RxGpsLocation.isGpsLocationAvailable()) { // if we received an old (last known)location
                             location.removeSpeed();
                             location.removeBearing();
                         }
@@ -110,7 +111,7 @@ public class MapFragmentIPresenter
                          @Override
                          public void call(Long i) {
                              if( mapFragment!=null)
-                                 mapFragment.setGPSstatus(getGPSstatus());
+                                 mapFragment.setGPSstatus(RxGpsLocation.isGpsLocationAvailable());
                          }
                      });
 
@@ -226,8 +227,17 @@ public class MapFragmentIPresenter
     {
         StringBuilder problems=new StringBuilder();
 
-        if(!getGPSstatus())
-            problems.append(context.getText(R.string.GPS_has_not_found_location));
+        switch(GPSLocationListener.estimateServiceStatus(context)) {
+            case 0:  if (!RxGpsLocation.isGpsLocationAvailable()) //
+                       problems.append(context.getText(R.string.GPS_has_not_found_location));
+                break;
+            case 1:
+                problems.append(context.getText(R.string.gps_disable));
+                break;
+            case 2:
+                problems.append(context.getText(R.string.gps_unreachable));
+                break;
+        }
 
         if(getDataModel().getCurrentTrack().needToBeSaved())
             problems.append(context.getText(R.string.track_may_be_lost));
@@ -288,10 +298,6 @@ public class MapFragmentIPresenter
     }
 
 
-    public boolean getGPSstatus()
-    {
-        return RxGpsLocation.isGPSavailable();
-    }
 
     /**
      * Method is invoked when currentTrack is changed

@@ -182,7 +182,7 @@ public class RxGpsLocation {
     /**
      * @return true if GPS is giving the current location properly
      */
-    public static boolean isGPSavailable()
+    public static boolean isGpsLocationAvailable()
     {
         long t=SystemClock.elapsedRealtime();
         return (lastLocationTime+GPSLocationListener.UPDATE_INTERVAL*5) > t;

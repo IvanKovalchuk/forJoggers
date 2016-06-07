@@ -39,8 +39,6 @@ public class GPSStatusListener
     @Override
     public void onGpsStatusChanged(int event) {
 
-
-
         GpsStatus status= locationManager.getGpsStatus (null);
 
         switch (event)
