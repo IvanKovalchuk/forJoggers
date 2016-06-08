@@ -357,6 +357,14 @@ implements  GpsStatusContract.IView
         otherSeries.clear();
         otherInUseSeries.clear();
         annotationSeries.clear();
+
+        annotationSeries.add(0,0); // add a fake point to force this Series to draw annotations
+        annotationSeries.addAnnotation(getString(R.string.west),-ampl,0);
+        annotationSeries.addAnnotation(getString(R.string.east),ampl,0);
+        int fontH=dpToPx(10);
+        annotationSeries.addAnnotation(getString(R.string.north),0,ampl-fontH);
+        annotationSeries.addAnnotation(getString(R.string.south),0,-ampl);
+
         lastLoc=null;
     }
     @Override
@@ -413,7 +421,7 @@ implements  GpsStatusContract.IView
             annotationSeries.addAnnotation(String.valueOf(sat.getPrn()),x,y-fontH*2/3);
 
         }
-        annotationSeries.add(0,0); // add a fake point to force this Series to draw annotations
+
     }
 
     @Override

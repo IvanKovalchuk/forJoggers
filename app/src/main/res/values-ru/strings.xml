@@ -165,5 +165,9 @@
     <string name="others">● Другие</string>
     <string name="longitude">Дол:</string>
     <string name="latitude">Шир:</string>
+    <string name="west">З</string>
+    <string name="east">В</string>
+    <string name="south">Ю</string>
+    <string name="north">С</string>
 
 </resources>
