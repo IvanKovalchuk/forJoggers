@@ -175,4 +175,11 @@
     <string name="background">Background</string>
     <string name="tts_speaking">Speaking...</string>
 
+    <!-- gps status -->
+    <string name="gps">GPS</string>
+    <string name="glonass">GLONASS</string>
+    <string name="others">Other</string>
+    <string name="longitude">lon:</string>
+    <string name="latitude">lat:</string>
+
 </resources>

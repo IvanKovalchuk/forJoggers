@@ -5,7 +5,7 @@ android {
     buildToolsVersion '23.0.2'
     defaultConfig {
         applicationId "com.kivsw.forjoggers"
-        minSdkVersion 10
+        minSdkVersion 15
         targetSdkVersion 15
         versionCode 9
         versionName '2.1.0'
@@ -24,12 +24,13 @@ android {
 }
 repositories {
     maven {
-        url "https://repository-achartengine.forge.cloudbees.com/snapshot/" //compile group: 'org.achartengine', name: 'achartengine', version: '1.2.0'
+        url "https://repository-achartengine.forge.cloudbees.com/snapshot/"
+        //compile group: 'org.achartengine', name: 'achartengine', version: '1.2.0'
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':dialogLib')
     compile 'org.osmdroid:osmdroid-android:5.1@aar'
     compile 'org.apache.commons:commons-lang3:3.3.2'
@@ -44,5 +45,5 @@ dependencies {
     compile 'io.reactivex:rxjava-math:1.0.0'
     compile 'io.reactivex:rxjava:1.1.3'
     compile project(path: ':OSMBonusPack')
-    compile group: 'org.achartengine', name: 'achartengine', version: '1.2.0'
+    compile 'org.achartengine:achartengine:1.2.0'
 }

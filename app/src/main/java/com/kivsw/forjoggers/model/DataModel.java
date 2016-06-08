@@ -12,7 +12,7 @@ import com.kivsw.forjoggers.model.track.CurrentTrack;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.model.track.TrackSmoother;
 import com.kivsw.forjoggers.model.track.TrackSmootherFactory;
-import com.kivsw.forjoggers.ui.map.MapFragmentIPresenter;
+import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
 import com.kivsw.forjoggers.ui.service.TrackingServicePresenter;
 
 import java.io.File;
@@ -362,7 +362,7 @@ public class DataModel
                     if(aFileName.equals(getTempFileName()))
                         currentTrack.setFileName("");
 
-                    MapFragmentIPresenter.getInstance(context).actionShowCurrentTrack();
+                    MapFragmentPresenter.getInstance(context).actionShowCurrentTrack();
                     settings.setCurrentFileName(currentTrack.getFileName());
                 }
                 else

@@ -27,7 +27,7 @@ implements TrackingServiceContract.IPresenter
         return singletone;
     };
 
-    TrackingService service=null;
+    TrackingServiceContract.IView service=null;
 
     private TrackingServicePresenter(Context context)
     {
@@ -37,7 +37,7 @@ implements TrackingServiceContract.IPresenter
 
     //-------------------------------------------------
     @Override
-    public void setService(TrackingService service) {
+    public void setService(TrackingServiceContract.IView service) {
         if (service == null)
         {
             getDataModel().getUsingCounter().stopUsingBy(TrackingService.TAG);

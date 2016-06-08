@@ -7,18 +7,25 @@ import android.location.LocationManager;
 /**
  * Created by ivan on 6/6/16.
  */
-public class GPSStatusListener
+public class GPSStatusHelper
         implements GpsStatus.Listener
 {
 
+    public interface  OnStatusChange
+    {
+        void onStatusChange(int event, GpsStatus status);
+    }
+
     private LocationManager locationManager;
-    public GPSStatusListener(Context context)
+    OnStatusChange  onStatusChangeListener=null;
+    public GPSStatusHelper(Context context, OnStatusChange onStatusChangeListener)
     {
         super();
 
         locationManager = (LocationManager)
                 context.getSystemService(Context.LOCATION_SERVICE);
 
+        this.onStatusChangeListener=onStatusChangeListener;
         locationManager.addGpsStatusListener(this);
     }
 
@@ -41,6 +48,8 @@ public class GPSStatusListener
 
         GpsStatus status= locationManager.getGpsStatus (null);
 
+        if(onStatusChangeListener!=null)
+            onStatusChangeListener.onStatusChange(event, status);
         switch (event)
         {
             case GpsStatus.GPS_EVENT_STARTED:

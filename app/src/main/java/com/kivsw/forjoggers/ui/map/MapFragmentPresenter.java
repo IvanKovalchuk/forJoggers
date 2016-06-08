@@ -9,7 +9,6 @@ import com.kivsw.forjoggers.helper.RxGpsLocation;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.ui.BasePresenter;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -22,21 +21,21 @@ import rx.functions.Action1;
  * Created by ivan on 4/22/16.
  */
 
-public class MapFragmentIPresenter
+public class MapFragmentPresenter
         extends BasePresenter
     implements MapFragmentContract.IPresenter
 {
 
-    static private MapFragmentIPresenter singletone=null;
+    static private MapFragmentPresenter singletone=null;
 
-    static public MapFragmentIPresenter getInstance(Context context)
+    static public MapFragmentPresenter getInstance(Context context)
     {
         if(singletone==null)
-            singletone = new MapFragmentIPresenter(context.getApplicationContext());
+            singletone = new MapFragmentPresenter(context.getApplicationContext());
         return singletone;
     };
 
-    MapFragment mapFragment=null;
+    MapFragmentContract.IView mapFragment=null;
     Subscription rxGps=null, rxGpsStateUpdate=null, rxTrackInfoUpdate=null,
                  rxFileNameUpdate=null, rxCurrentTrackUpdate=null, rxTrackSmotherUpdate=null,
                  rxTrackingUpdate=null;
@@ -44,13 +43,13 @@ public class MapFragmentIPresenter
 
     final static int  WARNINGS_AND_START_SERVICE_MESSAGE_ID=0;
 
-    private MapFragmentIPresenter(Context context) {
+    private MapFragmentPresenter(Context context) {
         super(context);
     }
 
 
     @Override
-    public void setUI(MapFragment aMapFragment)
+    public void setUI(MapFragmentContract.IView aMapFragment)
     {
         if(aMapFragment==null)
         {
@@ -164,20 +163,19 @@ public class MapFragmentIPresenter
     {
         if(! isTracking()) return;
 
-        final WeakReference<MapFragment> fragment=new WeakReference<MapFragment>(mapFragment);
-
         rxTrackInfoUpdate= Observable.interval(500, TimeUnit.MILLISECONDS,AndroidSchedulers.mainThread())
                 .subscribe(new Action1<Long>(){
                     @Override
                     public void call(Long i) {
+
                         if(!isTracking())
                         {
                             stopTrackingUpdating();
                             return;
                         };
-                        if( fragment.get()!=null)
+                        if( mapFragment!=null)
                         {
-                             fragment.get().updateTrackInfo(getTrackSmoother() ,getCurrentTrack());
+                            mapFragment.updateTrackInfo(getTrackSmoother() ,getCurrentTrack());
                         }
 
                     }

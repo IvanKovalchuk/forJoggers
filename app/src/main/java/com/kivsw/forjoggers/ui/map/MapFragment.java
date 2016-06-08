@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.model.track.Track;
 import com.kivsw.forjoggers.model.track.TrackSmoother;
 import com.kivsw.forjoggers.ui.CustomPagerView;
+import com.kivsw.forjoggers.ui.gps_status.GpsStatusFragment;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -65,7 +67,7 @@ public class MapFragment
     UnitUtils unitUtils = null;
 
     private CurrentLocationOverlay myLocationoverlay;
-    MapFragmentContract.IPresenter IPresenter;
+    MapFragmentContract.IPresenter presenter;
 
 
     public MapFragment() {
@@ -129,6 +131,7 @@ public class MapFragment
 
         satelliteImageView = (ImageView) rootView.findViewById(R.id.satelliteImageView);
         satelliteImageView.setVisibility(View.INVISIBLE);
+        satelliteImageView.setOnClickListener(this);
 
         activityImageView = (ImageView) rootView.findViewById(R.id.activityImageView);
 
@@ -149,7 +152,7 @@ public class MapFragment
 
         }
 
-        IPresenter = MapFragmentIPresenter.getInstance(getActivity());
+        presenter = MapFragmentPresenter.getInstance(getActivity());
 
         if(settings.getReturnToMyLocation())
             startFollowingMyLocation();
@@ -176,7 +179,7 @@ public class MapFragment
     public void onResume() {
         super.onResume();
 
-        IPresenter.updateTrackingStatus();
+        presenter.updateTrackingStatus();
 
     }
 
@@ -188,13 +191,13 @@ public class MapFragment
     @Override
     public void onStart() {
         super.onStart();
-        IPresenter.setUI(this);
+        presenter.setUI(this);
 
     }
 
     @Override
     public void onStop() {
-        IPresenter.setUI(null);
+        presenter.setUI(null);
         super.onStop();
         //mHandler.deleteAllMessages();
     }
@@ -216,7 +219,7 @@ public class MapFragment
      * check if mylocation is on the screen and correct visible bounds
      */
     void checkMyLocationVisibility() {
-        if (settings.getReturnToMyLocation() || IPresenter.isTracking())
+        if (settings.getReturnToMyLocation() || presenter.isTracking())
             showMyLocation();
     }
 
@@ -224,7 +227,8 @@ public class MapFragment
     /**
      * start mode following
      */
-    void startFollowingMyLocation()
+    @Override
+    public void startFollowingMyLocation()
     {
         //timeOfStartFollowingMyLocation = SystemClock.elapsedRealtime();
         settings.setReturnToMyLocation(true);
@@ -232,7 +236,8 @@ public class MapFragment
         showMyLocation();
 
     }
-    void stopFollowingMyLocation()
+    @Override
+    public void stopFollowingMyLocation()
     {
         settings.setReturnToMyLocation(false);
         myLocationButton.setImageResource(R.drawable.center_direction_black);
@@ -282,6 +287,7 @@ public class MapFragment
      * @param trackSmoother
      * @param currentTrack
      */
+    @Override
     public void updateTrackInfo(TrackSmoother trackSmoother, Track currentTrack ) {
 
         switch(currentTrack.getActivityType()) {
@@ -297,7 +303,7 @@ public class MapFragment
         }
 
         if((trackSmoother==null) ||
-           (!IPresenter.isTracking() && trackSmoother.getGeoPoints().size()<2)    )
+           (!presenter.isTracking() && trackSmoother.getGeoPoints().size()<2)    )
         {
             textTrackInfo.setText("");
             return;
@@ -355,6 +361,7 @@ public class MapFragment
     /**
      * @param available
      */
+    @Override
     public void setGPSstatus(boolean available) {
         if((isGpsAvailable!=null) && (available == isGpsAvailable.booleanValue()))
             return;
@@ -408,7 +415,7 @@ public class MapFragment
     public void updateFileName()
     {
 
-        String fn= IPresenter.getCurrentTrack().getFileName();
+        String fn= presenter.getCurrentTrack().getFileName();
         if(fn!=null && !fn.isEmpty()) {
             File file = new File(fn);
             fn=file.getName();
@@ -424,6 +431,7 @@ public class MapFragment
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
+    @Override
     public void setCurrentLocation(Location location)
     {
         myLocationoverlay.setLocation(location);//onLocationChanged(location,null);
@@ -435,12 +443,12 @@ public class MapFragment
         if(isGpsAvailable!=null && isGpsAvailable.booleanValue()) {
             if (location.hasSpeed()) {
                 resStr = unitUtils.speedToStr(location.getSpeed());
-            } else if ( IPresenter.isTracking() &&
-                        IPresenter.getTrackSmoother() != null &&
-                        IPresenter.getTrackSmoother().getGeoPoints() != null &&
-                        IPresenter.getTrackSmoother().getGeoPoints().size() > 1)
+            } else if ( presenter.isTracking() &&
+                        presenter.getTrackSmoother() != null &&
+                        presenter.getTrackSmoother().getGeoPoints() != null &&
+                        presenter.getTrackSmoother().getGeoPoints().size() > 1)
             {
-                ArrayList<Location> points = IPresenter.getTrackSmoother().getGeoPoints();
+                ArrayList<Location> points = presenter.getTrackSmoother().getGeoPoints();
                 Location l = points.get(points.size() - 1);
                 if (l.hasSpeed())
                     resStr = "~" + unitUtils.speedToStr(l.getSpeed());
@@ -450,10 +458,21 @@ public class MapFragment
         textCurrentSpeedInfo.setText(resStr);
 
     };
+    void showGpsStatus()
+    {
+        FragmentManager fm=getFragmentManager();
+        GpsStatusFragment fragment=(GpsStatusFragment)fm.findFragmentByTag("gpsStatus");
+        if(fragment==null)
+             fragment=GpsStatusFragment.newInstance();
+        if(fragment.isAdded()) return;
+
+        fragment.show(fm,"gpsStatus");
+
+    };
     //----------------------------------------------
 
     public void onSettingsChanged() {
-        updateTrackInfo(IPresenter.getTrackSmoother(), IPresenter.getCurrentTrack());
+        updateTrackInfo(presenter.getTrackSmoother(), presenter.getCurrentTrack());
     }
     //----------------------------------------------
     // CustomPagerView.IonPageAppear
@@ -474,15 +493,18 @@ public class MapFragment
         switch(v.getId())
         {
             case R.id.buttonStart: {
-                IPresenter.onStartClick();
+                presenter.onStartClick();
             }
             break;
             case R.id.buttonStop:
-                IPresenter.onStopClick();
+                presenter.onStopClick();
                 break;
 
             case R.id.myLocationButton:
                 startFollowingMyLocation();
+                break;
+            case R.id.satelliteImageView:
+                showGpsStatus();
                 break;
         }
     }
@@ -517,16 +539,16 @@ public void showMessageDialog(int id, String caption, String message)
 
     @Override
     public void onClickOk(MessageDialog msg) {
-        IPresenter.onMessageBoxClose(msg.getDlgId(), true);
+        presenter.onMessageBoxClose(msg.getDlgId(), true);
     }
 
     @Override
     public void onClickCancel(MessageDialog msg)
-    { IPresenter.onMessageBoxClose(msg.getDlgId(), false); }
+    { presenter.onMessageBoxClose(msg.getDlgId(), false); }
 
     @Override
     public void onClickExtra(MessageDialog msg)
-    { IPresenter.onMessageBoxClose(msg.getDlgId(), false); }
+    { presenter.onMessageBoxClose(msg.getDlgId(), false); }
     //-----------------------------------------------------------
 
 

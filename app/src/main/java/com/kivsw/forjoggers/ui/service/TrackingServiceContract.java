@@ -11,7 +11,7 @@ public class TrackingServiceContract {
     interface IPresenter
             extends IBasePresenter
     {
-        void setService(TrackingService service);
+        void setService(IView service);
 
         /** returns the time (milliseconds) to the next second,
          *  the moment to update the notification

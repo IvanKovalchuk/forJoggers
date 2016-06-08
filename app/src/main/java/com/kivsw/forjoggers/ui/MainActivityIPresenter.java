@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.model.track.Track;
-import com.kivsw.forjoggers.ui.map.MapFragmentIPresenter;
+import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
 import com.kivsw.forjoggers.ui.service.TrackingServicePresenter;
 
 import rx.Subscription;
@@ -108,14 +108,14 @@ public class MainActivityIPresenter
     public  void actionShowCurrentTrack()
     {
         if(!hasTrackData()) return;
-        MapFragmentIPresenter.getInstance(context).actionShowCurrentTrack();
+        MapFragmentPresenter.getInstance(context).actionShowCurrentTrack();
 
     };
     @Override
     public void actionAnimateTrack()
     {
         if(!hasTrackData()) return;
-        MapFragmentIPresenter.getInstance(context).actionAnimateTrack();
+        MapFragmentPresenter.getInstance(context).actionAnimateTrack();
     };
     public void actionExit()
     {

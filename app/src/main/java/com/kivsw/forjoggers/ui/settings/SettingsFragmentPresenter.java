@@ -5,7 +5,7 @@ import android.content.Context;
 import com.kivsw.forjoggers.model.DataModel;
 import com.kivsw.forjoggers.ui.chart.AnalysingFragmentPresenter;
 import com.kivsw.forjoggers.ui.BasePresenter;
-import com.kivsw.forjoggers.ui.map.MapFragmentIPresenter;
+import com.kivsw.forjoggers.ui.map.MapFragmentPresenter;
 
 /**
  * Created by ivan on 03.05.2016.
@@ -30,7 +30,7 @@ public class SettingsFragmentPresenter extends BasePresenter {
     public void onSettingsChanged() {
         // informs the rest components about new settings
         AnalysingFragmentPresenter.getInstance(context).onSettingsChanged();
-        MapFragmentIPresenter.getInstance(context).onSettingsChanged();
+        MapFragmentPresenter.getInstance(context).onSettingsChanged();
         DataModel.getInstance(context).onSettingsChanged();
     }
 }
