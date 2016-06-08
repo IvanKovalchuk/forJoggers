@@ -38,7 +38,7 @@ public class GpsStatusFragment extends DialogFragment
 implements  GpsStatusContract.IView
 {
 
-    TextView statusText;
+    TextView statusText, gpsText, glonassText, otherText;
     FrameLayout chartLayout;
     LinearLayout rootLayout;
 
@@ -79,6 +79,13 @@ implements  GpsStatusContract.IView
         rootLayout = (LinearLayout) rootView.findViewById(R.id.rootLayout);
 
         statusText = (TextView)rootView.findViewById(R.id.statusText);
+
+        gpsText = (TextView)rootView.findViewById(R.id.gpsText);
+        gpsText.setTextColor(gpsColor);
+        glonassText = (TextView)rootView.findViewById(R.id.glonassText);
+        glonassText.setTextColor(glonassColor);
+        otherText = (TextView)rootView.findViewById(R.id.otherText);
+        otherText.setTextColor(otherColor);
 
         initPseudoRadarChart();
 
@@ -127,8 +134,8 @@ implements  GpsStatusContract.IView
 
         multiRenderer.setLegendTextSize(dpToPx(12));
         multiRenderer.setFitLegend(true);
-        multiRenderer.setLegendHeight(dpToPx(48));
-        multiRenderer.setShowLegend(true);
+        //multiRenderer.setLegendHeight(dpToPx(48));
+        multiRenderer.setShowLegend(false);
 
         int ps=dpToPx(7);
         multiRenderer.setPointSize(ps);
@@ -151,9 +158,21 @@ implements  GpsStatusContract.IView
         multiRenderer.setPanEnabled(false);
         multiRenderer.setShowGrid(false);
 
-        //multiRenderer.setInitialRange(new double[] {-ampl*1.1,ampl*1.1,-ampl*1.1, ampl*1.1});
 
+        // calculates chart view size
+        Point p=getDislaySize();
+        int s;
+        if(p.x < p.y) {
+            //rootLayout.setOrientation(LinearLayout.VERTICAL);
+            s = p.x*9/10;
+        }
+        else {
+            //rootLayout.setOrientation(LinearLayout.HORIZONTAL);
+            s = p.y*9/10-dpToPx(75);//multiRenderer.getLegendHeight()*3;
+        }
+        ampl=s; // make the scale approximitale 1:1
 
+        // creates series
         int gridIndex[]=addRadialGrid();
         int seriesIndex[]=addGPSSeries();
 
@@ -165,18 +184,8 @@ implements  GpsStatusContract.IView
 //         mChart = ChartFactory.getLineChartView(getActivity(),dataset , multiRenderer);
 
         // add the chart to the layout
-        Point p=getDislaySize();
-        int s;
-        if(p.x < p.y) {
-            //rootLayout.setOrientation(LinearLayout.VERTICAL);
-            s = p.x*9/10;
-        }
-        else {
-            //rootLayout.setOrientation(LinearLayout.HORIZONTAL);
-            s = p.y*9/10-multiRenderer.getLegendHeight()*3;
-        }
 
-        chartLayout.getLayoutParams().height=s+multiRenderer.getLegendHeight();
+        chartLayout.getLayoutParams().height=s;//+multiRenderer.getLegendHeight();
         chartLayout.getLayoutParams().width=s;
         chartLayout.setLayoutParams(chartLayout.getLayoutParams());
 
@@ -241,6 +250,8 @@ implements  GpsStatusContract.IView
 
         return indexes;
     }
+
+    int gpsColor=0xFF00BB00, glonassColor=Color.RED, otherColor=0xFFAAAA00;
     private int[] addGPSSeries()
     {
         XYSeriesRenderer mRenderer;
@@ -248,26 +259,26 @@ implements  GpsStatusContract.IView
         int k=0;
 
         // GPS
-        mRenderer =createRendered(0xFF00BB00, false);
+        mRenderer =createRendered(gpsColor, false);
         gpsSeries=createXYSeries(getText(R.string.gps).toString());
         indexes[k++]=dataset.getSeriesCount();
         dataset.addSeries(gpsSeries);
         multiRenderer.addSeriesRenderer(mRenderer);
 
-        mRenderer =createRendered(0xFF00BB00, true);
+        mRenderer =createRendered(gpsColor, true);
         gpsInUseSeries=createXYSeries(getText(R.string.gps).toString());
         indexes[k++]=dataset.getSeriesCount();
         dataset.addSeries(gpsInUseSeries);
         multiRenderer.addSeriesRenderer(mRenderer);
 
         // glonass
-        mRenderer =createRendered(Color.RED, false);
+        mRenderer =createRendered(glonassColor, false);
         glonassSeries=createXYSeries(getText(R.string.glonass).toString());
         indexes[k++]=dataset.getSeriesCount();
         dataset.addSeries(glonassSeries);
         multiRenderer.addSeriesRenderer(mRenderer);
 
-        mRenderer =createRendered(Color.RED, true);
+        mRenderer =createRendered(glonassColor, true);
         glonassInUseSeries=createXYSeries(getText(R.string.glonass).toString());
         indexes[k++]=dataset.getSeriesCount();
         dataset.addSeries(glonassInUseSeries);
@@ -275,13 +286,13 @@ implements  GpsStatusContract.IView
 
 
         //other
-        mRenderer =createRendered(0xFFAAAA00, false);
+        mRenderer =createRendered(otherColor, false);
         otherSeries=createXYSeries(getText(R.string.others).toString());
         indexes[k++]=dataset.getSeriesCount();
         dataset.addSeries(otherSeries);
         multiRenderer.addSeriesRenderer(mRenderer);
 
-        mRenderer =createRendered(0xFFAAAA00, true);
+        mRenderer =createRendered(otherColor, true);
         otherInUseSeries=createXYSeries(getText(R.string.others).toString());
         indexes[k++]=dataset.getSeriesCount();
         dataset.addSeries(otherInUseSeries);
@@ -384,6 +395,9 @@ implements  GpsStatusContract.IView
         ser.clear();
         serInUse.clear();
 
+
+        int fontH=dpToPx(10);
+
         for(GpsSatellite sat:satellite)
         {
             double x,y;
@@ -396,7 +410,7 @@ implements  GpsStatusContract.IView
             if(sat.usedInFix())
                serInUse.add(x,y);
 
-            annotationSeries.addAnnotation(String.valueOf(sat.getPrn()),x,y);
+            annotationSeries.addAnnotation(String.valueOf(sat.getPrn()),x,y-fontH*2/3);
 
         }
         annotationSeries.add(0,0); // add a fake point to force this Series to draw annotations

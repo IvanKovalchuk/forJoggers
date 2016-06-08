@@ -160,9 +160,9 @@
     <string name="tts_speaking">Озвучивание...</string>
 
     <!-- gps status -->
-    <string name="gps">GPS</string>
-    <string name="glonass">ГЛОНАСС</string>
-    <string name="others">Другие</string>
+    <string name="gps">● GPS</string>
+    <string name="glonass">● ГЛОНАСС</string>
+    <string name="others">● Другие</string>
     <string name="longitude">Дол:</string>
     <string name="latitude">Шир:</string>
 

@@ -13,11 +13,39 @@
         >
     </FrameLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gps"
+            android:id="@+id/gpsText"
+            android:textSize="15sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/glonass"
+            android:id="@+id/glonassText"
+            android:layout_marginLeft="15dp"
+            android:textSize="15sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/others"
+            android:id="@+id/otherText"
+            android:layout_marginLeft="15dp"
+            android:textSize="15sp"/>
+    </LinearLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="xxx"
         android:id="@+id/statusText"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="10dp"
+        android:textSize="15sp"/>
 
 </LinearLayout>
