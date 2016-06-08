@@ -157,8 +157,17 @@ public class TrackSmootherByLine extends TrackSmoother {
                     longitude=lngApproximator.function(time);
 
             long deltaT=2;
-            double latitude0=latApproximator.function(time-deltaT),
-                   longitude0=lngApproximator.function(time-deltaT);
+            double latitude0, longitude0;
+            if((ind-b) > (e-ind))
+            {
+                latitude0 = latApproximator.function(time - deltaT);
+                longitude0 = lngApproximator.function(time - deltaT);
+            }
+            else
+            {
+                latitude0 = latApproximator.function(time + deltaT);
+                longitude0 = lngApproximator.function(time + deltaT);
+            }
 
             loc.setLatitude(latitude);
             loc.setLongitude(longitude);
