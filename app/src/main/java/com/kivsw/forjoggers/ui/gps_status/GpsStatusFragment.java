@@ -79,6 +79,7 @@ implements  GpsStatusContract.IView
         rootLayout = (LinearLayout) rootView.findViewById(R.id.rootLayout);
 
         statusText = (TextView)rootView.findViewById(R.id.statusText);
+        statusText.setText(" \n ");
 
         gpsText = (TextView)rootView.findViewById(R.id.gpsText);
         gpsText.setTextColor(gpsColor);
@@ -168,9 +169,9 @@ implements  GpsStatusContract.IView
         }
         else {
             //rootLayout.setOrientation(LinearLayout.HORIZONTAL);
-            s = p.y*9/10-dpToPx(75);//multiRenderer.getLegendHeight()*3;
+            s = p.y*9/10-dpToPx(80);//multiRenderer.getLegendHeight()*3;
         }
-        ampl=s; // make the scale approximitale 1:1
+        ampl=s/2-ps; // make the scale approximitale 1:1
 
         // creates series
         int gridIndex[]=addRadialGrid();
@@ -202,9 +203,12 @@ implements  GpsStatusContract.IView
 
         mRenderer =new XYSeriesRenderer();
         mRenderer.setLineWidth(dpToPx(2));
-        mRenderer.setColor(Color.LTGRAY);
+        mRenderer.setColor(0x60888888);
         mRenderer.setDisplayChartValues(false);
         mRenderer.setShowLegendItem(false);
+        mRenderer.setAnnotationsColor(0x800000FF);
+        int fntSz=dpToPx(20);
+        mRenderer.setAnnotationsTextSize(fntSz);
 
         // Include low and max value
         mRenderer.setDisplayBoundingPoints(true);
@@ -247,6 +251,12 @@ implements  GpsStatusContract.IView
         // adds x y
         radialGridX.add(-ampl,0); radialGridX.add(ampl,0);
         radialGridY.add(0,-ampl); radialGridY.add(0,ampl);
+
+        // direction's  labels
+        radialGridX.addAnnotation(getString(R.string.west), -ampl+fntSz/3, 0-fntSz/3);
+        radialGridX.addAnnotation(getString(R.string.east), ampl-fntSz/3 , 0-fntSz/3);
+        radialGridX.addAnnotation(getString(R.string.north),  0,           ampl-fntSz*2/3);
+        radialGridX.addAnnotation(getString(R.string.south),  0,           -ampl);
 
         return indexes;
     }
@@ -359,11 +369,6 @@ implements  GpsStatusContract.IView
         annotationSeries.clear();
 
         annotationSeries.add(0,0); // add a fake point to force this Series to draw annotations
-        annotationSeries.addAnnotation(getString(R.string.west),-ampl,0);
-        annotationSeries.addAnnotation(getString(R.string.east),ampl,0);
-        int fontH=dpToPx(10);
-        annotationSeries.addAnnotation(getString(R.string.north),0,ampl-fontH);
-        annotationSeries.addAnnotation(getString(R.string.south),0,-ampl);
 
         lastLoc=null;
     }
@@ -418,7 +423,7 @@ implements  GpsStatusContract.IView
             if(sat.usedInFix())
                serInUse.add(x,y);
 
-            annotationSeries.addAnnotation(String.valueOf(sat.getPrn()),x,y-fontH*2/3);
+            annotationSeries.addAnnotation(String.valueOf(sat.getPrn()),x,y-fontH*1/3);
 
         }
 

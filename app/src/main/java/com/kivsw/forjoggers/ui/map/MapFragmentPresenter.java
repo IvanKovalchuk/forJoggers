@@ -198,8 +198,8 @@ public class MapFragmentPresenter
     @Override
     public void actionAnimateTrack()
     {
-        RxGpsLocation.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
-        //RxGps.setEmulationData(new ArrayList<Location>(getTrackSmoother().getGeoPoints()));
+        //RxGpsLocation.setEmulationData(new ArrayList<Location>(getCurrentTrack().getGeoPoints()));
+        RxGpsLocation.setEmulationData(new ArrayList<Location>(getTrackSmoother().getGeoPoints()));
     }
     //----------------------------------------------------------
 

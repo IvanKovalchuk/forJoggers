@@ -15,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.model.track.Track;
@@ -81,8 +80,8 @@ public class AnalysingFragment extends Fragment
         graphSpiner.setOnItemSelectedListener(this);
         graphSpiner.setSelection(2);
 
-        if(BuildConfig.DEBUG) graphSpiner.setVisibility(View.VISIBLE);
-        else  graphSpiner.setVisibility(View.GONE);
+        /*if(BuildConfig.DEBUG) graphSpiner.setVisibility(View.VISIBLE);
+        else*/  graphSpiner.setVisibility(View.GONE);
 
         presenter = AnalysingFragmentPresenter.getInstance(getActivity());
 

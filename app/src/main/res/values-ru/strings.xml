@@ -84,7 +84,7 @@
     <string name="auto_stop">Автоматически останавливать</string>
     <string name="after">После:</string>
 
-    <string name="pronounce">Звуковое информирование</string>
+    <string name="pronounce">Голосовое информирование</string>
     <string name="tts_engine">TTS:</string>
     <string name="defaultTTS">по-умолчанию</string>
 

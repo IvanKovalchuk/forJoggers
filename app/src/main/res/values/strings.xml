@@ -85,7 +85,7 @@
     <string name="auto_stop">Auto stop</string>
     <string name="after">After:</string>
 
-    <string name="pronounce">Sound information</string>
+    <string name="pronounce">Voice notifications</string>
 
     <string name="tts_engine">TTS:</string>
     <string name="defaultTTS">default</string>

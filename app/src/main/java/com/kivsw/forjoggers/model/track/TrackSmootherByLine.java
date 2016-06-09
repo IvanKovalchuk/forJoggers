@@ -153,24 +153,27 @@ public class TrackSmootherByLine extends TrackSmoother {
         {
             Location loc=new Location(original.get(ind));
             double time=(original.get(ind).getTime()-t0)/1000.0;
-            double latitude=latApproximator.function(time),
-                    longitude=lngApproximator.function(time);
 
             long deltaT=2;
-            double latitude0, longitude0;
+            double latitude0, longitude0, latitude, longitude;
+
+            loc.setLatitude(latApproximator.function(time));
+            loc.setLongitude(lngApproximator.function(time));
+
             if((ind-b) > (e-ind))
             {
                 latitude0 = latApproximator.function(time - deltaT);
                 longitude0 = lngApproximator.function(time - deltaT);
+                latitude=loc.getLatitude();
+                longitude=loc.getLongitude();
             }
             else
             {
-                latitude0 = latApproximator.function(time + deltaT);
-                longitude0 = lngApproximator.function(time + deltaT);
+                latitude = latApproximator.function(time + deltaT);
+                longitude = lngApproximator.function(time + deltaT);
+                latitude0=loc.getLatitude();
+                longitude0=loc.getLongitude();
             }
-
-            loc.setLatitude(latitude);
-            loc.setLongitude(longitude);
 
             float distanceAndBearing[]=new float[3];
             Location.distanceBetween(latitude0, longitude0, latitude, longitude,distanceAndBearing);
