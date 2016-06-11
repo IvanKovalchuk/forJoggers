@@ -169,5 +169,6 @@
     <string name="east">В</string>
     <string name="south">Ю</string>
     <string name="north">С</string>
+    <string name="compass">Компас</string>
 
 </resources>

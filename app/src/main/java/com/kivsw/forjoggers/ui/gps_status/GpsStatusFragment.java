@@ -1,22 +1,30 @@
 package com.kivsw.forjoggers.ui.gps_status;
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.location.GpsSatellite;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.DialogFragment;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.Window;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.kivsw.forjoggers.R;
+import com.kivsw.forjoggers.helper.SettingsKeeper;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -35,12 +43,16 @@ import java.util.ArrayList;
 *  This class shows GPS's satellites
  */
 public class GpsStatusFragment extends DialogFragment
-implements  GpsStatusContract.IView
+implements  GpsStatusContract.IView,
+        View.OnClickListener
 {
 
     TextView statusText, gpsText, glonassText, otherText;
+    CheckBox compassCheckBox;
     FrameLayout chartLayout;
     LinearLayout rootLayout;
+
+    SettingsKeeper settings;
 
     GpsStatusContract.IPresenter presenter;
 
@@ -66,6 +78,7 @@ implements  GpsStatusContract.IView
         super.onCreate(savedInstanceState);
 
         presenter = GpsStatusPresenter.getInstance(getContext());
+        settings  = SettingsKeeper.getInstance(getContext());
 
     }
 
@@ -83,16 +96,31 @@ implements  GpsStatusContract.IView
 
         gpsText = (TextView)rootView.findViewById(R.id.gpsText);
         gpsText.setTextColor(gpsColor);
+        gpsText.setVisibility(View.INVISIBLE);
         glonassText = (TextView)rootView.findViewById(R.id.glonassText);
         glonassText.setTextColor(glonassColor);
+        glonassText.setVisibility(View.INVISIBLE);
         otherText = (TextView)rootView.findViewById(R.id.otherText);
         otherText.setTextColor(otherColor);
+        otherText.setVisibility(View.INVISIBLE);
+
+        compassCheckBox = (CheckBox)rootView.findViewById(R.id.compassCheckBox);
+        compassCheckBox.setChecked(settings.getUseCompass());
+        compassCheckBox.setVisibility(View.INVISIBLE);
+        compassCheckBox.setOnClickListener(this);
 
         initPseudoRadarChart();
+
 
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
         return rootView;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
     }
 
     @Override
@@ -138,7 +166,7 @@ implements  GpsStatusContract.IView
         //multiRenderer.setLegendHeight(dpToPx(48));
         multiRenderer.setShowLegend(false);
 
-        int ps=dpToPx(7);
+        int ps=dpToPx(10);
         multiRenderer.setPointSize(ps);
 
         multiRenderer.setApplyBackgroundColor(true);
@@ -184,8 +212,10 @@ implements  GpsStatusContract.IView
         mChart = ChartFactory.getCombinedXYChartView(getActivity(),dataset , multiRenderer,types);
 //         mChart = ChartFactory.getLineChartView(getActivity(),dataset , multiRenderer);
 
-        // add the chart to the layout
+        mChart.setPivotX(s/2);
+        mChart.setPivotY(s/2);
 
+        // add the chart to the layout
         chartLayout.getLayoutParams().height=s;//+multiRenderer.getLegendHeight();
         chartLayout.getLayoutParams().width=s;
         chartLayout.setLayoutParams(chartLayout.getLayoutParams());
@@ -319,6 +349,19 @@ implements  GpsStatusContract.IView
         return indexes;
 
     };
+    @Override
+    public void onClick(View v) {
+      switch (v.getId())
+      {
+          case R.id.compassCheckBox:
+              settings.setUseCompass(compassCheckBox.isChecked());
+              if(compassCheckBox.isChecked()==false)
+                  animateChartRotation(0);
+              else
+                  animateChartRotation(lastAzimuth);
+              break;
+      }
+    };
 
     XYSeriesRenderer createRendered(int color, boolean inFix)
     {
@@ -387,22 +430,29 @@ implements  GpsStatusContract.IView
     }
 
     @Override
-    public void addSatellites(ArrayList<GpsSatellite> satellite, int id) {
+    public void addSatellites(ArrayList<GpsSatellite> satellites, int id) {
         XYSeries ser=null, serInUse=null;
+        TextView legendText=null;
+
         switch(id)
         {
             case GpsStatusContract.GPS:
                 ser=gpsSeries;
                 serInUse=gpsInUseSeries;
+                legendText=gpsText;
                 break;
             case GpsStatusContract.GLONASS:
                 ser=glonassSeries;
                 serInUse=glonassInUseSeries;
+                legendText=glonassText;
                 break;
             case GpsStatusContract.OTHER:
                 ser=otherSeries;
                 serInUse=otherInUseSeries;
+                legendText=otherText;
                 break;
+            default:
+                return;
         }
 
         ser.clear();
@@ -411,7 +461,7 @@ implements  GpsStatusContract.IView
 
         int fontH=dpToPx(10);
 
-        for(GpsSatellite sat:satellite)
+        for(GpsSatellite sat:satellites)
         {
             double x,y;
             double el=(90-sat.getElevation())/90.0 * ampl;
@@ -426,14 +476,70 @@ implements  GpsStatusContract.IView
             annotationSeries.addAnnotation(String.valueOf(sat.getPrn()),x,y-fontH*1/3);
 
         }
+        if(satellites.size()>0)
+            legendText.setVisibility(View.VISIBLE);
+        else
+            legendText.setVisibility(View.GONE);
 
+    }
+    ObjectAnimator animator=null;
+    private void animateChartRotation(float angle)
+    {
+        float currentRotation=mChart.getRotation();
+            if(currentRotation>angle)
+            {
+                while((currentRotation-angle)>180)
+                    angle+=360;
+            }
+            else
+            {
+                while((angle-currentRotation)>180)
+                    angle-=360;
+            }
+
+        if(animator==null)
+        {
+            animator = ObjectAnimator.ofFloat(mChart, "rotation", currentRotation, angle);// new ObjectAnimator();
+            animator.setDuration(800);
+           // animator.setTarget(mChart);
+
+        }
+        else
+        if(animator.isStarted())
+            animator.cancel();
+
+
+       animator.setFloatValues(currentRotation, angle);
+
+       animator.start();
+        //mChart.setRotation(angle);
     }
 
     @Override
     public void setLocation(Location loc)
     {
         lastLoc=loc;
-    };
+    }
+
+    float lastAzimuth=0;
+    @Override
+    public void setMagneticAzimuth(float angle) {
+        lastAzimuth=angle;
+
+        compassCheckBox.setVisibility(View.VISIBLE);
+        if(!compassCheckBox.isChecked()) return;
+
+        if(animator!=null && animator.isStarted()) return;
+
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        int dspRotation = display.getRotation()*90;
+        angle = angle - dspRotation;
+
+        mChart.setRotation(angle);
+
+    }
+
+
 
 
 }

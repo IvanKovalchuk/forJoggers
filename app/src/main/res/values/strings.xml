@@ -185,5 +185,6 @@
     <string name="east">E</string>
     <string name="south">S</string>
     <string name="north">N</string>
+    <string name="compass">Compass</string>
 
 </resources>

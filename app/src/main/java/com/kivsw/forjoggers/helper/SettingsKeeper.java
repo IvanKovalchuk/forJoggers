@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 /**
- * Created by ivan on 11.11.15.
+ * This class keeps all the setting with SharedPreferences
  */
 public class SettingsKeeper {
     private static SettingsKeeper settingKeeper=null;
@@ -165,6 +165,17 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("keepBackground", v);
+        e.commit();
+    }
+    //-----------------------------------------------------
+    public  boolean getUseCompass()
+    {
+        return sharedPreferences.getBoolean("UseCompass", true);
+    };
+    public void setUseCompass(boolean v)
+    {
+        SharedPreferences.Editor e= sharedPreferences.edit();
+        e.putBoolean("UseCompass", v);
         e.commit();
     }
     //-----------------------------------------------------

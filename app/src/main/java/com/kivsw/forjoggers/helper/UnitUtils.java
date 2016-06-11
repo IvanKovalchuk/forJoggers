@@ -7,7 +7,6 @@ import com.kivsw.forjoggers.R;
 import java.util.Locale;
 
 /**
- * Created by ivan on 12.12.2015.
  * Translate units of values
  */
 public class UnitUtils {

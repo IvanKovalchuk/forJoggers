@@ -9,7 +9,8 @@ import android.os.Bundle;
 import java.util.List;
 
 /**
- * Created by ivan on 12.11.15.
+ * This class  is a wrapper around LocationManager.
+ * It provides the current location
  */
 public class GPSLocationListener implements android.location.LocationListener{
     //Context context=null;

@@ -5,6 +5,7 @@ import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.LocationManager;
 
+import com.kivsw.forjoggers.helper.CompassHelper;
 import com.kivsw.forjoggers.helper.GPSStatusHelper;
 import com.kivsw.forjoggers.helper.RxGpsLocation;
 
@@ -15,7 +16,8 @@ import java.util.Iterator;
  * Created by ivan on 6/7/16.
  */
 public class GpsStatusPresenter
-        implements GpsStatusContract.IPresenter, GPSStatusHelper.OnStatusChange
+        implements GpsStatusContract.IPresenter, GPSStatusHelper.OnStatusChange,
+        CompassHelper.CompassDirectionListener
 {
 
     static private GpsStatusPresenter singletone=null;
@@ -31,11 +33,19 @@ public class GpsStatusPresenter
     Context context;
     GpsStatusContract.IView view;
     GPSStatusHelper mGPSStatusHelper;
+    CompassHelper compassHelper=null;
 
     GpsStatusPresenter(Context context)
     {
         this.context=context;
         mGPSStatusHelper = null;
+        if(CompassHelper.isAvaliable(context))
+        try {
+            compassHelper=new CompassHelper(context);
+        }catch (Exception e)
+        {
+
+        }
     };
 
 
@@ -48,10 +58,14 @@ public class GpsStatusPresenter
         {
             if(mGPSStatusHelper!=null) mGPSStatusHelper.release();
             mGPSStatusHelper=null;
+            if(compassHelper!=null)
+                compassHelper.stop();
         }
         else
         {
             mGPSStatusHelper=new GPSStatusHelper(context,this);
+            if(compassHelper!=null)
+              compassHelper.start(this);
         }
     }
 
@@ -106,5 +120,11 @@ public class GpsStatusPresenter
             view.addSatellites(other,GpsStatusContract.OTHER);
             view.invalidateSatilletes();
         }
+    }
+
+    @Override
+    public void onCompassDirection(float azimuth) {
+        if(view!=null)
+            view.setMagneticAzimuth(azimuth);
     }
 }

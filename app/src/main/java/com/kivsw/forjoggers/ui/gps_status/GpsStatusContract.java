@@ -24,5 +24,6 @@ public interface GpsStatusContract {
         void addSatellites(ArrayList<GpsSatellite> satellite, int sysId);
 
         void setLocation(Location loc);
+        void setMagneticAzimuth(float angle);
     }
 }

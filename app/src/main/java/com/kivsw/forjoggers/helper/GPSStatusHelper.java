@@ -5,7 +5,7 @@ import android.location.GpsStatus;
 import android.location.LocationManager;
 
 /**
- * Created by ivan on 6/6/16.
+ *  This class retrieve GPS status (to get all visible satellites)
  */
 public class GPSStatusHelper
         implements GpsStatus.Listener

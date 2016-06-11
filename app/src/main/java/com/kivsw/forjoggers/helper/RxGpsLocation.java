@@ -17,8 +17,8 @@ import rx.subjects.PublishSubject;
 
 
 /**
- * create an observable for GPS
- *
+ * create an RX-observable for GPS.
+ * It helps to get the current location
  */
 public class RxGpsLocation {
 
