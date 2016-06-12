@@ -72,16 +72,8 @@ implements SensorEventListener {
         {
             double lst=angles.peekLast().val;
 
-            if(lst>a)
-            {
-                while((lst-a)>180)
-                    a+=360;
-            }
-            else
-            {
-                while((a-lst)>180)
-                    a-=360;
-            }
+            a= correctAngle(lst,a);
+
         }
         angles.add(DirectionItem.valueOf(a));
 
@@ -92,6 +84,21 @@ implements SensorEventListener {
         // sends an average value
         if(compassDirectionListener!=null)
             compassDirectionListener.onCompassDirection((float) calcAvAngle());
+    }
+
+    static public double correctAngle(double prevAngle, double nextAngle)
+    {
+        if(prevAngle>nextAngle)
+        {
+            while((prevAngle-nextAngle)>180)
+                nextAngle+=360;
+        }
+        else
+        {
+            while((nextAngle-prevAngle)>180)
+                nextAngle-=360;
+        }
+        return nextAngle;
     }
 
     double calcAvAngle()

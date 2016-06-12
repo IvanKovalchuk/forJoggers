@@ -4,11 +4,14 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.location.GpsSatellite;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.app.DialogFragment;
 import android.util.DisplayMetrics;
@@ -24,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.kivsw.forjoggers.R;
+import com.kivsw.forjoggers.helper.CompassHelper;
 import com.kivsw.forjoggers.helper.SettingsKeeper;
 
 import org.achartengine.ChartFactory;
@@ -37,6 +41,7 @@ import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -51,6 +56,7 @@ implements  GpsStatusContract.IView,
     CheckBox compassCheckBox;
     FrameLayout chartLayout;
     LinearLayout rootLayout;
+    MyHandler mHandler;
 
     SettingsKeeper settings;
 
@@ -79,6 +85,7 @@ implements  GpsStatusContract.IView,
 
         presenter = GpsStatusPresenter.getInstance(getContext());
         settings  = SettingsKeeper.getInstance(getContext());
+        mHandler = new MyHandler(this);
 
     }
 
@@ -134,7 +141,7 @@ implements  GpsStatusContract.IView,
     public void onStop() {
         presenter.setUI(null);
         super.onStop();
-        //mHandler.deleteAllMessages();
+        mHandler.deleteAllMessages();
     }
 
     XYSeries radialGrid1, radialGrid2, radialGridX, radialGridY;
@@ -356,9 +363,11 @@ implements  GpsStatusContract.IView,
           case R.id.compassCheckBox:
               settings.setUseCompass(compassCheckBox.isChecked());
               if(compassCheckBox.isChecked()==false)
-                  animateChartRotation(0);
+                  mHandler.setAngleTo(0);
+                  //animateChartRotation(0);
               else
-                  animateChartRotation(lastAzimuth);
+                  mHandler.setAngleTo(lastAzimuth);
+                  //animateChartRotation(lastAzimuth);
               break;
       }
     };
@@ -512,7 +521,7 @@ implements  GpsStatusContract.IView,
        animator.setFloatValues(currentRotation, angle);
 
        animator.start();
-        //mChart.setRotation(angle);
+
     }
 
     @Override
@@ -535,10 +544,89 @@ implements  GpsStatusContract.IView,
         int dspRotation = display.getRotation()*90;
         angle = angle - dspRotation;
 
-        mChart.setRotation(angle);
+        mHandler.setAngleTo(angle);
+        //mChart.setRotation(angle);
 
     }
+    //------------------------------------------------------
+    static class MyHandler extends Handler {
+        final private int UPDATE_AZIMUTH = 1;
+        final private float speed=180.0f/2000; // 180 degree per second
+        double maxStep=1000;
+        WeakReference<GpsStatusFragment> fragment_ref;
+        double targetAngel = 0;
+        long lastTime=SystemClock.elapsedRealtime();
 
+        MyHandler(GpsStatusFragment f) {
+            super();
+            this.fragment_ref=new WeakReference<>(f);
+        }
+
+        public void setAngleTo(double angle)
+        {
+            targetAngel=angle;
+            if(!hasMessages(UPDATE_AZIMUTH)) {
+                scheduleUpdateAzimith();
+                lastTime=SystemClock.elapsedRealtime();
+            }
+        }
+        protected void scheduleUpdateAzimith() {
+            removeMessages(UPDATE_AZIMUTH);
+            int dt=1000/50;
+            sendEmptyMessageDelayed(UPDATE_AZIMUTH, dt );
+            maxStep = speed*dt*3;
+        }
+
+        public void deleteAllMessages() {
+            removeMessages(UPDATE_AZIMUTH);
+        }
+
+
+        void doRotateAnim(GpsStatusFragment fragment)
+        {
+            long currentTime=SystemClock.elapsedRealtime();
+            double currentRot=fragment.mChart.getRotation();
+            double target= CompassHelper.correctAngle(currentRot,targetAngel);
+            long dt = currentTime-lastTime;
+            lastTime=currentTime;
+            double step = dt*speed;
+            if(step > maxStep) step = maxStep;
+            double resRot;
+            if(currentRot<target)
+            {
+                resRot = currentRot+step;
+                if(resRot<target)
+                {
+                    fragment.mChart.setRotation((float)resRot);
+                    scheduleUpdateAzimith();
+                }
+                else
+                    fragment.mChart.setRotation((float)target); // the target angle has been achieved
+            }
+            else
+            {
+                resRot = currentRot-step;
+                if(resRot>target)
+                {
+                    fragment.mChart.setRotation((float)resRot);
+                    scheduleUpdateAzimith();
+                }
+                else
+                    fragment.mChart.setRotation((float)target);// the target angle has been achieved
+            }
+        };
+        public void handleMessage(Message msg) {
+            GpsStatusFragment fragment=fragment_ref.get();
+            if(fragment==null) return;
+
+            switch (msg.what) {
+                case UPDATE_AZIMUTH:
+                    doRotateAnim(fragment);
+                    break;
+            }
+
+        }
+    }
 
 
 
