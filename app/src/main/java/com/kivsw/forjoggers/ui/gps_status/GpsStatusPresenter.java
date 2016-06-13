@@ -74,8 +74,10 @@ public class GpsStatusPresenter
 
         if(event==GpsStatus.GPS_EVENT_STOPPED)
         {
-            view.clearSatellites();
-            view.invalidateSatilletes();
+            if(view!=null) {
+                view.clearSatellites();
+                view.invalidateSatilletes();
+            }
             return;
         };
 
