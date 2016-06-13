@@ -1,7 +1,7 @@
 <html>
 
 <body lang="ru-RU" dir="ltr">
-<pre class="western"><font size="3" style="font-size: 12pt"><b>ForJoggers</b></font>
+<font size="3" style="font-size: 12pt"><b>ForJoggers</b></font>
 
 This application is a GPS tracker for sportsmen.
 It helps you to know:
