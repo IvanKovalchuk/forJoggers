@@ -7,8 +7,8 @@ This application is a GPS tracker for sportsmen.
 It helps you to know:
 - your location and movement
 - your speed
-- hiking, jogging or cycling distance travelled
-- energy you have spent
+- the hiking, jogging or cycling distance you travelled
+- the energy you have spent
 
 Furthermore this application shows GPS status and may be used as a compass if your phone has such a sensor.
 
