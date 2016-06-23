@@ -1,10 +1,15 @@
 package com.kivsw.forjoggers.ui;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -105,6 +110,8 @@ implements  FileDialog.OnCloseListener,
         IPresenter.onCreateActivity(this);
 
         onNewIntent(getIntent());
+
+        checkDozeMode();
     }
 //----------------------------------------------------------
     @Override
@@ -251,6 +258,26 @@ implements  FileDialog.OnCloseListener,
             super.onBackPressed();
         else
             pager.setCurrentItem(1,true);
+    }
+
+    /**
+     * Asks the user to turn off Doze mode for this application
+     */
+    @TargetApi(23)
+    private void checkDozeMode()
+    {
+        if(Build.VERSION.SDK_INT<23) return;
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+
+        String packageName = this.getPackageName();
+        if(pm.isIgnoringBatteryOptimizations(packageName) )
+             return;
+
+        //Intent i=new Intent( Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS );
+        Intent i=new Intent( Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + packageName) );
+
+        startActivity(i);
     }
 
     private void initStrictMode()
