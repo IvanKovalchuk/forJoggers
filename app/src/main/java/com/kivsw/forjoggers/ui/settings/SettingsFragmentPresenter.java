@@ -29,8 +29,9 @@ public class SettingsFragmentPresenter extends BasePresenter {
     @Override
     public void onSettingsChanged() {
         // informs the rest components about new settings
+        DataModel.getInstance(context).onSettingsChanged();
         AnalysingFragmentPresenter.getInstance(context).onSettingsChanged();
         MapFragmentPresenter.getInstance(context).onSettingsChanged();
-        DataModel.getInstance(context).onSettingsChanged();
+
     }
 }

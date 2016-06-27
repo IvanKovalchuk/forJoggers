@@ -29,7 +29,7 @@ public class Track {
     //-----------------------------------------------------
     protected ArrayList<Location> mGeoPoints=null;
     public long timeStart=0, timeStop=0;
-    int activityType;
+    private int activityType;
     IOnChange onChange=null;
 
     //-----------------------------------------------------
@@ -349,6 +349,8 @@ public class Track {
         if(v<0) v=0;
         if(v>2) v=2;
         activityType=v;
+     //   if(onChange!=null) onChange.onAddPoint();
+
     }
 
     public double getСalories(double weight)

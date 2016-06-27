@@ -1,6 +1,7 @@
 package com.kivsw.forjoggers.ui.map;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.location.Location;
@@ -147,6 +148,8 @@ public class MapFragment
 
         myLocationButton = (FloatingActionButton) rootView.findViewById(R.id.myLocationButton);
         myLocationButton.setOnClickListener(this);
+        //myLocationButton.setRippleColor(0x90FFFFFF);
+        myLocationButton.setBackgroundTintList(ColorStateList.valueOf(0x90FFFFFF));
 
         if (savedInstanceState != null) {
 

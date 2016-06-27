@@ -76,6 +76,7 @@
         app:elevation="0dp"
         android:src="@drawable/center_direction_colour"
         android.support.design:backgroundTint="#90FFFFFF"
+
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp" />
 

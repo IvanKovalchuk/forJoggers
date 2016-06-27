@@ -1,6 +1,7 @@
 package com.kivsw.forjoggers.ui.settings;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,6 +14,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -303,8 +305,12 @@ implements CustomPagerView.IonPageAppear
 
     @Override
     public void onPageDisappear() {
-        View focus= getView().findFocus();
-        if(focus!=null) focus.clearFocus(); // clear focus to hide the virtual keyboard
+        View focusView= getView().findFocus();
+        if(focusView!=null) {
+            InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+            focusView.clearFocus();
+        }
         if(isVisible)
            saveData();
         isVisible=false;

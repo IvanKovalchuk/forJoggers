@@ -30,7 +30,8 @@ public abstract class TrackSmoother extends Track
      */
     public boolean needRecalculate(Track newTrack)
     {
-        return newTrack.getGeoPoints().size()!=track.getGeoPoints().size();
+        return (newTrack.getGeoPoints().size()!=track.getGeoPoints().size()) ||
+               (newTrack.getActivityType() != track.getActivityType());
     }
     @Override
     public long getTrackPointsTime()
@@ -50,6 +51,12 @@ public abstract class TrackSmoother extends Track
         if(track==null) return SettingsKeeper.JOGGING;
         return track.getActivityType();
     };
+    @Override
+    public void setActivityType(int v)
+    {
+        if(track==null) return;
+        track.setActivityType(v);
+    }
 
     public abstract void doSmooth();
   /*  @Override

@@ -479,6 +479,8 @@ public class DataModel
      * is invoked by a presenter when the user has changes the settings
      */
     public void onSettingsChanged() {
+        if(trackSmoother!=null)
+            trackSmoother.setActivityType(currentTrack.getActivityType());
 
         // starts or stop background working
         if(settings.getKeepBackGround())
@@ -490,6 +492,7 @@ public class DataModel
             if(!settings.getTTS_engine().equals(speaker.currentEngine)) // if the user has changed TTS-engine
                 speaker.release();
         }
+
 
     }
     /**
