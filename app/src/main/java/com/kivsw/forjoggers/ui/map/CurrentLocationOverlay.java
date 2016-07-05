@@ -13,7 +13,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 public class CurrentLocationOverlay extends MyLocationNewOverlay {
 
     public CurrentLocationOverlay(Context context, MapView mapView) {
-        super(context, new GpsMyLocationProvider(context), mapView);
+        super(/*context, */new GpsMyLocationProvider(context), mapView);
         disableFollowLocation();
         setDrawAccuracyEnabled(true);
     };

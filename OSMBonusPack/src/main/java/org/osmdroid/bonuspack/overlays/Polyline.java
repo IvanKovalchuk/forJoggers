@@ -209,7 +209,8 @@ public class Polyline extends OverlayWithIW {
 	}
 	@Override
 	protected void draw(final Canvas canvas, final MapView mapView, final boolean shadow) {
-		drawOld( canvas, mapView, shadow);
+		//drawOld( canvas, mapView, shadow);
+		drawNew( canvas, mapView, shadow);
 	}
 	protected void drawOld(final Canvas canvas, final MapView mapView, final boolean shadow) {
 

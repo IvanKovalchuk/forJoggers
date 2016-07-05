@@ -27,7 +27,8 @@ import com.kivsw.forjoggers.ui.CustomPagerView;
 import com.kivsw.forjoggers.ui.gps_status.GpsStatusFragment;
 
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.overlays.Polyline;
+//import org.osmdroid.bonuspack.overlays.Polyline;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
