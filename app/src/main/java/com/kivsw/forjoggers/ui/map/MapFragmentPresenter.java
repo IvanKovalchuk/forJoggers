@@ -38,7 +38,7 @@ public class MapFragmentPresenter
     MapFragmentContract.IView mapFragment=null;
     Subscription rxGps=null, rxGpsStateUpdate=null, rxTrackInfoUpdate=null,
                  rxFileNameUpdate=null, rxCurrentTrackUpdate=null, rxTrackSmotherUpdate=null,
-                 rxTrackingUpdate=null;
+                 rxStartStopUpdate =null;
 
 
     final static int  WARNINGS_AND_START_SERVICE_MESSAGE_ID=0;
@@ -74,9 +74,9 @@ public class MapFragmentPresenter
             if(rxTrackSmotherUpdate!=null) rxTrackSmotherUpdate.unsubscribe();
             rxTrackSmotherUpdate=null;
 
-            if(rxTrackingUpdate!=null)
-                rxTrackingUpdate.unsubscribe();
-            rxTrackingUpdate=null;
+            if(rxStartStopUpdate !=null)
+                rxStartStopUpdate.unsubscribe();
+            rxStartStopUpdate =null;
 
             mapFragment = null;
         }
@@ -142,7 +142,7 @@ public class MapFragmentPresenter
                             }
                         });
 
-            rxTrackingUpdate=getDataModel().getStartStopObservable()
+            rxStartStopUpdate =getDataModel().getStartStopObservable()
                     .subscribe(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean isTracking) {

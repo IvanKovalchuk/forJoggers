@@ -64,6 +64,7 @@ public class TrackSmootherByLine extends TrackSmoother {
         mGeoPoints = doSmooth(track.getGeoPoints(), 0,s,  0,s);
     }
 
+
     /**
      *
      * @param original real data to be smoothed
