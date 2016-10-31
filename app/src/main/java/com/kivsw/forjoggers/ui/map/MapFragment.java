@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,19 +29,22 @@ import com.kivsw.forjoggers.ui.CustomPagerView;
 import com.kivsw.forjoggers.ui.gps_status.GpsStatusFragment;
 
 import org.osmdroid.api.IMapController;
-//import org.osmdroid.bonuspack.overlays.Polyline;
-import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.BoundingBoxE6;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
+
+//import org.osmdroid.bonuspack.overlays.Polyline;
 
 
 
@@ -69,6 +74,8 @@ public class MapFragment
     UnitUtils unitUtils = null;
 
     private CurrentLocationOverlay myLocationoverlay;
+    private CompassOverlay mCompassOverlay;
+    private ScaleBarOverlay mScaleBarOverlay;
     MapFragmentContract.IPresenter presenter;
 
 
@@ -97,6 +104,12 @@ public class MapFragment
         //mapView.setTileSource(TileSourceFactory.CYCLEMAP);
         OnlineTileSourceBase tileSource = null;
         tileSource = TileSourceFactory.MAPNIK;//CYCLEMAP;//CLOUDMADESMALLTILES;//MAPQUESTAERIAL;//MAPQUESTOSM;//PUBLIC_TRANSPORT;
+         //tileSource = TileSourceFactory.CLOUDMADESMALLTILES;
+        /*tileSource=new XYTileSource("Mapnik",
+                0, 25, 256, ".png", new String[] {
+                "http://a.tile.openstreetmap.org/",
+                "http://b.tile.openstreetmap.org/",
+                "http://c.tile.openstreetmap.org/" });*/
         mapView.setTileSource(tileSource);
         //mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
@@ -104,6 +117,19 @@ public class MapFragment
         // My Location Overlay
         myLocationoverlay = new CurrentLocationOverlay(getActivity(), mapView);
         mapView.getOverlays().add(myLocationoverlay);
+
+        // Compass overlay
+        mCompassOverlay = new CompassOverlay(getActivity(), new InternalCompassOrientationProvider(getActivity()), mapView);
+        mCompassOverlay.enableCompass();
+        mapView.getOverlays().add(mCompassOverlay);
+
+        // map scale bar
+        mScaleBarOverlay = new ScaleBarOverlay(mapView);
+        mScaleBarOverlay.setCentred(true);
+        //mScaleBarOverlay.setScaleBarOffset(100 / 2, 10); //play around with these values to get the location on screen in the right place for your applicatio
+        mScaleBarOverlay.setAlignBottom(true);
+        //mScaleBarOverlay.setAlignRight(true);
+        mapView.getOverlays().add(this.mScaleBarOverlay);
 
         // path overlay
         originalPath = new Polyline(getActivity());
@@ -163,6 +189,8 @@ public class MapFragment
         else
             stopFollowingMyLocation();
 
+        onSettingsChanged();
+
         return rootView;
     }
 
@@ -197,7 +225,35 @@ public class MapFragment
         super.onStart();
         presenter.setUI(this);
 
+        if(rootView.getWidth()>0)
+            initLayoutPositions();
+        else {
+            ViewTreeObserver vto = rootView.getViewTreeObserver();
+            vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                public void onGlobalLayout() {
+                    // remove the listener so it won't get called again if the view layout changes
+                    if (Build.VERSION.SDK_INT >= 16)
+                        rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    else
+                        rootView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+
+                    initLayoutPositions();
+
+                }
+            });
+
+        }
+
     }
+    private void initLayoutPositions()
+    {
+        final float compassRadius=35;
+        final float Xcenter = unitUtils.pxToDp(satelliteImageView.getLeft()) - compassRadius;
+        final float Ycenter = unitUtils.pxToDp(satelliteImageView.getHeight()/2+satelliteImageView.getTop());
+
+        mCompassOverlay.setCompassCenter(Xcenter, Ycenter);
+    };
+
 
     @Override
     public void onStop() {
@@ -267,7 +323,7 @@ public class MapFragment
         GeoPoint bottomRightGpt = (GeoPoint) mapView.getProjection().fromPixels(
                 mapView.getWidth(), mapView.getHeight());
 
-        BoundingBoxE6 bounding = mapView.getBoundingBox();
+        BoundingBox bounding = mapView.getBoundingBox();
 
         GeoPoint cl = new GeoPoint(myLocationoverlay.getLastFix());
         boolean r = bounding.contains(cl); // whether the current location is visible
@@ -477,6 +533,17 @@ public class MapFragment
 
     public void onSettingsChanged() {
         updateTrackInfo(presenter.getTrackSmoother(), presenter.getCurrentTrack());
+
+        switch(settings.getDistanceUnit())
+        {
+            case SettingsKeeper.METERS:
+            case SettingsKeeper.KILOMETERS:
+                mScaleBarOverlay.setUnitsOfMeasure(ScaleBarOverlay.UnitsOfMeasure.metric);
+                break;
+            case SettingsKeeper.MILES:
+                mScaleBarOverlay.setUnitsOfMeasure(ScaleBarOverlay.UnitsOfMeasure.imperial);
+                break;
+        }
     }
     //----------------------------------------------
     // CustomPagerView.IonPageAppear

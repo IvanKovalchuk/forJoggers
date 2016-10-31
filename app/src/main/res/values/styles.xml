@@ -11,10 +11,15 @@
 
         <item name="android:textColor">#FF000000</item>
         <item name="android:checkboxStyle">@style/customCheckBoxStyle</item>
+        <item name="android:dialogTheme">@style/CustomDialog</item>
     </style>
 
     <style name="customCheckBoxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
         <item name="android:textColor">#FF000000</item>
+    </style>
+
+    <style name="CustomDialog" parent="@style/Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">false</item>
     </style>
 
 </resources>

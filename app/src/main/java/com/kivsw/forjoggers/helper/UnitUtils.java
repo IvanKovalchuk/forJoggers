@@ -1,6 +1,7 @@
 package com.kivsw.forjoggers.helper;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 
 import com.kivsw.forjoggers.R;
 
@@ -149,5 +150,16 @@ public class UnitUtils {
 
         return unit;
 
+    }
+
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        int px = (int)((dp * displayMetrics.density) + 0.5);
+        return px;
+    }
+    public float pxToDp(int px) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dp = (px / displayMetrics.density);
+        return dp;
     }
 }

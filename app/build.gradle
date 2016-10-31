@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    buildToolsVersion '23.0.3'
     defaultConfig {
         applicationId "com.kivsw.forjoggers"
         minSdkVersion 15
@@ -27,11 +27,15 @@ repositories {
         url "https://repository-achartengine.forge.cloudbees.com/snapshot/"
         //compile group: 'org.achartengine', name: 'achartengine', version: '1.2.0'
     }
+    flatDir{
+        dirs 'libs'
+    }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':dialogLib')
+    compile(name:'dialogLib', ext:'aar')
+    compile(name:'achartengine', ext:'aar')
+    //compile project(':dialogLib')
     //compile 'org.osmdroid:osmdroid-android:5.1@aar'
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'com.google.code.gson:gson:2.3'
@@ -45,6 +49,7 @@ dependencies {
     compile 'io.reactivex:rxjava-math:1.0.0'
     compile 'io.reactivex:rxjava:1.1.3'
     //compile project(path: ':OSMBonusPack')
-    compile 'org.achartengine:achartengine:1.2.0'
-    compile 'org.osmdroid:osmdroid-android:5.2'
+    //compile 'org.achartengine:achartengine:1.2.0'
+    //compile 'org.osmdroid:osmdroid-android:5.2'
+    compile 'org.osmdroid:osmdroid-android:5.5:release@aar'
 }

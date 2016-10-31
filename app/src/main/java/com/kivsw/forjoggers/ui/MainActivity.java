@@ -112,7 +112,11 @@ implements  FileDialog.OnCloseListener,
         onNewIntent(getIntent());
 
         checkDozeMode();
+
     }
+
+
+
 //----------------------------------------------------------
     @Override
     protected void onNewIntent(Intent i)
