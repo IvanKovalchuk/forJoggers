@@ -33,6 +33,7 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
@@ -104,15 +105,21 @@ public class MapFragment
         //mapView.setTileSource(TileSourceFactory.CYCLEMAP);
         OnlineTileSourceBase tileSource = null;
         tileSource = TileSourceFactory.MAPNIK;//CYCLEMAP;//CLOUDMADESMALLTILES;//MAPQUESTAERIAL;//MAPQUESTOSM;//PUBLIC_TRANSPORT;
-         //tileSource = TileSourceFactory.CLOUDMADESMALLTILES;
-        /*tileSource=new XYTileSource("Mapnik",
-                0, 25, 256, ".png", new String[] {
+
+        float scale = getContext().getResources().getDisplayMetrics().density/1.5f;
+        if(scale <1) scale=1;
+
+        final int newScale = (int) (256 * scale + 0.5);
+        tileSource=new XYTileSource("Mapnik",
+                0, 18, newScale, ".png", new String[] {
                 "http://a.tile.openstreetmap.org/",
                 "http://b.tile.openstreetmap.org/",
-                "http://c.tile.openstreetmap.org/" });*/
+                "http://c.tile.openstreetmap.org/" });//*/
         mapView.setTileSource(tileSource);
         //mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
+        //mapView.setMaxZoomLevel(19);
+        //mapView.setTilesScaledToDpi(true);
 
         // My Location Overlay
         myLocationoverlay = new CurrentLocationOverlay(getActivity(), mapView);
@@ -124,7 +131,7 @@ public class MapFragment
         mapView.getOverlays().add(mCompassOverlay);
 
         // map scale bar
-        mScaleBarOverlay = new ScaleBarOverlay(mapView);
+        mScaleBarOverlay = new CurrentScaleBarOverlay(mapView,unitUtils);
         mScaleBarOverlay.setCentred(true);
         //mScaleBarOverlay.setScaleBarOffset(100 / 2, 10); //play around with these values to get the location on screen in the right place for your applicatio
         mScaleBarOverlay.setAlignBottom(true);
