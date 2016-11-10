@@ -30,7 +30,7 @@ public class TrackSmootherByPolynom extends TrackSmootherByLine {
     public void doSmooth()
     {
         super.doSmooth();
-        thinOutGeoPoints();
+        //thinOutGeoPoints();
     }
 
 

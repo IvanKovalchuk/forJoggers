@@ -15,9 +15,11 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import com.kivsw.forjoggers.BuildConfig;
 import com.kivsw.forjoggers.R;
 import com.kivsw.forjoggers.helper.UnitUtils;
 import com.kivsw.forjoggers.model.track.Track;
+import com.kivsw.forjoggers.model.track.TrackSmootherByTurnAndPolynom;
 import com.kivsw.forjoggers.ui.CustomPagerView;
 import com.kivsw.forjoggers.ui.MainActivity;
 
@@ -80,8 +82,8 @@ public class AnalysingFragment extends Fragment
         graphSpiner.setOnItemSelectedListener(this);
         graphSpiner.setSelection(2);
 
-        /*if(BuildConfig.DEBUG) graphSpiner.setVisibility(View.VISIBLE);
-        else*/  graphSpiner.setVisibility(View.GONE);
+        if(BuildConfig.DEBUG) graphSpiner.setVisibility(View.VISIBLE);
+        else  graphSpiner.setVisibility(View.GONE);
 
         presenter = AnalysingFragmentPresenter.getInstance(getActivity());
 
@@ -210,10 +212,11 @@ public class AnalysingFragment extends Fragment
             long t0 = curentTrack.getGeoPoints().get(0).getTime();
 
             Location prevLoc=null;
-            double prev=0, add=0, t_i=1;
+            double prevY=0, add=0, t_i=1;
+            int i=-1;
             for(Location loc:curentTrack.getGeoPoints())
             {
-
+                i++;
                 double y=0;
                 switch(num)
                 {
@@ -226,23 +229,34 @@ public class AnalysingFragment extends Fragment
                     case 3: y=loc.getBearing()+add;
                             if(prevLoc!=null)
                             {
-                                double d=y-prev;
+                                double d=y-prevY;
                                 if(d<-180) add+=360;
                                 if(d>180) add-=360;
                                 y=loc.getBearing()+add;
                             }
-                            prev=y;
+
 
                         break;
                     case 4:
+                            if(curentTrack instanceof TrackSmootherByTurnAndPolynom)
+                            {
+                                y=((TrackSmootherByTurnAndPolynom)curentTrack).getTurn(i);
+                            }
+                            else
                             if(prevLoc!=null && prevLoc.hasBearing() && loc.hasBearing())
                                 y=Track.turn(prevLoc.getBearing(),loc.getBearing());
+
+                            double d=y+add-prevY;
+                            if(d<-180) add+=360;
+                            if(d>180) add-=360;
+                            y+=add;
                         break;
                 }
                 t_i=(loc.getTime()-t0);
                //data[i++]=new DataPoint(lastX, y);
                 lineData.add(t_i, y);
                 prevLoc = loc;
+                prevY=y;
             };
 
 

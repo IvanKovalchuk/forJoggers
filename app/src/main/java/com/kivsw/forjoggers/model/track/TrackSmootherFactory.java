@@ -5,7 +5,7 @@ package com.kivsw.forjoggers.model.track;
  */
 public class TrackSmootherFactory {
 
-    final static public int LINEAR=0, SQUARE=1, COMBINED=2;
+    final static public int LINEAR=0, SQUARE=1, SQUARE_TURNS=2;
     static public TrackSmoother getSmoother(int id, Track track)
     {
         switch(id)
@@ -15,7 +15,7 @@ public class TrackSmootherFactory {
             case SQUARE:
                  return new TrackSmootherByPolynom(track);
 
-            case COMBINED: return  new TrackSmootherByCombining(track);
+            case SQUARE_TURNS: return  new TrackSmootherByTurnAndPolynom(track);
         }
 
         return null;

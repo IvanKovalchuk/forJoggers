@@ -21,7 +21,7 @@ public class TrackSmootherByLine extends TrackSmoother {
     {
         super(track);
         //deltaT=20000; deltaDistance=600;
-        deltaT=15000; deltaDistance=40;
+        deltaT=15000*5; deltaDistance=60;
     };
 
     protected void createApproximators()
@@ -70,7 +70,7 @@ public class TrackSmootherByLine extends TrackSmoother {
      * @param original real data to be smoothed
      * @param begin the first available item of real data
      * @param end   the end of real data
-     * @param start the first item to bew smoothed
+     * @param start the first item to be smoothed
      * @param stop  the last+1 item to be smoothed
      * @return an array of smoothed locations from (start) to (stop-1)
      */
@@ -93,7 +93,7 @@ public class TrackSmootherByLine extends TrackSmoother {
             while (avB < i) {
                 Location l = original.get(avB);
                 //if ((l.getTime() > Tmin) && (deltaDistance > loc.distanceTo(l)))
-               if(nearEnough(loc,l))
+               if(nearEnough(i,loc,l))
                     break;
                 avB++;
             };
@@ -102,7 +102,7 @@ public class TrackSmootherByLine extends TrackSmoother {
             while (avE < end) {
                 Location l = original.get(avE);
                 // if ((l.getTime() > Tmax) || (deltaDistance < loc.distanceTo(l)))
-                if(!nearEnough(loc,l))
+                if(!nearEnough(i,loc,l))
                     break;
                 avE++;
             };
@@ -117,13 +117,13 @@ public class TrackSmootherByLine extends TrackSmoother {
 
     };
 
-    boolean nearEnough(Location origin, Location neighbour)
+    boolean nearEnough(int originIndex, Location origin,  Location neighbour)
     {
         long dT=Math.abs(origin.getTime()-neighbour.getTime());
         double dd=origin.distanceTo(neighbour);
 
         // return (dT<=deltaT && dd<=deltaDistance);
-        return ( (0.2*dT/(double)deltaT + dd/deltaDistance) < 1.5);
+        return ( (dT/(double)deltaT + dd/deltaDistance) < 1.5);
 
     }
 
@@ -155,7 +155,7 @@ public class TrackSmootherByLine extends TrackSmoother {
             Location loc=new Location(original.get(ind));
             double time=(original.get(ind).getTime()-t0)/1000.0;
 
-            long deltaT=2;
+            long deltaTime=2;
             double latitude0, longitude0, latitude, longitude;
 
             loc.setLatitude(latApproximator.function(time));
@@ -163,15 +163,15 @@ public class TrackSmootherByLine extends TrackSmoother {
 
             if((ind-b) > (e-ind))
             {
-                latitude0 = latApproximator.function(time - deltaT);
-                longitude0 = lngApproximator.function(time - deltaT);
+                latitude0 = latApproximator.function(time - deltaTime);
+                longitude0 = lngApproximator.function(time - deltaTime);
                 latitude=loc.getLatitude();
                 longitude=loc.getLongitude();
             }
             else
             {
-                latitude = latApproximator.function(time + deltaT);
-                longitude = lngApproximator.function(time + deltaT);
+                latitude = latApproximator.function(time + deltaTime);
+                longitude = lngApproximator.function(time + deltaTime);
                 latitude0=loc.getLatitude();
                 longitude0=loc.getLongitude();
             }
@@ -180,7 +180,7 @@ public class TrackSmootherByLine extends TrackSmoother {
             Location.distanceBetween(latitude0, longitude0, latitude, longitude,distanceAndBearing);
 
             loc.setBearing(distanceAndBearing[1]);
-            loc.setSpeed((float) distanceAndBearing[0]/deltaT);
+            loc.setSpeed((float) distanceAndBearing[0]/deltaTime);
             /*loc.setBearing((float) Track.bearing(latitude, longitude, latitude2, longitude2));
             loc.setSpeed((float)Track.distance(latitude, longitude, latitude2, longitude2)/deltaT);*/
             return loc;

@@ -171,7 +171,8 @@ public class DataModel
             @Override
             public TrackSmoother call(Track track) {
                 TrackSmoother r =TrackSmootherFactory
-                        .getSmoother(TrackSmootherFactory.SQUARE, currentTrack);
+                        .getSmoother(TrackSmootherFactory.SQUARE_TURNS, currentTrack);
+                //.getSmoother(TrackSmootherFactory.SQUARE, currentTrack);
                 isTrackSmoothing=true;
                 return r;
             }
