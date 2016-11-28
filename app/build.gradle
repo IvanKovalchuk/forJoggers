@@ -7,8 +7,8 @@ android {
         applicationId "com.kivsw.forjoggers"
         minSdkVersion 15
         targetSdkVersion 15
-        versionCode 14
-        versionName '2.3.2'
+        versionCode 15
+        versionName '2.4.0'
     }
     buildTypes {
         release {
@@ -33,8 +33,8 @@ repositories {
 }
 
 dependencies {
-    compile(name:'dialogLib', ext:'aar')
-    compile(name:'achartengine', ext:'aar')
+    compile(name: 'dialogLib', ext: 'aar')
+    compile(name: 'achartengine', ext: 'aar')
     //compile project(':dialogLib')
     //compile 'org.osmdroid:osmdroid-android:5.1@aar'
     compile 'org.apache.commons:commons-lang3:3.3.2'
