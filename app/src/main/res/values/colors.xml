@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    -->
+
+    <color name="settings_caption_color">#88000055</color>
+    <color name="settings_caption_font_color">#ffffffff</color>
+    <color name="light_background_color">#66aaaaaa</color>
+    <color name="tab_color">#FF222222</color>
+</resources>

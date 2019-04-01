@@ -43,27 +43,29 @@
         android:layout_marginTop="5dp" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/Start"
-        android:textSize="30dp"
-        android:textColor="#FFFFFFFF"
         android:id="@+id/buttonStart"
-        android:layout_gravity="center_horizontal|bottom"
-        android:background="@drawable/start_btn"
-        android:layout_marginBottom="15dp"
-        android:alpha="0.6" />
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/Stop"
-        android:textSize="30dp"
-        android:textColor="#FFFFFFFF"
-        android:id="@+id/buttonStop"
         android:layout_gravity="center_horizontal|bottom"
-        android:background="@drawable/stop_btn"
         android:layout_marginBottom="15dp"
-        android:alpha="0.6" />
+        android:alpha="0.6"
+        android:background="@drawable/start_btn"
+        android:text="@string/Start"
+        android:textColor="#FFFFFFFF"
+        android:textSize="30dp"/>
+
+    <Button
+        android:id="@+id/buttonStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="15dp"
+        android:alpha="0.6"
+        android:background="@drawable/stop_btn"
+        android:text="@string/Stop"
+
+        android:textColor="#FFFFFFFF"
+        android:textSize="30dp"/>
 
     <android.support.design.widget.FloatingActionButton
         xmlns:app="http://schemas.android.com/apk/res-auto"

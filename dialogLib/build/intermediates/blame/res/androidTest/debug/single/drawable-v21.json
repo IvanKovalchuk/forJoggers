@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/drawable-v21/abc_edit_text_material.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/drawable-v21/abc_edit_text_material.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/drawable-v21/abc_btn_colored_material.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/drawable-v21/abc_btn_colored_material.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/drawable-v21/abc_action_bar_item_background_material.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/drawable-v21/abc_action_bar_item_background_material.xml"
+    }
+]

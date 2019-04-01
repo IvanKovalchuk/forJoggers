@@ -60,7 +60,7 @@ public class SettingsKeeper {
         e.putInt("zoom", zoom);
         e.putLong("latitude", Double.doubleToLongBits(lat));
         e.putLong("longitude", Double.doubleToLongBits(lng));
-        e.commit();
+        e.apply();
     }
 
     //-----------------------------------------------------
@@ -72,7 +72,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putString("FileName", fn);
-        e.commit();
+        e.apply();
     }
     //-----------------------------------------------------
     //-----------------------------------------------------
@@ -84,7 +84,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("ReturnToMyLocation", v);
-        e.commit();
+        e.apply();
     }
     //-----------------------------------------------------
     public  String getLastDirPath()
@@ -95,7 +95,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putString("LastPath", t);
-        e.commit();
+        e.apply();
     }
     //-----------------------------------------------------
     public FlexibleWeight getMyWeight()
@@ -124,7 +124,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putInt("activityType", activityType);
-        e.commit();
+        e.apply();
     }
     //-------------------------------------------------------------
     public static final int METERS=0, KILOMETERS=1, MILES=2;
@@ -136,7 +136,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putInt("distanceUnit", distanceUnit);
-        e.commit();
+        e.apply();
     }
     //-------------------------------------------------------------
     public static final int SECOND=0, MINUTE=1, HOUR=2;
@@ -153,7 +153,7 @@ public class SettingsKeeper {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putInt("timeUnit", timeUnit);
         e.putInt("speedDistanceUnit", distanceUnit);
-        e.commit();
+        e.apply();
     }
     //-------------------------------------------------------------
 
@@ -165,7 +165,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("keepBackground", v);
-        e.commit();
+        e.apply();
     }
     //-----------------------------------------------------
     public  boolean getUseCompass()
@@ -176,7 +176,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("UseCompass", v);
-        e.commit();
+        e.apply();
     }
     //-----------------------------------------------------
     // sets autostop for distance
@@ -188,7 +188,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("IsDistanceAutoStop", v);
-        e.commit();
+        e.apply();
     }
 
     public FlexibleDistance getAutoStopDistance()
@@ -212,7 +212,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("autoStopTime", v);
-        e.commit();
+        e.apply();
     }
     public FlexibleTime getAutoStopTime()
     {
@@ -231,7 +231,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putString("TTSengine", engine);
-        e.commit();
+        e.apply();
     }
     public  String getTTS_engine()
     {
@@ -251,7 +251,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("StartStopSpeaking", v);
-        e.commit();
+        e.apply();
     }
     // sets distance speaking
     public  boolean getIsDistanceSpeaking()
@@ -262,7 +262,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("IsDistanceSpeaking", v);
-        e.commit();
+        e.apply();
     }
 
     public FlexibleDistance getDistanceSpeaking()
@@ -285,7 +285,7 @@ public class SettingsKeeper {
     {
         SharedPreferences.Editor e= sharedPreferences.edit();
         e.putBoolean("IsTimeSpeaking", v);
-        e.commit();
+        e.apply();
     }
     public FlexibleTime getTimeSpeaking()
     {
@@ -318,7 +318,7 @@ public class SettingsKeeper {
 
             e.putLong(name+"Value", value);
             e.putInt(name+"Unit", unit);
-            e.commit();
+            e.apply();
         }
 
         void load(SharedPreferences sharedPreferences,String name)

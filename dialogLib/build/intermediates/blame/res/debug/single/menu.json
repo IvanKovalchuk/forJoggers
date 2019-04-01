@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/debug/menu/filelistcontextmenu.xml",
+        "source": "/mnt/data/data/android/android_dialog_sample/dialogLib/src/main/res/menu/filelistcontextmenu.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/debug/menu/filelistmenu.xml",
+        "source": "/mnt/data/data/android/android_dialog_sample/dialogLib/src/main/res/menu/filelistmenu.xml"
+    }
+]

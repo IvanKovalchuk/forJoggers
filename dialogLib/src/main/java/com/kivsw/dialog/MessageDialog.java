@@ -1,4 +1,4 @@
-/*
+/**
 * Class that shows a messageDialog window
 * 
 *  WARNING!!! it's not desirable to invoke DialogFragment.show(...) from  OnCloseListener's methods
@@ -24,15 +24,7 @@ import com.kivsw.dialoglib.R;
 
 public class MessageDialog extends BaseDialog implements OnClickListener
 {
-	/*public interface OnOkListener
-	{
-		void onClickOk(MessageDialog msg);
-	};	
-	public interface OnCloseListener
-	{
-		void onClickOk(MessageDialog msg);
-		void onClickCancel(MessageDialog msg);
-	};*/
+
 	public interface OnCloseListener  
 	{
 		void onClickOk(MessageDialog msg);
@@ -41,12 +33,18 @@ public class MessageDialog extends BaseDialog implements OnClickListener
 	};
 
 
-	private boolean doDismiss; // allow to dismiss dialog after any button was pressed 
-	Button okBtn= null, cancelBtn= null, extraBtn= null;
-	TextView tv;
-	CheckBox checkBoxDontShowAgain=null;
+	private boolean doDismiss; // allow to dismiss dialog after any button was pressed
+	private Button okBtn= null, cancelBtn= null, extraBtn= null;
+	private TextView tv;
+	private CheckBox checkBoxDontShowAgain=null;
 	//---------------------------------------------------------------------
-	// creates a message dialog, that holds only "ok" button
+
+	/** creates a message dialog, that holds only "ok" button
+	 *
+	 * @param title
+	 * @param msg
+     * @return
+     */
 	public static MessageDialog newInstance(String title, String msg)
 	{
 		//android.R.string.error_message_title;
@@ -54,35 +52,65 @@ public class MessageDialog extends BaseDialog implements OnClickListener
 	}
 
 	//---------------------------------------------------------------------
-	// creates a message dialog instance, that holds "ok" and "cancel" buttons
+
+	/** creates a message dialog instance, that holds "ok" and "cancel" buttons
+	 *
+	 * @param dlgId
+	 * @param title
+	 * @param msg
+	 * @param listener
+     * @return
+     */
 	public static MessageDialog newInstance(int dlgId,String title, String msg, final OnCloseListener listener)
 	{
 		return newInstance(dlgId,title, msg, false, listener, "", "", null);
 	}
-	// creates a message dialog instance, that holds "ok" and "cancel" buttons
+
+	/** creates a message dialog instance, that holds "ok" , "cancel" buttons
+	 *   and may have "don't show again" checkbox
+	 *
+	 * @param dlgId
+	 * @param title
+	 * @param msg
+	 * @param askDontShowAgain set it true if you need "don't show again" checkbox
+	 * @param listener
+     * @return
+     */
 	public static MessageDialog newInstance(int dlgId,String title, String msg, boolean askDontShowAgain, final OnCloseListener listener)
 	{
 		return newInstance(dlgId,title, msg, askDontShowAgain, listener, "", "", null);
 	}
 	//---------------------------------------------------------------------
-	// creates a message dialog instance, that may hold any 3 buttons
-	// okTitle,cancelTitle,exTitle parameters are button's title:
-	//     null value means that a button is invisible
-	//     "" value means that button is visible and has its default title.
-	//     another values entitle appropriate button
+	private final static String MESSAGE_PARAM="MESSAGE_PARAM",
+	                            TITLE_PARAM="TITLE_PARAM",
+	                            DIALOG_ID_PARAM="DIALOG_ID_PARAM",
+	                            DONT_SHOW_AGAIN="DONT_SHOW_AGAIN",
+	                            OK_TITLE_PARAM="OK_TITLE_PARAM",
+	                            CANCEL_BTN_PARAM="CANCEL_BTN_PARAM",
+	                            EXTRA_BTN_PARAM="EXTRA_BTN_PARAM";
+	/** creates a message dialog instance, that may hold all 3 buttons.
+	 *  @param  okTitle,
+	 *  @param  cancelTitle,
+	 *  @param exTitle These parameters are button's title:
+	 *      null value means that a button is invisible
+	 *      "" value means that button is visible and has its default title.
+	 *      another values entitle appropriate button
+	 *
+	 *  @param askDontShowAgain enables "Don't show again" checkBox
+	 */
 	public static MessageDialog newInstance(int dlgId,String title, String msg, boolean askDontShowAgain, OnCloseListener listener, String okTitle, String cancelTitle, String exTitle)
 	{
 		MessageDialog Instance=new MessageDialog();
 		
         Bundle args = new Bundle();
-        args.putString("message",msg);
-        args.putString("title",title);
-        args.putInt("dlgId", dlgId);
-		args.putBoolean("askDontShowAgain",askDontShowAgain);
+        args.putString(MESSAGE_PARAM,msg);
+        args.putString(TITLE_PARAM,title);
+        args.putInt(DIALOG_ID_PARAM, dlgId);
+		args.putBoolean(DONT_SHOW_AGAIN,askDontShowAgain);
         
-        args.putString("okbtn",okTitle);
-        args.putString("cancelbtn",cancelTitle);
-        args.putString("extrabtn",exTitle);
+        args.putString(OK_TITLE_PARAM,okTitle);
+        args.putString(CANCEL_BTN_PARAM,cancelTitle);
+        args.putString(EXTRA_BTN_PARAM,exTitle);
         
        
         Instance.setListener(listener);
@@ -92,8 +120,10 @@ public class MessageDialog extends BaseDialog implements OnClickListener
 
 	}
 	//-------------------------------------------------------------------
-	// prevent dismissing this dialog after any button was pressed
-	// it should be invoked inside of OnCloseListener
+	/** prevent dismissing this dialog after any button was pressed
+	 * it should be invoked inside of OnCloseListener
+	 */
+
 	public void dontDismiss() 
 	{doDismiss=false;}
 	//-------------------------------------------------------------------
@@ -110,11 +140,11 @@ public class MessageDialog extends BaseDialog implements OnClickListener
         extraBtn.setOnClickListener(this);
         
         tv = (TextView)v.findViewById(R.id.dlMessageTextView);
-        tv.setText(Html.fromHtml(getArguments().getString("message")));
+        tv.setText(Html.fromHtml(getArguments().getString(MESSAGE_PARAM)));
     	
-    	String okTitle=getArguments().getString("okbtn");
-    	String cancelTitle=getArguments().getString("cancelbtn");
-    	String extraTitle=getArguments().getString("extrabtn");
+    	String okTitle=getArguments().getString(OK_TITLE_PARAM);
+    	String cancelTitle=getArguments().getString(CANCEL_BTN_PARAM);
+    	String extraTitle=getArguments().getString(EXTRA_BTN_PARAM);
     	
     	if(okTitle!=null)
     	{
@@ -141,17 +171,16 @@ public class MessageDialog extends BaseDialog implements OnClickListener
     	else extraBtn.setVisibility(View.GONE);
 
 		checkBoxDontShowAgain = (CheckBox)v.findViewById(R.id.checkBoxDontShowAgain);
-		if(!getArguments().getBoolean("askDontShowAgain"))
+		if(!getArguments().getBoolean(DONT_SHOW_AGAIN))
 		  checkBoxDontShowAgain.setVisibility(View.GONE);
 		else checkBoxDontShowAgain.setVisibility(View.VISIBLE);
     	
     	AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     	
-    	//builder.setIcon(R.drawable.ic_launcher);
-    	builder.setTitle(getArguments().getString("title"));
+    	builder.setTitle(getArguments().getString(TITLE_PARAM));
     	builder.setView(v);
     	
-    	setDlgId(getArguments().getInt("dlgId"));
+    	setDlgId(getArguments().getInt(DIALOG_ID_PARAM));
     	
     	return builder.create();
 	}
@@ -177,19 +206,7 @@ public class MessageDialog extends BaseDialog implements OnClickListener
 		super.onCancel(dialog);
 		if(getListener()!=null) getListener().onClickCancel(this);
 	}
-	//-------------------------------------------------------------------
-	/*public void onClick(DialogInterface dialog, int id) {
-		
-		if(listener!=null)
-		{
-		  if(id==DialogInterface.BUTTON_POSITIVE) // positive button
-			  listener.onClickOk(this);
-		  else 
-		  if(id==DialogInterface.BUTTON_NEGATIVE) // positive button
-			  listener.onClickCancel(this);
-		}
 
-    }*/
 	//-------------------------------------------------------------------
 	@Override
 	public void onClick(View v) 

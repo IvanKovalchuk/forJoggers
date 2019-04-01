@@ -27,19 +27,16 @@ public class IconSpinnerAdapter extends ArrayAdapter<String> {
     @Override
     public View getDropDownView(int position, View convertView,
                                 ViewGroup parent) {
-// TODO Auto-generated method stub
         return getCustomView(position, convertView, parent);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-// TODO Auto-generated method stub
         return getCustomView(position, convertView, parent);
     }
 
     public View getCustomView(int position, View convertView, ViewGroup parent) {
-// TODO Auto-generated method stub
-//return super.getView(position, convertView, parent);
+
         View row;
         if(convertView!=null)
             row =convertView;

@@ -14,8 +14,8 @@ import android.widget.TextView;
 import com.kivsw.dialoglib.R;
 
 public class StatusDialog extends DialogFragment {
-	
-	TextView text=null, exText=null;
+
+	private TextView text=null, exText=null;
 	//-----------------------------------------------------
 	public static StatusDialog getInstance(String msg)
 	{

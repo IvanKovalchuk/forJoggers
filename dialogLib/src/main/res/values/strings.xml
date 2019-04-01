@@ -8,9 +8,7 @@
     <string name="file">File:</string>
     <string name="path">Path:</string>
     <string name="file_doesnt_exist">File doesn\'t exist</string>
-    <!--  <string name="OK">OK</string>
-      <string name="Cancel">Cancel</string>
-      <string name="I_dont_know">I don\'t know</string> -->
+
     <string name="dont_show_again">don\'t show this message again</string>
     <string name="enter_file_name">Enter a filename</string>
     <string name="Confirmation">Confirmation</string>

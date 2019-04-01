@@ -142,12 +142,11 @@ public class TrackSmootherByTurnAndPolynom extends TrackSmootherByPolynom {
         return bearing;
     }
 
-    double deltaBearing=60;
     boolean nearEnough(int originIndex, Location origin,  Location neighbour)
     {
         long dT=Math.abs(origin.getTime()-neighbour.getTime());
         double dd=origin.distanceTo(neighbour);
-        double scale = Math.abs(getTurn(originIndex)/deltaBearing);
+        double scale = Math.abs(getTurn(originIndex)/60);
         if(scale<1) scale=1;
 
         // return (dT<=deltaT && dd<=deltaDistance);

@@ -1,9 +1,9 @@
-/*
- *  Base class of all the dialog in this library.
+/**
+ *  Base class of all the dialogs
  *   It holds, saves and restore button's listener
- *   this work properly only when the listener is FragmentActivity or Fragment
+ *   that works properly only when the listener is an instance of FragmentActivity or Fragment
  */
- 
+
 package com.kivsw.dialog;
 
 import android.os.Bundle;
@@ -14,8 +14,8 @@ import android.support.v4.app.FragmentActivity;
 public class BaseDialog extends DialogFragment {
 	enum TypeListener {SimpleListener, ActivityListener, FragmentListener };
 	private Object listener=null;
-	TypeListener typeListener=null;
-	int dlgId=0;
+	private TypeListener typeListener=null;
+	private int dlgId=0;
 	//------------------------------------
 	/** @return current listener
 	 */
@@ -79,7 +79,7 @@ public class BaseDialog extends DialogFragment {
 		{
 			dlgId=savedInstanceState.getInt("dlgId",dlgId);
 
-			int i=savedInstanceState.getInt("typeListener",TypeListener.SimpleListener.ordinal());
+			int i=savedInstanceState.getInt("typeListener", TypeListener.SimpleListener.ordinal());
 			typeListener = TypeListener.values()[i];
 			switch(typeListener)
 			{

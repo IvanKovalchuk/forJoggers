@@ -4,28 +4,26 @@
  */
 package com.kivsw.dialog;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-//import java.util.Locale;
-
-
-
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kivsw.dialoglib.R;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+//import java.util.Locale;
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -74,17 +72,17 @@ class FileAdapter extends Object implements ListAdapter
 		return fi;
 	}
 	//-------------------------------------------------------------------------------		
-	ArrayList<DataSetObserver> dataSetObservers;
-	String path;
+	private ArrayList<DataSetObserver> dataSetObservers;
+	private String path;
 
-	boolean isAllowedDir=true, isAllowedFile=true, isAllowedHidden=true; // file type filter
-	ArrayList<Pattern> filters;  // file name filters
-	String usedWildCard="";     
-	
-	
-	
-	ArrayList<FileInfo> fileList=null; // null value means that it's necessary to rebuild fileList 
-	Context context;
+	private boolean isAllowedDir=true, isAllowedFile=true, isAllowedHidden=true; // file type filter
+	private ArrayList<Pattern> filters;  // file name filters
+	private String usedWildCard="";
+
+
+
+	private ArrayList<FileInfo> fileList=null; // null value means that it's necessary to rebuild fileList
+	private Context context;
 	//----------------------------------------
 	/** Creates an entitle of FileAdapter
 	 * @param cnt
@@ -366,45 +364,42 @@ class FileAdapter extends Object implements ListAdapter
 	 *   
 	 */
 	public View getView(int position, View convertView, ViewGroup parent) {
-		
-		View v=convertView;
+
 		String s;
-		
+
+		if(convertView==null)
+		{
+			convertView = View.inflate(context, R.layout.file_item, null);
+		};
+
+		TextView fileName, fileInfo;
+		ImageView image;
+		fileName = (TextView) convertView.findViewById(R.id.textViewFileName);
+    	fileInfo = (TextView) convertView.findViewById(R.id.textViewFileInfo);
+		image = (ImageView) convertView.findViewById(R.id.imageView);
+
 		if(fileList==null) buildFileList();
 		
-		if(v==null && (position>=0)&&(position<getCount()))
+		if((position>=0)&&(position<getCount()))
 		{
-			TextView t;
 			FileInfo fi=fileList.get(position);
-			
-	       	LinearLayout l = new LinearLayout(context);
-	       	l.setOrientation(LinearLayout.HORIZONTAL);
-	       	v=l;
 	       	
 	       	// choose file/dir picture
-	       	ImageView img=new ImageView(context);
 	       	if(fi.isDir)
 	       	{
-	       		if((position==0) && 0==fi.name.compareTo("..")) img.setImageResource(R.drawable.icodirup);
-	       		else img.setImageResource(R.drawable.icodir);
+	       		if((position==0) && 0==fi.name.compareTo("..")) image.setImageResource(R.drawable.icodirup);
+	       		else image.setImageResource(R.drawable.icodir);
 	       	}
 	       	else
-	       	if(fi.isFile)  img.setImageResource(R.drawable.icofile);
-	       	else img.setImageResource(R.drawable.icospecial);
-	       	l.addView(img);
+	       	if(fi.isFile)  image.setImageResource(R.drawable.icofile);
+	       	else image.setImageResource(R.drawable.icospecial);
 	       	
-				// file name
-			t=new TextView(context);
-	       	t.setText(fi.name);
-	       	
-	       	LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(/*LinearLayout.LayoutParams.WRAP_CONTENT*/0, LinearLayout.LayoutParams.WRAP_CONTENT);
-	       	lp.weight = 1;
-	       	l.addView(t,lp);
+			// file name
+			fileName.setText(fi.name);
 	       	
 	       	if(!fi.isDir)
 	       	{
 	         	// the file size
-		       	t=new TextView(context);
 		       	if(fi.size<1024) 
 		       		s=(String.format("%4db ",fi.size));
 		       	else if(fi.size<1024*1024) 
@@ -415,25 +410,24 @@ class FileAdapter extends Object implements ListAdapter
 		       		s=(String.format("%4dG ",fi.size/(1024*1024*1024))); 
 		       	else
 		       		s=(String.format("%4dT ",fi.size/(1024*1024*1024*1024))); 
-	
-		       	t=new TextView(context);
-		       	t.setText(s);
-		       	l.addView(t);
+
+				fileInfo.setText(s);
 	       	}
-	       	
+	       	else
 	       	if(!fi.isDir || !fi.name.equals(".."))
 	       	{
 		       	// date and time when the file was modified 
 		       	s = String.format("%tF\n%tT", fi.Modified, fi.Modified);
 		       	//s = s+String.format("\n%tT\n%tF", fi.Modified, fi.Modified);
-		       	t=new TextView(context);
-		       	t.setText(s);
-		       	t.setGravity(android.view.Gravity.RIGHT);
-		       	l.addView(t);
+				fileInfo.setText(s);
+
+
 	       	}
+			else
+				fileInfo.setText("");
 		}
 		
-		return v;
+		return convertView;
 	}
 
 	//----------------------------------------

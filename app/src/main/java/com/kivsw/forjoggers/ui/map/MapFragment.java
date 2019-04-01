@@ -29,11 +29,11 @@ import com.kivsw.forjoggers.ui.CustomPagerView;
 import com.kivsw.forjoggers.ui.gps_status.GpsStatusFragment;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Polyline;
@@ -106,20 +106,28 @@ public class MapFragment
         OnlineTileSourceBase tileSource = null;
         tileSource = TileSourceFactory.MAPNIK;//CYCLEMAP;//CLOUDMADESMALLTILES;//MAPQUESTAERIAL;//MAPQUESTOSM;//PUBLIC_TRANSPORT;
 
-        float scale = getContext().getResources().getDisplayMetrics().density/1.5f;
+        Configuration.getInstance().setUserAgentValue(getContext().getPackageName());
+
+        /*float scale = getContext().getResources().getDisplayMetrics().density/1.5f;
         if(scale <1) scale=1;
 
         final int newScale = (int) (256 * scale + 0.5);
         tileSource=new XYTileSource("Mapnik",
-                0, 18, newScale, ".png", new String[] {
-                "http://a.tile.openstreetmap.org/",
-                "http://b.tile.openstreetmap.org/",
-                "http://c.tile.openstreetmap.org/" });//*/
+                0, 19, newScale, ".png", new String[] {
+                "https://a.tile.openstreetmap.org/",
+                "https://b.tile.openstreetmap.org/",
+                "https://c.tile.openstreetmap.org/" },"© OpenStreetMap contributors",
+                new TileSourcePolicy(2,
+                        TileSourcePolicy.FLAG_NO_BULK
+                                | TileSourcePolicy.FLAG_NO_PREVENTIVE
+                                | TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL
+                                | TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
+                ));//*/
         mapView.setTileSource(tileSource);
-        //mapView.setBuiltInZoomControls(true);
+        //mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        mapView.setBuiltInZoomControls(false);
         mapView.setMultiTouchControls(true);
-        //mapView.setMaxZoomLevel(19);
-        //mapView.setTilesScaledToDpi(true);
+
 
         // My Location Overlay
         myLocationoverlay = new CurrentLocationOverlay(getActivity(), mapView);
@@ -133,18 +141,16 @@ public class MapFragment
         // map scale bar
         mScaleBarOverlay = new CurrentScaleBarOverlay(mapView,unitUtils);
         mScaleBarOverlay.setCentred(true);
-        //mScaleBarOverlay.setScaleBarOffset(100 / 2, 10); //play around with these values to get the location on screen in the right place for your applicatio
         mScaleBarOverlay.setAlignBottom(true);
-        //mScaleBarOverlay.setAlignRight(true);
         mapView.getOverlays().add(this.mScaleBarOverlay);
 
         // path overlay
-        originalPath = new Polyline(getActivity());
+        originalPath = new Polyline(mapView);
         originalPath.setColor(0xFFFF0000);
         originalPath.setWidth(3f);
         mapView.getOverlays().add(originalPath);
 
-        smoothyPath = new Polyline(getActivity());
+        smoothyPath = new Polyline(mapView);
         smoothyPath.setColor(0x7F7F3030);
         smoothyPath.setWidth(2f);
         mapView.getOverlays().add(smoothyPath);
@@ -219,12 +225,14 @@ public class MapFragment
         super.onResume();
 
         presenter.updateTrackingStatus();
+        mapView.onResume();
 
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mapView.onPause();
     }
 
     @Override
@@ -649,7 +657,7 @@ public void showMessageDialog(int id, String caption, String message)
 
         @Override
         public boolean onZoom(ZoomEvent event) {
-            int zl=event.getZoomLevel();
+            int zl=(int)Math.round(event.getZoomLevel());
             GeoPoint c=mapView.getBoundingBox().getCenter();
             settings.setZoomLevel(zl, c.getLatitude(), c.getLongitude());
             return false;

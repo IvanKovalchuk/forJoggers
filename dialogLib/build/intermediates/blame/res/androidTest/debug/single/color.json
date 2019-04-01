@@ -1,0 +1,46 @@
+[
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_primary_text_material_light.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_primary_text_material_light.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_search_url_text.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_search_url_text.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_secondary_text_material_light.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_secondary_text_material_light.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_primary_text_disable_only_material_light.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_primary_text_disable_only_material_light.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_secondary_text_material_dark.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_secondary_text_material_dark.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_background_cache_hint_selector_material_dark.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_background_cache_hint_selector_material_dark.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_background_cache_hint_selector_material_light.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_background_cache_hint_selector_material_light.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/switch_thumb_material_dark.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/switch_thumb_material_dark.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_primary_text_disable_only_material_dark.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_primary_text_disable_only_material_dark.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/switch_thumb_material_light.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/switch_thumb_material_light.xml"
+    },
+    {
+        "merged": "/mnt/data/data/android/android_dialog_sample/dialogLib/build/intermediates/res/merged/androidTest/debug/color/abc_primary_text_material_dark.xml",
+        "source": "/home/ivan/.android/build-cache/1837b1bc0b231db35b5ff7c24b539aa44f72a70b/output/res/color/abc_primary_text_material_dark.xml"
+    }
+]

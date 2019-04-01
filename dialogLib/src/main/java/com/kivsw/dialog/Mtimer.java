@@ -4,7 +4,7 @@ import android.os.SystemClock;
 
 public class Mtimer {
 
-	long t;
+	private long t;
 	public Mtimer()
 	{
 		storageTime();

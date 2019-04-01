@@ -27,7 +27,7 @@ import java.util.Set;
 public class TouchListener implements  android.view.View.OnTouchListener
 {
 
-	Context context;
+	private Context context;
 	
 	class Pointer // contains initial and final position of the finger
 	{
@@ -38,20 +38,20 @@ public class TouchListener implements  android.view.View.OnTouchListener
 	};
 	
 	protected SparseArray<Pointer> pointers; // active events of touching
-	
-	boolean isGestureEnd=true; // true if the current gesture is finished
+
+	private boolean isGestureEnd=true; // true if the current gesture is finished
 	public enum Gesture {gRotation, gPinch, gHSwipe, gVSwipe, gTap, gLongTap, gDoubleTap}; // all recognized gestures
-	EnumSet<Gesture> gesturesSet =null; // set holds the recognized gestures
-	
-	long previousTapTime=0;            // hold the time of previous Tap event
-	View previousTapedView=null;       // hold view that has been taped
+	private EnumSet<Gesture> gesturesSet =null; // set holds the recognized gestures
+
+	private long previousTapTime=0;            // hold the time of previous Tap event
+	private View previousTapedView=null;       // hold view that has been taped
 	
 	// the thresholds that means the event start
 	double rotateThreshold=15.0/180*Math.PI,  // 15 degree for rotation
 		   zoomingThreshold = 0.10,           // 10% for zooming
 		   swipeThreshold = 0.15;             // 0.15 inch for sweep
-	
-	DisplayMetrics diaplayMetrics = null;     // the display information
+
+	private DisplayMetrics diaplayMetrics = null;     // the display information
 	
 	//-----------------------------------------------------------------------------
 	public TouchListener(Context context)

@@ -8,9 +8,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -29,11 +27,11 @@ implements OnClickListener
 		void onClickOk(InputDialog dlg, String newValue, String initialValue);
 		void onClickCancel(InputDialog dlg);
 	};
-	
-	
-	Button okBtn,cancelBtn;
-	TextView textView;
-	EditText editText;
+
+
+	private Button okBtn,cancelBtn;
+	private TextView textView;
+	private EditText editText;
 
     public static InputDialog newInstance(int dlgId, String title, String msg, String value, int inputType, final OnCloseListener listener)
 	{
@@ -43,16 +41,23 @@ implements OnClickListener
 
 	}
 	//-------------------------------------------------------------
+	private final static String
+			MESSAGE_PARAM="MESSAGE_PARAM",
+			TITLE_PARAM="TITLE_PARAM",
+			DIALOG_ID_PARAM="DIALOG_ID_PARAM",
+	        OLD_VALUE_PARAM="OLD_VALUE_PARAM",
+	        INPUT_TYPE_PARAM="INPUT_TYPE_PARAM";
+
 	protected static void initNewInstance(InputDialog instance, int dlgId, String title, String msg, String value, int inputType, final OnCloseListener listener)
 	{
 		instance.setOnCloseListener(listener);
 		
         Bundle args = new Bundle();
-        args.putString("title",title);
-        args.putString("msg",msg);
-        args.putString("value",value);
-        args.putInt("inputType", inputType);
-        args.putInt("dlgId",dlgId);
+        args.putString(TITLE_PARAM,title);
+        args.putString(MESSAGE_PARAM,msg);
+        args.putString(OLD_VALUE_PARAM,value);
+        args.putInt(INPUT_TYPE_PARAM, inputType);
+        args.putInt(DIALOG_ID_PARAM,dlgId);
         instance.setArguments(args);
 
 
@@ -73,24 +78,24 @@ implements OnClickListener
 
         editText=(EditText)v.findViewById(R.id.dlEditValue);
         
-        editText.setInputType(this.getArguments().getInt("inputType"));
-        editText.setText(this.getArguments().getString("value"));
+        editText.setInputType(this.getArguments().getInt(INPUT_TYPE_PARAM));
+        editText.setText(this.getArguments().getString(OLD_VALUE_PARAM));
 		editText.requestFocus();
-		editText.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0, 0, 0));
-		editText.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0, 0, 0));
+		//editText.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0, 0, 0));
+		//editText.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0, 0, 0));
         //getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
 		textView=(TextView)v.findViewById(R.id.dlInputValTextView);
-		textView.setText(this.getArguments().getString("msg"));
+		textView.setText(this.getArguments().getString(MESSAGE_PARAM));
 
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-    	builder.setTitle(getArguments().getString("title"));
+    	builder.setTitle(getArguments().getString(TITLE_PARAM));
     	builder.setView(v);
     	
-    	setDlgId(getArguments().getInt("dlgId"));
+    	setDlgId(getArguments().getInt(DIALOG_ID_PARAM));
 
         return builder.create();
 	}

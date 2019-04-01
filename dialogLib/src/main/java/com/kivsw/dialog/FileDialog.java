@@ -24,7 +24,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.kivsw.dialoglib.R;
@@ -51,18 +50,17 @@ public class FileDialog extends BaseDialog
 		void onClickCancel(FileDialog dlg);
 	};
 	//-----------------------------------------------------------------
-	TypeDialog td=null;
-	String InitialDir=null, Mask=null;
+	private TypeDialog td=null;
+	private String InitialDir=null, Mask=null;
 	//OnCloseListener onCloseListener=null;
-	Button buttonOk, buttonCancel;
-	EditText editFile;
-	TextView editPath,labelFile;
+	private Button buttonOk, buttonCancel;
+	private EditText editFile;
+	private TextView editPath,labelFile;
 
-	LinearLayout fileNameLayout; 
-	
-	ListView fileList;
-	FileListView fileListView;
-    String resultName;
+	private LinearLayout fileNameLayout;
+
+	private FileListView fileListView;
+	private String resultName;
 	
 	//-----------------------------------------------------------------
     /**
@@ -152,8 +150,8 @@ public class FileDialog extends BaseDialog
 					labelFile.setVisibility( View.GONE);
 	                break;
 			}
-			
-			//setHasOptionsMenu (true);
+
+			getDialog().getWindow().setFeatureInt(Window.FEATURE_NO_TITLE,0);
 			 
 	        return v;
 	    }

@@ -1,8 +1,10 @@
 package com.kivsw.forjoggers.ui;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
@@ -13,8 +15,9 @@ import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,11 +30,15 @@ import com.kivsw.forjoggers.helper.SettingsKeeper;
 import com.kivsw.forjoggers.ui.chart.AnalysingFragment;
 import com.kivsw.forjoggers.ui.map.MapFragment;
 import com.kivsw.forjoggers.ui.settings.SettingsFragment;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
-public class MainActivity extends ActionBarActivity
+
+public class MainActivity extends AppCompatActivity
 implements  FileDialog.OnCloseListener,
             MessageDialog.OnCloseListener,
             View.OnClickListener,
@@ -112,6 +119,7 @@ implements  FileDialog.OnCloseListener,
         onNewIntent(getIntent());
 
         checkDozeMode();
+        askForPermissions();
 
     }
 
@@ -252,6 +260,9 @@ implements  FileDialog.OnCloseListener,
     {
         IPresenter.onStopActivity();
         super.onStop();
+
+        if(permissionDisposable!=null)
+           permissionDisposable.dispose();
 
     }
     //----------------------------------------------------------
@@ -471,6 +482,51 @@ implements  FileDialog.OnCloseListener,
         }
 
     }
+
+    /**
+     * read more: https://github.ru/tbruyelle/RxPermissions
+     */
+    static private String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.INTERNET,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+    };
+
+    private Disposable permissionDisposable=null;
+    protected void askForPermissions() {
+        if(checkPermission(getApplicationContext()))
+            return;
+
+        RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity instance
+
+
+        permissionDisposable = rxPermissions
+                .request(PERMISSIONS)
+                .subscribe(new Consumer<Boolean>() {
+                    public void accept(Boolean granted) {
+                        if (granted){ // Always true pre-M
+                            // All requested permissions are granted
+                        } else{
+                            // Oups permission denied
+                        }
+                    }
+                });
+    }
+
+    protected boolean checkPermission(Context context)
+    {
+        for(int i=0; i< PERMISSIONS.length; i++) {
+            String p=PERMISSIONS[i];
+            if (ContextCompat.checkSelfPermission(context, p) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 
 }
